@@ -1,0 +1,632 @@
+{
+  "schema_version": "1.0.0",
+  "capture_id": "cap_lidar_b",
+  "tier": "lidar",
+  "pipeline_version": "0.1.0-fixture",
+  "generated_at": "2026-09-01T12:00:00Z",
+  "scale": {
+    "source": "lidar_depth",
+    "scale_factor": {
+      "value": 1.0,
+      "ci_95": [
+        0.99,
+        1.01
+      ],
+      "unit": "ratio"
+    },
+    "reference_description": null,
+    "notes": null
+  },
+  "drift_correction": {
+    "enabled": true,
+    "method": "pose_graph",
+    "loop_closures": 1,
+    "residual_closure_error": {
+      "value": 0.028,
+      "ci_95": [
+        0.018000000000000002,
+        0.038
+      ],
+      "unit": "m"
+    },
+    "ablation_footprint_area": {
+      "value": 23.587,
+      "ci_95": [
+        23.233195,
+        23.940805
+      ],
+      "unit": "m2"
+    },
+    "notes": null
+  },
+  "property_totals": {
+    "room_count": 2,
+    "total_floor_area": {
+      "value": 22.53,
+      "ci_95": [
+        22.192050000000002,
+        22.86795
+      ],
+      "unit": "m2"
+    },
+    "footprint_area": {
+      "value": 22.68,
+      "ci_95": [
+        22.3398,
+        23.0202
+      ],
+      "unit": "m2"
+    },
+    "total_wall_area": null,
+    "bounding_box_m": null
+  },
+  "rooms": [
+    {
+      "id": "living_room",
+      "name": "Living Room",
+      "pose": {
+        "x": 0.0,
+        "y": 0.0,
+        "theta_rad": 0.0
+      },
+      "walls": [
+        {
+          "id": "living_room_w0",
+          "start": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "end": {
+            "x": 4.031,
+            "y": 0.0
+          },
+          "length": {
+            "value": 4.031,
+            "ci_95": [
+              4.011,
+              4.050999999999999
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.437,
+            "ci_95": [
+              2.425,
+              2.449
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [
+            "op_lr_window"
+          ],
+          "observation_note": null
+        },
+        {
+          "id": "living_room_w1",
+          "start": {
+            "x": 4.031,
+            "y": 0.0
+          },
+          "end": {
+            "x": 4.031,
+            "y": 2.981
+          },
+          "length": {
+            "value": 2.981,
+            "ci_95": [
+              2.961,
+              3.001
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.437,
+            "ci_95": [
+              2.425,
+              2.449
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [
+            "op_lr_door"
+          ],
+          "observation_note": null
+        },
+        {
+          "id": "living_room_w2",
+          "start": {
+            "x": 4.031,
+            "y": 2.981
+          },
+          "end": {
+            "x": 0.0,
+            "y": 2.981
+          },
+          "length": {
+            "value": 4.018,
+            "ci_95": [
+              3.9979999999999998,
+              4.037999999999999
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.437,
+            "ci_95": [
+              2.425,
+              2.449
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [],
+          "observation_note": null
+        },
+        {
+          "id": "living_room_w3",
+          "start": {
+            "x": 0.0,
+            "y": 2.981
+          },
+          "end": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "length": {
+            "value": 3.021,
+            "ci_95": [
+              3.001,
+              3.041
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.437,
+            "ci_95": [
+              2.425,
+              2.449
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [],
+          "observation_note": null
+        }
+      ],
+      "openings": [
+        {
+          "id": "op_lr_door",
+          "wall_id": "living_room_w1",
+          "type": "door",
+          "width": {
+            "value": 0.822,
+            "ci_95": [
+              0.8069999999999999,
+              0.837
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.03,
+            "ci_95": [
+              2.0149999999999997,
+              2.045
+            ],
+            "unit": "m"
+          },
+          "offset_along_wall": {
+            "value": 0.9,
+            "ci_95": [
+              0.87,
+              0.93
+            ],
+            "unit": "m"
+          },
+          "sill_height": null,
+          "connects_room_id": null,
+          "detection_confidence": 1.0
+        },
+        {
+          "id": "op_lr_window",
+          "wall_id": "living_room_w0",
+          "type": "window",
+          "width": {
+            "value": 1.221,
+            "ci_95": [
+              1.2060000000000002,
+              1.236
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.03,
+            "ci_95": [
+              2.0149999999999997,
+              2.045
+            ],
+            "unit": "m"
+          },
+          "offset_along_wall": {
+            "value": 0.9,
+            "ci_95": [
+              0.87,
+              0.93
+            ],
+            "unit": "m"
+          },
+          "sill_height": null,
+          "connects_room_id": null,
+          "detection_confidence": 1.0
+        }
+      ],
+      "surfaces": [
+        {
+          "id": "living_room_w0_surface",
+          "room_id": "living_room",
+          "kind": "wall",
+          "wall_id": "living_room_w0",
+          "area": {
+            "value": 9.824,
+            "ci_95": [
+              9.676639999999999,
+              9.97136
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "living_room_w1_surface",
+          "room_id": "living_room",
+          "kind": "wall",
+          "wall_id": "living_room_w1",
+          "area": {
+            "value": 7.265,
+            "ci_95": [
+              7.156025,
+              7.373975
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "living_room_w2_surface",
+          "room_id": "living_room",
+          "kind": "wall",
+          "wall_id": "living_room_w2",
+          "area": {
+            "value": 9.792,
+            "ci_95": [
+              9.64512,
+              9.93888
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "living_room_w3_surface",
+          "room_id": "living_room",
+          "kind": "wall",
+          "wall_id": "living_room_w3",
+          "area": {
+            "value": 7.362,
+            "ci_95": [
+              7.25157,
+              7.47243
+            ],
+            "unit": "m2"
+          }
+        }
+      ],
+      "ceiling_height": {
+        "value": 2.437,
+        "ci_95": [
+          2.425,
+          2.449
+        ],
+        "unit": "m"
+      },
+      "floor_area": {
+        "value": 12.02,
+        "ci_95": [
+          11.839699999999999,
+          12.2003
+        ],
+        "unit": "m2"
+      },
+      "perimeter": {
+        "value": 14.051,
+        "ci_95": [
+          13.9456175,
+          14.1563825
+        ],
+        "unit": "m"
+      },
+      "source_frame_count": null
+    },
+    {
+      "id": "bedroom",
+      "name": "Bedroom",
+      "pose": {
+        "x": 4.031,
+        "y": 0.0,
+        "theta_rad": 0.0
+      },
+      "walls": [
+        {
+          "id": "bedroom_w0",
+          "start": {
+            "x": 4.031,
+            "y": 0.0
+          },
+          "end": {
+            "x": 7.53,
+            "y": 0.0
+          },
+          "length": {
+            "value": 3.499,
+            "ci_95": [
+              3.479,
+              3.519
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.449,
+            "ci_95": [
+              2.437,
+              2.461
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [],
+          "observation_note": null
+        },
+        {
+          "id": "bedroom_w1",
+          "start": {
+            "x": 7.53,
+            "y": 0.0
+          },
+          "end": {
+            "x": 7.53,
+            "y": 3.002
+          },
+          "length": {
+            "value": 3.002,
+            "ci_95": [
+              2.9819999999999998,
+              3.022
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.449,
+            "ci_95": [
+              2.437,
+              2.461
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [],
+          "observation_note": null
+        },
+        {
+          "id": "bedroom_w2",
+          "start": {
+            "x": 7.53,
+            "y": 3.002
+          },
+          "end": {
+            "x": 4.031,
+            "y": 3.002
+          },
+          "length": {
+            "value": 3.508,
+            "ci_95": [
+              3.488,
+              3.528
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.449,
+            "ci_95": [
+              2.437,
+              2.461
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [],
+          "observation_note": null
+        },
+        {
+          "id": "bedroom_w3",
+          "start": {
+            "x": 4.031,
+            "y": 3.002
+          },
+          "end": {
+            "x": 4.031,
+            "y": 0.0
+          },
+          "length": {
+            "value": 3.001,
+            "ci_95": [
+              2.981,
+              3.021
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.449,
+            "ci_95": [
+              2.437,
+              2.461
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [
+            "op_bed_door"
+          ],
+          "observation_note": null
+        }
+      ],
+      "openings": [
+        {
+          "id": "op_bed_door",
+          "wall_id": "bedroom_w3",
+          "type": "door",
+          "width": {
+            "value": 0.763,
+            "ci_95": [
+              0.748,
+              0.778
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.03,
+            "ci_95": [
+              2.0149999999999997,
+              2.045
+            ],
+            "unit": "m"
+          },
+          "offset_along_wall": {
+            "value": 0.9,
+            "ci_95": [
+              0.87,
+              0.93
+            ],
+            "unit": "m"
+          },
+          "sill_height": null,
+          "connects_room_id": null,
+          "detection_confidence": 1.0
+        }
+      ],
+      "surfaces": [
+        {
+          "id": "bedroom_w0_surface",
+          "room_id": "bedroom",
+          "kind": "wall",
+          "wall_id": "bedroom_w0",
+          "area": {
+            "value": 8.569,
+            "ci_95": [
+              8.440465000000001,
+              8.697535
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "bedroom_w1_surface",
+          "room_id": "bedroom",
+          "kind": "wall",
+          "wall_id": "bedroom_w1",
+          "area": {
+            "value": 7.352,
+            "ci_95": [
+              7.24172,
+              7.462280000000001
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "bedroom_w2_surface",
+          "room_id": "bedroom",
+          "kind": "wall",
+          "wall_id": "bedroom_w2",
+          "area": {
+            "value": 8.591,
+            "ci_95": [
+              8.462135,
+              8.719864999999999
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "bedroom_w3_surface",
+          "room_id": "bedroom",
+          "kind": "wall",
+          "wall_id": "bedroom_w3",
+          "area": {
+            "value": 7.349,
+            "ci_95": [
+              7.238765,
+              7.4592350000000005
+            ],
+            "unit": "m2"
+          }
+        }
+      ],
+      "ceiling_height": {
+        "value": 2.449,
+        "ci_95": [
+          2.437,
+          2.461
+        ],
+        "unit": "m"
+      },
+      "floor_area": {
+        "value": 10.51,
+        "ci_95": [
+          10.35235,
+          10.66765
+        ],
+        "unit": "m2"
+      },
+      "perimeter": {
+        "value": 13.01,
+        "ci_95": [
+          12.912424999999999,
+          13.107575
+        ],
+        "unit": "m"
+      },
+      "source_frame_count": null
+    }
+  ],
+  "adjacencies": [
+    {
+      "room_a_id": "living_room",
+      "room_b_id": "bedroom",
+      "via_opening_id": "op_lr_door",
+      "shared_wall_ids": [
+        null,
+        null
+      ],
+      "confidence": 0.9
+    }
+  ],
+  "damage": [],
+  "concealed_flags": [],
+  "scope": [],
+  "quality": {
+    "overall_confidence": 0.85,
+    "interval_method": "Fixture: intervals asserted by hand to exercise the calibration row.",
+    "calibration_note": null,
+    "degradations": [],
+    "warnings": [
+      "operator re-walked the living room; two passes merged"
+    ],
+    "coverage": {}
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "capture_id": "demo_photo",
+  "tier": "photo",
+  "space_id": "demo_property",
+  "device": {
+    "model": "iPhone 15",
+    "os_version": "18.5",
+    "has_lidar": false
+  },
+  "captured_at": "2026-09-01T11:20:00+00:00",
+  "operator": "fixture",
+  "declared_rooms": [
+    "living_room",
+    "bedroom"
+  ],
+  "notes": "Photo-tier fixture: 1x1 placeholder images, enough to exercise the reader."
+}

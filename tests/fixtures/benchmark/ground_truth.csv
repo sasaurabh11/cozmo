@@ -1,0 +1,17 @@
+room,element,element_id,dimension,value_m,method,notes
+living_room,wall,living_room_w0,length,4.000,laser,south wall
+living_room,wall,living_room_w1,length,3.000,laser,east wall
+living_room,wall,living_room_w2,length,4.000,laser,north wall
+living_room,wall,living_room_w3,length,3.000,laser,west wall
+living_room,room,living_room,ceiling_height,2.450,laser,
+living_room,room,living_room,floor_area,12.000,derived,w0 x w1
+living_room,opening,op_lr_door,width,0.810,tape,door to bedroom
+living_room,opening,op_lr_window,width,1.200,tape,south window
+bedroom,wall,bedroom_w0,length,3.500,laser,
+bedroom,wall,bedroom_w1,length,3.000,laser,
+bedroom,wall,bedroom_w2,length,3.500,laser,
+bedroom,wall,bedroom_w3,length,3.000,laser,
+bedroom,room,bedroom,ceiling_height,2.450,laser,
+bedroom,room,bedroom,floor_area,10.500,derived,w0 x w1
+bedroom,opening,op_bed_door,width,0.760,tape,door to living room
+,property,property,footprint_area,22.500,derived,sum of room areas
