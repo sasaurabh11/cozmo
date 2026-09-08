@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "capture_id": "cap_photo_a",
   "tier": "photo",
   "pipeline_version": "0.1.0-fixture",
@@ -622,6 +622,7 @@
   "quality": {
     "overall_confidence": 0.83,
     "interval_method": "Fixture: intervals asserted by hand to exercise the calibration row.",
+    "ceiling_method": null,
     "calibration_note": null,
     "degradations": [],
     "warnings": [

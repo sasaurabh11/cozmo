@@ -1,12 +1,14 @@
 """Single-capture orchestrator.
 
-STUB. There is no vision code in this repo yet. :func:`build_stub_plan` emits a
-hardcoded property with plausible numbers so the contract, the CLI and the
-scoreboard can be exercised end to end before any algorithm exists. Every stub
-plan says so in ``quality.warnings`` -- a plan that looks measured but is not
-would poison the benchmark it is meant to validate.
+The LiDAR tier is real: :func:`build_lidar_plan` fuses depth frames, fits the
+floor, extracts a wall polygon, estimates the ceiling, detects openings and
+renders the plan. Photo and video are still stubs -- :func:`build_stub_plan`
+emits a hardcoded property so the contract and the scoreboard stay exercisable
+at those tiers, and every stub plan says so in ``quality.warnings``, because a
+plan that looks measured but is not would poison the benchmark it is meant to
+validate.
 
-What is *not* stubbed, and will not change when the real stages land:
+What is true of every tier:
 
 * seeding happens before anything else and is recorded;
 * the input directory is hashed, so a reported number can always be tied to the
@@ -19,18 +21,27 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 import os
 import platform
 import subprocess
 import sys
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
+
+import numpy as np
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 from .. import PIPELINE_VERSION, SCHEMA_VERSION, __version__
+from ..geometry.fuse import DEFAULT_STRIDE, DEFAULT_VOXEL_M, fuse_capture
+from ..geometry.layout import extract_layout
+from ..geometry.openings import detect_openings, wall_observation_fractions
+from ..geometry.planes import estimate_ceiling, fit_floor
+from ..geometry.render import render_plan
 from ..io.capture import CaptureBundle, load_capture
+from ..io.lidar import LidarCapture
 from ..schema import (
     Adjacency,
     ConcealedFlag,
@@ -57,6 +68,8 @@ from ..schema import (
     Wall,
 )
 from ..seed import DEFAULT_SEED, set_global_seeds
+
+log = logging.getLogger("cozmo.pipeline.run")
 
 PLAN_FILENAME = "plan.json"
 MANIFEST_FILENAME = "run_manifest.json"
@@ -445,6 +458,293 @@ def build_stub_plan(
 
 
 # --------------------------------------------------------------------------
+# LiDAR tier: the real reconstruction
+# --------------------------------------------------------------------------
+
+# Interval placeholders. These are asserted, not calibrated -- the calibration
+# pass comes later and will replace every one of them with a propagated error
+# budget. They are here because a measurement without an interval is not a
+# measurement, and because the benchmark's coverage row needs something to score.
+LIDAR_WALL_ABS_M = 0.02
+LIDAR_WALL_REL = 0.01
+# Openings are found on a 5 cm occupancy grid, so quantisation alone is +-2.5 cm.
+LIDAR_OPENING_ABS_M = 0.05
+LIDAR_AREA_REL = 0.04
+
+
+def _wall_measurement_lidar(length_m: float) -> Measurement:
+    half = LIDAR_WALL_ABS_M + LIDAR_WALL_REL * abs(length_m)
+    return Measurement.symmetric(round(length_m, 4), round(half, 4))
+
+
+def _opening_measurement(value_m: float) -> Measurement:
+    return Measurement.symmetric(round(value_m, 4), LIDAR_OPENING_ABS_M)
+
+
+def build_lidar_plan(
+    bundle: CaptureBundle,
+    drift_correction: bool = True,
+    generated_at: Optional[datetime] = None,
+    stride: int = DEFAULT_STRIDE,
+    voxel_size_m: float = DEFAULT_VOXEL_M,
+    run_ablation: bool = True,
+) -> Tuple[Plan, Dict[str, Any]]:
+    """Reconstruct one room from a LiDAR capture.
+
+    ``drift_correction`` selects the room's own axes (estimated from wall
+    normals) over the capture's world axes. With it off the layout is built in
+    the pose frame exactly as ARKit produced it, which is the "poses used as-is"
+    arm of the drift ablation.
+    """
+    lidar = bundle.payload
+    if not isinstance(lidar, LidarCapture):
+        raise TypeError(f"expected a LiDAR capture, got {type(lidar).__name__}")
+
+    timings: Dict[str, float] = {}
+
+    mark = time.time()
+    fused = fuse_capture(lidar, stride=stride, voxel_size_m=voxel_size_m)
+    timings["fuse_s"] = round(time.time() - mark, 3)
+
+    mark = time.time()
+    floor = fit_floor(fused.points)
+    timings["floor_s"] = round(time.time() - mark, 3)
+
+    mark = time.time()
+    layout = extract_layout(
+        fused.points, floor, fused.trajectory, manhattan_snap=drift_correction
+    )
+    timings["layout_s"] = round(time.time() - mark, 3)
+
+    mark = time.time()
+    ceiling = estimate_ceiling(
+        fused.points, floor,
+        camera_height=fused.camera_height_median,
+        wall_top_heights=layout.wall_top_heights,
+    )
+    timings["ceiling_s"] = round(time.time() - mark, 3)
+
+    mark = time.time()
+    detections = detect_openings(
+        layout.points_uv, layout.points_height, layout.walls, ceiling.height_above_floor_m
+    )
+    observation = wall_observation_fractions(
+        layout.points_uv, layout.points_height, layout.walls, ceiling.height_above_floor_m
+    )
+    timings["openings_s"] = round(time.time() - mark, 3)
+
+    # The drift ablation: the same layout with the correction flipped. Required
+    # by the gate, and cheap -- the cloud is already fused.
+    ablation_area: Optional[float] = None
+    if run_ablation:
+        mark = time.time()
+        try:
+            other = extract_layout(
+                fused.points, floor, fused.trajectory, manhattan_snap=not drift_correction
+            )
+            ablation_area = other.floor_area_m2
+        except ValueError as exc:
+            log.warning("drift ablation failed: %s", exc)
+        timings["ablation_s"] = round(time.time() - mark, 3)
+
+    room_id = (bundle.manifest.declared_rooms or ["room_1"])[0]
+    ceiling_measurement = Measurement(
+        value=round(ceiling.height_above_floor_m, 4),
+        ci_95=(round(ceiling.ci_95[0], 4), round(ceiling.ci_95[1], 4)),
+    )
+
+    walls: List[Wall] = []
+    surfaces: List[Surface] = []
+    openings: List[Opening] = []
+    by_wall: Dict[int, List[Any]] = {}
+    for detection in detections:
+        by_wall.setdefault(detection.wall_index, []).append(detection)
+
+    for index, segment in enumerate(layout.walls):
+        wall_id = f"{room_id}_w{index}"
+        wall_openings = by_wall.get(index, [])
+        opening_ids = []
+        for number, detection in enumerate(wall_openings):
+            opening_id = f"{wall_id}_op{number}"
+            opening_ids.append(opening_id)
+            openings.append(Opening(
+                id=opening_id,
+                wall_id=wall_id,
+                type=OpeningType.DOOR if detection.kind == "door" else OpeningType.WINDOW,
+                width=_opening_measurement(detection.width_m),
+                height=_opening_measurement(detection.height_m),
+                offset_along_wall=_opening_measurement(detection.offset_along_wall_m),
+                sill_height=(
+                    _opening_measurement(detection.sill_height_m)
+                    if detection.kind == "window" else None
+                ),
+                detection_confidence=round(float(detection.confidence), 3),
+            ))
+
+        walls.append(Wall(
+            id=wall_id,
+            start=Point2D(x=round(segment.start[0], 4), y=round(segment.start[1], 4)),
+            end=Point2D(x=round(segment.end[0], 4), y=round(segment.end[1], 4)),
+            length=_wall_measurement_lidar(segment.length_m),
+            height=ceiling_measurement.model_copy(deep=True),
+            opening_ids=opening_ids,
+            observation_note=(
+                f"observed across {observation[index]:.0%} of its length"
+                + (f", to {segment.top_height_m:.2f} m above floor"
+                   if segment.top_height_m is not None else "")
+            ),
+        ))
+        surfaces.append(Surface(
+            id=f"{wall_id}_surface", room_id=room_id, kind=SurfaceKind.WALL, wall_id=wall_id,
+            area=Measurement.relative(
+                round(segment.length_m * ceiling.height_above_floor_m, 4),
+                LIDAR_AREA_REL, Unit.SQUARE_METERS,
+            ),
+        ))
+
+    floor_area = Measurement.relative(round(layout.floor_area_m2, 4), LIDAR_AREA_REL, Unit.SQUARE_METERS)
+    for kind in (SurfaceKind.FLOOR, SurfaceKind.CEILING):
+        surfaces.append(Surface(
+            id=f"{room_id}_{kind.value}", room_id=room_id, kind=kind,
+            area=floor_area.model_copy(deep=True),
+        ))
+
+    room = Room(
+        id=room_id,
+        name=room_id.replace("_", " ").title(),
+        pose=Pose2D(x=0.0, y=0.0, theta_rad=float(layout.frame.rotation_rad)),
+        walls=walls,
+        openings=openings,
+        surfaces=surfaces,
+        ceiling_height=ceiling_measurement,
+        floor_area=floor_area,
+        perimeter=Measurement.symmetric(
+            round(layout.perimeter_m, 4),
+            round(sum(w.length.half_width for w in walls), 4) if walls else 0.05,
+        ),
+        source_frame_count=fused.frames_used,
+    )
+
+    degradations: List[str] = []
+    warnings_out: List[str] = list(bundle.warnings)
+    if not ceiling.measured:
+        degradations.append(f"ceiling not measured ({ceiling.method})")
+    if layout.stats.get("manhattan_score", 1.0) < 0.5:
+        degradations.append(
+            f"weak rectilinear structure (score {layout.stats['manhattan_score']:.2f}); "
+            f"the room may not be rectilinear, or wall normals are noisy"
+        )
+    if fused.stats.get("fraction_above_camera", 1.0) < 0.15:
+        degradations.append(
+            f"only {fused.stats['fraction_above_camera']:.1%} of points above camera height"
+        )
+    poorly_seen = [i for i, f in enumerate(observation) if f < 0.6]
+    if poorly_seen:
+        degradations.append(
+            f"walls {poorly_seen} observed across less than 60% of their length; "
+            f"absence of openings in them is not evidence they are solid"
+        )
+
+    drift = DriftCorrection(
+        enabled=drift_correction,
+        method=DriftMethod.MANHATTAN_SNAP if drift_correction else DriftMethod.NONE_POSES_AS_IS,
+        loop_closures=0,
+        residual_closure_error=(
+            Measurement.symmetric(float(lidar.sanity.get("loop_closure_gap_m") or 0.0), 0.05)
+            if lidar.sanity.get("loop_closure_gap_m") is not None else None
+        ),
+        ablation_footprint_area=(
+            Measurement.relative(round(ablation_area, 4), LIDAR_AREA_REL, Unit.SQUARE_METERS)
+            if ablation_area is not None else None
+        ),
+        notes=(
+            f"Wall normals give the room's own axes ({layout.rotation_deg:.1f} deg off the pose "
+            f"frame) and the layout is built on them. No loop closure: this walk ends "
+            f"{lidar.sanity.get('loop_closure_gap_m')} m from its start, so there is no loop to close."
+            if drift_correction else
+            "Poses used as-is: the layout is built on ARKit's world axes with no correction. "
+            "This is the ablation arm and fails the drift-accountability gate by design."
+        ),
+    )
+
+    plan = Plan(
+        schema_version=SCHEMA_VERSION,
+        capture_id=bundle.capture_id,
+        tier=Tier.LIDAR,
+        pipeline_version=PIPELINE_VERSION,
+        generated_at=generated_at or datetime.now(timezone.utc),
+        scale=ScaleInfo(
+            source=ScaleSource.LIDAR_DEPTH,
+            scale_factor=Measurement(value=1.0, ci_95=(0.995, 1.005), unit=Unit.RATIO),
+            reference_description="sensor-metric depth; no external scale reference used",
+        ),
+        drift_correction=drift,
+        property_totals=PropertyTotals(
+            room_count=1,
+            total_floor_area=floor_area.model_copy(deep=True),
+            footprint_area=floor_area.model_copy(deep=True),
+            total_wall_area=Measurement.relative(
+                round(layout.perimeter_m * ceiling.height_above_floor_m, 4),
+                LIDAR_AREA_REL, Unit.SQUARE_METERS,
+            ),
+            bounding_box_m=(
+                round(float(layout.polygon.bounds[2] - layout.polygon.bounds[0]), 3),
+                round(float(layout.polygon.bounds[3] - layout.polygon.bounds[1]), 3),
+            ),
+        ),
+        rooms=[room],
+        adjacencies=[],
+        damage=[],
+        concealed_flags=[],
+        scope=[],
+        quality=QualityReport(
+            overall_confidence=0.70 if ceiling.measured else 0.55,
+            interval_method=(
+                "Placeholder intervals: wall +-(2 cm + 1% of length), openings +-5 cm (one "
+                "occupancy cell), areas +-4%. The ceiling interval is real -- it comes from "
+                "the ceiling estimator. Calibration against ground truth has not run yet."
+            ),
+            calibration_note="Uncalibrated. Do not read these intervals as verified coverage.",
+            ceiling_method=ceiling.method,
+            degradations=degradations,
+            warnings=warnings_out,
+            coverage={
+                "fraction_above_camera": float(fused.stats.get("fraction_above_camera", 0.0)),
+                "wall_band_points": float(layout.stats.get("wall_band_points", 0)),
+                "mean_wall_observation": round(
+                    float(np.mean(observation)) if observation else 0.0, 4
+                ),
+                "walls_well_observed": float(
+                    sum(1 for f in observation if f >= 0.6)
+                ),
+            },
+        ),
+    )
+
+    details: Dict[str, Any] = {
+        "fusion": fused.summary(),
+        "floor_plane": floor.summary(),
+        "layout": layout.summary(),
+        "ceiling": ceiling.summary(),
+        "wall_observation_fraction": [round(f, 3) for f in observation],
+        "openings": [
+            {
+                "wall_index": d.wall_index, "kind": d.kind,
+                "width_m": round(d.width_m, 3), "height_m": round(d.height_m, 3),
+                "offset_along_wall_m": round(d.offset_along_wall_m, 3),
+                "sill_height_m": round(d.sill_height_m, 3), "confidence": d.confidence,
+                **d.stats,
+            }
+            for d in detections
+        ],
+        "ablation_floor_area_m2": round(ablation_area, 4) if ablation_area is not None else None,
+        "timings_s": timings,
+        "layout_result": layout,     # not serialised; used by the renderer
+    }
+    return plan, details
+
+
+# --------------------------------------------------------------------------
 # Provenance
 # --------------------------------------------------------------------------
 
@@ -542,6 +842,28 @@ class RunResult:
     plan_path: Path
     manifest_path: Path
     manifest: Dict[str, Any]
+    rendered: List[Path] = field(default_factory=list)
+
+
+@dataclass
+class _RenderOpening:
+    """The few fields the renderer needs from a detected opening."""
+
+    wall_index: int
+    kind: str
+    width_m: float
+    offset_along_wall_m: float
+
+
+def _detections_for_render(openings: Sequence[Dict[str, Any]]) -> List[_RenderOpening]:
+    return [
+        _RenderOpening(
+            wall_index=int(o["wall_index"]), kind=str(o["kind"]),
+            width_m=float(o["width_m"]),
+            offset_along_wall_m=float(o.get("offset_along_wall_m", 0.0)),
+        )
+        for o in openings
+    ]
 
 
 def run_capture(
@@ -550,8 +872,10 @@ def run_capture(
     drift_correction: bool = True,
     seed: int = DEFAULT_SEED,
     command: Optional[Sequence[str]] = None,
+    stride: int = DEFAULT_STRIDE,
+    voxel_size_m: float = DEFAULT_VOXEL_M,
 ) -> RunResult:
-    """Run one capture: load, reconstruct (stubbed), write plan + manifest."""
+    """Run one capture: load, reconstruct, write plan, manifest and drawing."""
     started = time.time()
     seed_record = set_global_seeds(seed)
 
@@ -561,7 +885,38 @@ def run_capture(
 
     bundle = load_capture(input_dir)
     input_hash = hash_directory(input_dir)
-    plan = build_stub_plan(bundle, drift_correction=drift_correction, generated_at=_deterministic_now())
+    generated_at = _deterministic_now()
+
+    rendered: List[Path] = []
+    if bundle.tier is Tier.LIDAR:
+        plan, details = build_lidar_plan(
+            bundle,
+            drift_correction=drift_correction,
+            generated_at=generated_at,
+            stride=stride,
+            voxel_size_m=voxel_size_m,
+        )
+        layout = details.pop("layout_result")
+        try:
+            rendered = render_plan(
+                layout.walls,
+                [d for d in _detections_for_render(details["openings"])],
+                out_dir,
+                title=f"{plan.capture_id} - {plan.rooms[0].name}",
+                subtitle=(
+                    f"{plan.rooms[0].floor_area.value:.2f} m2 floor area  |  ceiling "
+                    f"{plan.rooms[0].ceiling_height.value:.2f} m ({plan.quality.ceiling_method})  |  "
+                    f"drift correction {'on' if drift_correction else 'off'}"
+                ),
+                trajectory_uv=layout.frame.project(bundle.payload.trajectory()),
+                rotation_deg=layout.rotation_deg,
+            )
+        except Exception as exc:  # noqa: BLE001 - a failed drawing must not lose the plan
+            log.warning("plan rendering failed: %s", exc)
+        reconstruction: Optional[Dict[str, Any]] = details
+    else:
+        plan = build_stub_plan(bundle, drift_correction=drift_correction, generated_at=generated_at)
+        reconstruction = None
 
     plan_path = out_dir / PLAN_FILENAME
     plan_path.write_text(plan.to_json() + "\n")
@@ -578,7 +933,15 @@ def run_capture(
         "options": {"drift_correction": drift_correction},
         "input": input_hash,
         "capture": bundle.summary(),
-        "outputs": {PLAN_FILENAME: sha256_file(plan_path)},
+        "outputs": {
+            PLAN_FILENAME: sha256_file(plan_path),
+            **{path.name: sha256_file(path) for path in rendered},
+        },
+        "reconstruction": reconstruction,
+        "reconstruction_settings": (
+            {"stride": stride, "voxel_size_m": voxel_size_m}
+            if bundle.tier is Tier.LIDAR else None
+        ),
         "environment": {
             "python": sys.version.split()[0],
             "platform": platform.platform(),
@@ -588,6 +951,9 @@ def run_capture(
         "duration_s": round(time.time() - started, 4),
     }
     manifest_path = out_dir / MANIFEST_FILENAME
-    manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=False) + "\n")
+    manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=False, default=str) + "\n")
 
-    return RunResult(plan=plan, plan_path=plan_path, manifest_path=manifest_path, manifest=manifest)
+    return RunResult(
+        plan=plan, plan_path=plan_path, manifest_path=manifest_path,
+        manifest=manifest, rendered=rendered,
+    )

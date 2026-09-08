@@ -367,6 +367,10 @@ class QualityReport(StrictModel):
 
     overall_confidence: float = Field(ge=0.0, le=1.0)
     interval_method: str
+    # How the ceiling height was arrived at: measured_plane | wall_extrapolation
+    # | scan_cutoff_prior | prior. A capture that never looks up cannot measure a
+    # ceiling, and the plan has to say so rather than quietly returning a number.
+    ceiling_method: Optional[str] = None
     calibration_note: Optional[str] = None
     # Named degradations we detected: mirrors, glass, wet-look floor, low light.
     degradations: List[str] = Field(default_factory=list)

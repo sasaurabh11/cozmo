@@ -21,8 +21,6 @@ from __future__ import annotations
 
 import base64
 import json
-import struct
-import zlib
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Tuple
@@ -328,22 +326,6 @@ TINY_JPEG = base64.b64decode(
 )
 
 
-def _png_gray16(width: int, height: int, value: int) -> bytes:
-    """Minimal 16-bit greyscale PNG -- the shape Stray Scanner writes depth in."""
-    raw = b"".join(b"\x00" + struct.pack(">H", value) * width for _ in range(height))
-
-    def chunk(tag: bytes, data: bytes) -> bytes:
-        return (struct.pack(">I", len(data)) + tag + data
-                + struct.pack(">I", zlib.crc32(tag + data) & 0xFFFFFFFF))
-
-    return (
-        b"\x89PNG\r\n\x1a\n"
-        + chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 16, 0, 0, 0, 0))
-        + chunk(b"IDAT", zlib.compress(raw))
-        + chunk(b"IEND", b"")
-    )
-
-
 def write_photo_capture() -> Path:
     root = CAPTURES / "demo_photo"
     for room, count in (("living_room", 4), ("bedroom", 3)):
@@ -364,52 +346,11 @@ def write_photo_capture() -> Path:
     return root
 
 
-def write_lidar_capture() -> Path:
-    root = CAPTURES / "demo_lidar"
-    (root / "depth").mkdir(parents=True, exist_ok=True)
-    (root / "confidence").mkdir(parents=True, exist_ok=True)
-
-    frames = 6
-    for index in range(frames):
-        (root / "depth" / f"{index:06d}.png").write_bytes(_png_gray16(2, 2, 1800 + index * 5))
-        (root / "confidence" / f"{index:06d}.png").write_bytes(_png_gray16(2, 2, 2))
-
-    (root / "camera_matrix.csv").write_text(
-        "1595.2,0.0,952.4\n0.0,1595.2,714.1\n0.0,0.0,1.0\n"
-    )
-    # A short walk that returns near its start: the last row is 3 cm off the
-    # first, which is the raw drift the correction stage has to answer for.
-    poses = [
-        (0.000, 0, 0.000, 0.000, 0.000),
-        (0.100, 1, 0.480, 0.000, 0.010),
-        (0.200, 2, 0.960, 0.000, 0.480),
-        (0.300, 3, 0.950, 0.005, 0.960),
-        (0.400, 4, 0.470, 0.004, 0.970),
-        (0.500, 5, 0.020, 0.002, 0.022),
-    ]
-    lines = ["timestamp,frame,x,y,z,qx,qy,qz,qw"]
-    lines += [f"{ts},{frame},{x},{y},{z},0.0,0.0,0.0,1.0" for ts, frame, x, y, z in poses]
-    (root / "odometry.csv").write_text("\n".join(lines) + "\n")
-
-    (root / "capture.json").write_text(json.dumps({
-        "capture_id": "demo_lidar",
-        "tier": "lidar",
-        "space_id": "demo_property",
-        "device": {"model": "iPhone 15 Pro", "os_version": "18.5", "has_lidar": True},
-        "captured_at": "2026-09-01T11:40:00+00:00",
-        "operator": "fixture",
-        "declared_rooms": ["living_room", "bedroom"],
-        "notes": "LiDAR-tier fixture in Stray Scanner layout; 6 tiny frames.",
-    }, indent=2) + "\n")
-    return root
-
-
 def main() -> None:
     print("ground truth :", write_ground_truth())
     for path in write_plans():
         print("plan         :", path)
     print("photo capture:", write_photo_capture())
-    print("lidar capture:", write_lidar_capture())
 
 
 if __name__ == "__main__":

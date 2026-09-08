@@ -1,0 +1,10 @@
+room,element,element_id,dimension,value_m,method,notes
+test_room,wall,test_room_w0,length,3.600,synthetic,exact by construction
+test_room,wall,test_room_w1,length,2.800,synthetic,exact by construction
+test_room,wall,test_room_w2,length,3.600,synthetic,exact by construction
+test_room,wall,test_room_w3,length,2.800,synthetic,exact by construction
+test_room,room,test_room,ceiling_height,2.500,synthetic,exact by construction
+test_room,room,test_room,floor_area,10.080,synthetic,w x d
+test_room,opening,test_room_w2_op0,width,0.850,synthetic,doorway cut in the z_min wall
+test_room,opening,test_room_w3_op0,width,1.100,synthetic,window cut in the x_max wall
+,property,property,footprint_area,10.080,synthetic,single room

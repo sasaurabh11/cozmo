@@ -18,8 +18,8 @@ from pydantic import Field, field_validator
 from ..schema import StrictModel, Tier
 from .photo import PhotoCapture, load_photo_capture
 from .photo import summarize as summarize_photo
-from .stray import StrayCapture, load_stray_capture
-from .stray import summarize as summarize_stray
+from .lidar import LidarCapture, load_lidar_capture
+from .lidar import summarize as summarize_lidar
 
 CAPTURE_MANIFEST_NAME = "capture.json"
 VIDEO_SUFFIXES = {".mov", ".mp4", ".m4v"}
@@ -74,7 +74,7 @@ class CaptureBundle:
 
     root: Path
     manifest: CaptureManifest
-    payload: Union[PhotoCapture, VideoCapture, StrayCapture]
+    payload: Union[PhotoCapture, VideoCapture, LidarCapture]
     warnings: List[str]
 
     @property
@@ -99,8 +99,8 @@ class CaptureBundle:
     def summary(self) -> Dict[str, Any]:
         if isinstance(self.payload, PhotoCapture):
             payload = summarize_photo(self.payload)
-        elif isinstance(self.payload, StrayCapture):
-            payload = summarize_stray(self.payload)
+        elif isinstance(self.payload, LidarCapture):
+            payload = summarize_lidar(self.payload)
         else:
             payload = {"video": self.payload.video.name, "size_bytes": self.payload.size_bytes}
         return {
@@ -159,12 +159,12 @@ def load_capture(input_dir: Path) -> CaptureBundle:
     warnings: List[str] = []
 
     if manifest.tier is Tier.PHOTO:
-        payload: Union[PhotoCapture, VideoCapture, StrayCapture] = load_photo_capture(root)
+        payload: Union[PhotoCapture, VideoCapture, LidarCapture] = load_photo_capture(root)
         warnings.extend(payload.warnings())
     elif manifest.tier is Tier.VIDEO:
         payload = _load_video(root, manifest)
     elif manifest.tier is Tier.LIDAR:
-        payload = load_stray_capture(root)
+        payload = load_lidar_capture(root)
         warnings.extend(payload.warnings)
         if not payload.has_depth:
             warnings.append("capture declares the LiDAR tier but carries no depth frames")

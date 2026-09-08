@@ -31,6 +31,19 @@ def set_global_seeds(seed: int = DEFAULT_SEED) -> Dict[str, object]:
         record["seeded"].append("numpy")
 
     try:
+        import open3d as o3d
+    except ImportError:
+        record["unavailable"].append("open3d")
+    else:
+        # Open3D's RANSAC (segment_plane) draws from its own global RNG, not
+        # numpy's. Without this, two runs over the same capture fit slightly
+        # different floor planes and every dimension downstream moves -- which
+        # is precisely the failure the repeatability gate exists to catch, and
+        # it would have been ours rather than the sensor's.
+        o3d.utility.random.seed(seed)
+        record["seeded"].append("open3d")
+
+    try:
         import torch
     except ImportError:
         # torch is optional until a learned model lands in the pipeline.

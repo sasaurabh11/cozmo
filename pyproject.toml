@@ -14,6 +14,15 @@ dependencies = [
     "pydantic>=2.6",
     "typer>=0.12",
     "numpy>=1.24",
+    # Reconstruction. open3d supplies RANSAC plane fitting, normal estimation and
+    # voxel downsampling; opencv and pandas are what the Stray Scanner loader
+    # itself imports.
+    "open3d>=0.18",
+    "opencv-python-headless>=4.9",
+    "pandas>=2.0",
+    "scipy>=1.10",
+    "shapely>=2.0",
+    "matplotlib>=3.7",
 ]
 
 [project.optional-dependencies]

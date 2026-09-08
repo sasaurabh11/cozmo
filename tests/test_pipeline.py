@@ -28,15 +28,25 @@ class TestCaptureDispatch:
         assert bundle.room_names() == ["bedroom", "living_room"]
         assert bundle.summary()["payload"]["image_count"] == 7
 
-    def test_lidar_capture_exposes_poses_and_drift_gap(self, lidar_capture):
+    def test_lidar_capture_exposes_frames_and_intrinsics(self, lidar_capture):
         bundle = load_capture(lidar_capture)
         summary = bundle.summary()["payload"]
-        assert summary["frame_count"] == 6
-        assert summary["depth_frames"] == 6
-        assert summary["loop_closure_gap_m"] == pytest.approx(0.0298, abs=1e-3)
+        assert summary["frame_count"] == 16
+        assert summary["depth_frames"] == 16
+        assert summary["depth_resolution"] == [128, 96]
+        # Intrinsics must come out scaled to the depth stream, not the RGB one.
+        assert summary["depth_intrinsics_fx"] == pytest.approx(92.0, abs=0.5)
 
-    def test_repeat_captures_share_a_space_id(self, photo_capture, lidar_capture):
-        assert load_capture(photo_capture).space_id == load_capture(lidar_capture).space_id
+    def test_ingest_reports_how_much_was_seen_above_camera_height(self, lidar_capture):
+        """The ingest ceiling check is a cheap proxy, and it is only a proxy.
+
+        It counts points above camera height, which tall walls also supply, so a
+        capture with no ceiling can still pass it. The real decision is made in
+        planes.py against the plane itself -- see the ceiling-method tests.
+        """
+        summary = load_capture(lidar_capture).summary()["payload"]
+        assert 0.0 <= summary["fraction_above_camera_height"] <= 1.0
+        assert "ceiling_likely_captured" in summary
 
     def test_missing_capture_json_is_a_clear_error(self, tmp_path):
         (tmp_path / "rooms").mkdir()
@@ -71,9 +81,9 @@ class TestRunOutputs:
         assert any("STUB PIPELINE" in w for w in result.plan.quality.warnings)
         assert json.loads(result.manifest_path.read_text())["stub"] is True
 
-    def test_drift_flag_reaches_the_plan_and_the_ablation(self, lidar_capture, tmp_path):
-        on = run_capture(lidar_capture, tmp_path / "on", drift_correction=True).plan
-        off = run_capture(lidar_capture, tmp_path / "off", drift_correction=False).plan
+    def test_drift_flag_reaches_the_plan_and_the_ablation(self, photo_capture, tmp_path):
+        on = run_capture(photo_capture, tmp_path / "on", drift_correction=True).plan
+        off = run_capture(photo_capture, tmp_path / "off", drift_correction=False).plan
 
         assert on.drift_correction.enabled is True
         assert on.drift_correction.method is DriftMethod.POSE_GRAPH
@@ -93,7 +103,7 @@ class TestDeterminism:
         second = run_capture(photo_capture, tmp_path / "b").plan_path.read_text()
         assert first == second
 
-    def test_same_room_gets_the_same_geometry_across_captures(self, photo_capture, lidar_capture, tmp_path):
+    def test_same_room_gets_the_same_geometry_across_captures(self, photo_capture, tmp_path):
         """Repeatability starts here: identical input, identical output."""
         a = run_capture(photo_capture, tmp_path / "a").plan
         b = run_capture(photo_capture, tmp_path / "b").plan
@@ -104,6 +114,13 @@ class TestDeterminism:
         lidar = run_capture(lidar_capture, tmp_path / "l").plan
         assert photo.rooms[0].walls[0].length.half_width > lidar.rooms[0].walls[0].length.half_width
         assert photo.quality.overall_confidence < lidar.quality.overall_confidence
+
+    def test_same_room_gets_the_same_geometry_across_lidar_runs(self, lidar_capture, tmp_path):
+        """The repeatability gate starts here: identical input, identical walls."""
+        a = run_capture(lidar_capture, tmp_path / "a").plan
+        b = run_capture(lidar_capture, tmp_path / "b").plan
+        assert [round(w.length.value, 6) for w in a.rooms[0].walls] == \
+               [round(w.length.value, 6) for w in b.rooms[0].walls]
 
     def test_seed_record_lists_what_was_seeded(self):
         record = set_global_seeds(1234)
