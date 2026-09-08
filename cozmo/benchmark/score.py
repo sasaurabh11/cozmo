@@ -36,6 +36,11 @@ RESULTS_FILENAME = "results.json"
 
 PASS, FAIL, SKIP = "PASS", "FAIL", "SKIP"
 
+# Binary floating point puts 2.450 - 2.435 at 1.5000000000000013 cm. Without
+# this slack a measurement exactly on a gate would fail it, which is not what
+# "<= 1.5 cm" means to anyone holding a laser measurer.
+EPS = 1e-9
+
 AREA_DIMENSIONS = {"floor_area", "footprint_area"}
 VALID_ELEMENTS = {"wall", "opening", "room", "property"}
 
@@ -74,13 +79,13 @@ class Tolerances:
     footprint_rel: float
 
     def wall_ok(self, error_m: float, truth_m: float) -> bool:
-        return error_m <= max(self.wall_abs_m, self.wall_rel * abs(truth_m))
+        return error_m <= max(self.wall_abs_m, self.wall_rel * abs(truth_m)) + EPS
 
     def ceiling_ok(self, error_m: float, truth_m: float) -> bool:
-        return error_m <= max(self.ceiling_abs_m, self.ceiling_rel * abs(truth_m))
+        return error_m <= max(self.ceiling_abs_m, self.ceiling_rel * abs(truth_m)) + EPS
 
     def opening_ok(self, error_m: float, truth_m: float) -> bool:
-        return error_m <= max(self.opening_abs_m, self.opening_rel * abs(truth_m))
+        return error_m <= max(self.opening_abs_m, self.opening_rel * abs(truth_m)) + EPS
 
 
 # Gates that are tier-independent in the brief.
@@ -306,7 +311,7 @@ def gate_wall_lengths(lp: LoadedPlan, gt: GroundTruth) -> GateResult:
     )
     return GateResult(
         gate="wall_lengths", scope=lp.capture_id, tier=lp.tier.value,
-        status=PASS if fraction >= tol.wall_pass_fraction else FAIL,
+        status=PASS if fraction >= tol.wall_pass_fraction - EPS else FAIL,
         metric=f"{passed}/{len(comparisons)} within tol ({_pct(fraction)}), worst {worst['abs_error_m'] * 100:.1f} cm",
         threshold=threshold, value=round(fraction, 4),
         detail={"worst_wall": worst["wall_id"], "comparisons": comparisons},
@@ -405,7 +410,7 @@ def gate_opening_widths(lp: LoadedPlan, gt: GroundTruth) -> GateResult:
     fraction = hits / denominator
     return GateResult(
         gate="opening_widths", scope=lp.capture_id, tier=lp.tier.value,
-        status=PASS if fraction >= tol.opening_pass_fraction else FAIL,
+        status=PASS if fraction >= tol.opening_pass_fraction - EPS else FAIL,
         metric=(
             f"{hits}/{denominator} ({_pct(fraction)}); "
             f"{len(missed)} missed, {len(phantom)} phantom"
@@ -432,7 +437,7 @@ def gate_footprint(lp: LoadedPlan, gt: GroundTruth) -> GateResult:
     rel = _rel_error(predicted.value, truth_row.value_m) or 0.0
     return GateResult(
         gate="footprint", scope=lp.capture_id, tier=lp.tier.value,
-        status=PASS if rel <= tol.footprint_rel else FAIL,
+        status=PASS if rel <= tol.footprint_rel + EPS else FAIL,
         metric=f"{predicted.value:.2f} m2 vs {truth_row.value_m:.2f} m2 ({_pct(rel)})",
         threshold=f"within +-{_pct(tol.footprint_rel)}",
         value=round(rel, 5),
@@ -496,7 +501,7 @@ def gate_interval_coverage(lp: LoadedPlan, gt: GroundTruth) -> GateResult:
     mean_half_width = sum(c["half_width"] for c in checks) / len(checks)
     return GateResult(
         gate="interval_coverage", scope=lp.capture_id, tier=lp.tier.value,
-        status=PASS if fraction >= INTERVAL_COVERAGE_MIN else FAIL,
+        status=PASS if fraction >= INTERVAL_COVERAGE_MIN - EPS else FAIL,
         metric=f"{covered}/{len(checks)} covered ({_pct(fraction)}), mean +-{mean_half_width * 100:.1f} cm",
         threshold=f">= {_pct(INTERVAL_COVERAGE_MIN)} of 95% intervals",
         value=round(fraction, 4),
@@ -547,7 +552,9 @@ def gate_repeatability(plans: Sequence[LoadedPlan]) -> List[GateResult]:
                         "capture_a": a.capture_id, "capture_b": b.capture_id,
                         "a_m": m_a.value, "b_m": m_b.value,
                         "diff_m": round(diff, 4),
-                        "within_tolerance": diff <= max(REPEATABILITY_ABS_M, REPEATABILITY_REL * reference),
+                        "within_tolerance": diff <= max(
+                            REPEATABILITY_ABS_M, REPEATABILITY_REL * reference
+                        ) + EPS,
                     })
 
         if not comparisons:
@@ -594,7 +601,7 @@ def gate_ceiling_spread(plans: Sequence[LoadedPlan]) -> List[GateResult]:
         spread = max(heights) - min(heights)
         results.append(GateResult(
             gate="ceiling_spread", scope=f"{tier}:{room_id}", tier=tier,
-            status=PASS if spread <= CEILING_SPREAD_MAX_M else FAIL,
+            status=PASS if spread <= CEILING_SPREAD_MAX_M + EPS else FAIL,
             metric=f"spread {spread * 100:.1f} cm across {len(values)} captures",
             threshold=f"<= {CEILING_SPREAD_MAX_M * 100:.0f} cm",
             value=round(spread, 4),

@@ -142,9 +142,13 @@ class Measurement(StrictModel):
 
     def contains(self, truth: float) -> bool:
         """Does the interval cover a ground-truth value? This is the calibration
-        question the benchmark asks of every measurement."""
+        question the benchmark asks of every measurement.
+
+        The 1e-9 slack keeps a truth value sitting exactly on an interval bound
+        from being ruled outside it by binary floating point.
+        """
         lo, hi = self.ci_95
-        return lo <= truth <= hi
+        return (lo - 1e-9) <= truth <= (hi + 1e-9)
 
     @classmethod
     def symmetric(cls, value: float, half_width: float, unit: Unit = Unit.METERS) -> "Measurement":
