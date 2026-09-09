@@ -47,6 +47,14 @@ FLOOR_SEED_BAND_M = 0.08
 
 # A ceiling must clear this height above the floor to be believable at all.
 CEILING_MIN_ABOVE_FLOOR_M = 1.90
+
+# The top of the band an unmeasured ceiling could plausibly sit in. Ordinary
+# residential ceilings run to about 3.4 m -- the benchmark's own flat measures
+# 3.07 m where a capture looked up -- so an interval that stops at 2.99 m (the
+# old prior + 0.55) cannot contain the truth in a building like that. Used only
+# by the scan_cutoff_prior branch, where nothing above the observed wall tops
+# was seen and every height in the band is equally consistent with the data.
+CEILING_PLAUSIBLE_MAX_M = 3.40
 CEILING_DISTANCE_M = 0.04
 # ... and needs this much support, as a fraction of all points, to be trusted.
 CEILING_MIN_SUPPORT_RATIO = 0.02
@@ -364,15 +372,26 @@ def estimate_ceiling(
             )
 
         # Walls stop at inconsistent heights, or too low to be a ceiling. This is
-        # where the scan ended, not where the room does. The only defensible
-        # claim is a lower bound: the ceiling is at least as high as the highest
-        # point actually seen on a wall. The interval runs from that bound to a
-        # structural prior, and the estimate is the prior, not the observation --
-        # reporting 1.7 m here because the operator never looked up would be a
-        # confident answer to a question the capture did not ask.
+        # where the scan ended, not where the room does. The only thing the
+        # capture established is a lower bound: the ceiling is at least as high
+        # as the highest point actually seen on a wall.
+        #
+        # This branch used to anchor both the estimate and the interval's top on
+        # `prior_height_m` (2.44 m), giving an upper bound of prior + 0.55 =
+        # 2.99 m. That is structurally incapable of covering an ordinary 3.0 m
+        # apartment ceiling, and on the benchmark's repeat pair it produced an
+        # interval of [2.05, 2.99] for a flat whose ceiling the paired scan
+        # measured at 3.07 m -- a 95% interval that did not contain the truth.
+        #
+        # With nothing observed above `lower`, every height between that bound
+        # and a plausible maximum is equally consistent with the data. So the
+        # interval spans exactly that band, and the estimate is its midpoint:
+        # the choice that minimises worst-case error when the data cannot
+        # discriminate. The prior is no longer the answer -- it never had any
+        # claim on this building.
         lower = max(highest, CEILING_MIN_ABOVE_FLOOR_M * 0.9)
-        upper = max(prior_height_m + 0.55, lower + 0.35)
-        height = min(max(prior_height_m, lower + 0.05), upper)
+        upper = max(CEILING_PLAUSIBLE_MAX_M, lower + 0.35)
+        height = 0.5 * (lower + upper)
         return CeilingEstimate(
             height_above_floor_m=height,
             ci_95=(lower, upper),
@@ -382,8 +401,10 @@ def estimate_ceiling(
             note=(
                 f"No ceiling plane, and wall tops disagree by {spread:.2f} m "
                 f"(median {consensus:.2f} m, highest {highest:.2f} m): the capture stopped "
-                f"below the ceiling. Reported height is a structural prior bounded below by "
-                f"the highest observed wall point; treat it as an interval, not a measurement."
+                f"below the ceiling. The only measurement here is the lower bound "
+                f"{lower:.2f} m; the reported height is the midpoint of the band between that "
+                f"bound and a plausible maximum ceiling, not an observation. Read the interval, "
+                f"not the value, and sweep the phone upward to turn this into a measurement."
             ),
             stats=stats,
         )

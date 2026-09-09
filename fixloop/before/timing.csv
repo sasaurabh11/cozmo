@@ -1,0 +1,12 @@
+capture,tier,seconds,exit_code
+synthetic_room,lidar,2.8,0
+synthetic_no_ceiling,lidar,2.5,0
+apartment_lidar,lidar,6.8,0
+scan_with_ceiling,lidar,68.8,0
+scan_floor_only,lidar,21.5,0
+demo_office,photo,43.1,0
+saurabh_room,photo,48.4,0
+saurabh_room_photo,photo,90.4,0
+demo_fourroom,photo,140.5,0
+apartment_video,video,107.2,0
+saurabh_room_video,video,233.4,0

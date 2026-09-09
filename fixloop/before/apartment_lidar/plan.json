@@ -3,7 +3,7 @@
   "capture_id": "apartment_lidar_01",
   "tier": "lidar",
   "pipeline_version": "0.4.0-video-calibration",
-  "generated_at": "2026-09-09T17:49:40.491978Z",
+  "generated_at": "2025-09-01T12:00:00Z",
   "scale": {
     "source": "lidar_depth",
     "scale_factor": {

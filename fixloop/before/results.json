@@ -1,6 +1,6 @@
 {
   "scorer_version": "1.0.0",
-  "generated_at": "2026-09-09T18:03:08.465125+00:00",
+  "generated_at": "2026-09-09T18:28:23.667857+00:00",
   "ground_truth": {
     "path": "/Users/saurabh/Documents/Cozmo/tests/fixtures/benchmark/ground_truth_synthetic.csv",
     "sha256": "31ee87819d035f3ca193e2f2dafe2e2d512dfa8bb35bb56334405523fe8cc4cb",
@@ -13,8 +13,8 @@
     {
       "capture_id": "apartment_lidar_01",
       "tier": "lidar",
-      "path": "fixloop/before/apartment_lidar/plan.json",
-      "sha256": "54e221109f65fc648fcb8d4b3f5d56b47775cb831d07961e803b4e6c5ffe1890",
+      "path": "benchmark_runs/apartment_lidar/plan.json",
+      "sha256": "1e8d48883eaa818c16a4efc6e006082822b48a5a87b3305db9d48eb35b80e8a6",
       "pipeline_version": "0.4.0-video-calibration",
       "schema_version": "1.3.0",
       "rooms": [
@@ -22,10 +22,82 @@
       ]
     },
     {
+      "capture_id": "apartment_video_01",
+      "tier": "video",
+      "path": "benchmark_runs/apartment_video/plan.json",
+      "sha256": "2bd297d74ff05d53bb1a5a24b28dd51730c2cedf54c4181fa7368604ca90a20e",
+      "pipeline_version": "0.4.0-video-calibration",
+      "schema_version": "1.3.0",
+      "rooms": [
+        "room_3",
+        "room_4"
+      ]
+    },
+    {
+      "capture_id": "demo_fourroom",
+      "tier": "photo",
+      "path": "benchmark_runs/demo_fourroom/plan.json",
+      "sha256": "e4a223287d28a43650d8935982039df0aa878d0976ac6b7031ba0a0158f286fa",
+      "pipeline_version": "0.4.0-video-calibration",
+      "schema_version": "1.3.0",
+      "rooms": [
+        "living_room",
+        "office_full"
+      ]
+    },
+    {
+      "capture_id": "demo_office_7scenes",
+      "tier": "photo",
+      "path": "benchmark_runs/demo_office/plan.json",
+      "sha256": "34e4a1b25aedf1174562499337ef9fbcda3f201a38256ec6c6e7a4498e79d2e3",
+      "pipeline_version": "0.4.0-video-calibration",
+      "schema_version": "1.3.0",
+      "rooms": [
+        "office"
+      ]
+    },
+    {
+      "capture_id": "living_room_photos_02",
+      "tier": "photo",
+      "path": "benchmark_runs/saurabh_room/plan.json",
+      "sha256": "6d847d30f14450534e63beabfa6c93bbf970e8378851a31961e6a7b86d35ff16",
+      "pipeline_version": "0.4.0-video-calibration",
+      "schema_version": "1.3.0",
+      "rooms": [
+        "living_room"
+      ]
+    },
+    {
+      "capture_id": "living_room_photos_03",
+      "tier": "photo",
+      "path": "benchmark_runs/saurabh_room_photo/plan.json",
+      "sha256": "b87127350cdea1049cfb4e85d22bf855cd26be6d40b1ba0e36474520598b5175",
+      "pipeline_version": "0.4.0-video-calibration",
+      "schema_version": "1.3.0",
+      "rooms": [
+        "bathroom",
+        "corridor",
+        "living_room"
+      ]
+    },
+    {
+      "capture_id": "room_video_01",
+      "tier": "video",
+      "path": "benchmark_runs/saurabh_room_video/plan.json",
+      "sha256": "547f011a1eea781564525c57856976624a3e2d4298b652b2a68c089ee2b21d1f",
+      "pipeline_version": "0.4.0-video-calibration",
+      "schema_version": "1.3.0",
+      "rooms": [
+        "room_1",
+        "room_3",
+        "room_4"
+      ]
+    },
+    {
       "capture_id": "scan_floor_only",
       "tier": "lidar",
-      "path": "fixloop/before/scan_floor_only/plan.json",
-      "sha256": "7e5eb3597b49d85eefc653374ff53054fbd1110337c8488ae6c8edf1629fdcd7",
+      "path": "benchmark_runs/scan_floor_only/plan.json",
+      "sha256": "31632b23f3ef33eb17e976a31117accd3b22d7e1be7a63fa3892bfadc0c896f0",
       "pipeline_version": "0.4.0-video-calibration",
       "schema_version": "1.3.0",
       "rooms": [
@@ -35,8 +107,8 @@
     {
       "capture_id": "scan_with_ceiling",
       "tier": "lidar",
-      "path": "fixloop/before/scan_with_ceiling/plan.json",
-      "sha256": "fb1797064ffc1d4a592cbe8074f9d60a84732dccbe384cde7d9cbf7b363ea98b",
+      "path": "benchmark_runs/scan_with_ceiling/plan.json",
+      "sha256": "d9b90a56a695d3e0d6f5c048f223de76c89c5b2196e0b1e929a0655f8ae299e1",
       "pipeline_version": "0.4.0-video-calibration",
       "schema_version": "1.3.0",
       "rooms": [
@@ -46,8 +118,8 @@
     {
       "capture_id": "synthetic_no_ceiling",
       "tier": "lidar",
-      "path": "fixloop/before/synthetic_no_ceiling/plan.json",
-      "sha256": "c048504f6d3923579fcc2a1b5b7a3756bb7aa7ec9e1945a2a27c6726f5db3f23",
+      "path": "benchmark_runs/synthetic_no_ceiling/plan.json",
+      "sha256": "8584ff989c72eb3443a204503a4cf4c0602a952e3fb7ee6906a2305081ac86fe",
       "pipeline_version": "0.4.0-video-calibration",
       "schema_version": "1.3.0",
       "rooms": [
@@ -57,8 +129,8 @@
     {
       "capture_id": "synthetic_room",
       "tier": "lidar",
-      "path": "fixloop/before/synthetic_room/plan.json",
-      "sha256": "e89bad859c88f5f3a07d5b20737b1a4462626f4f7727ced0919391a2e644945e",
+      "path": "benchmark_runs/synthetic_room/plan.json",
+      "sha256": "7b5bf7173629b7eb98021b6e23fc9e4175bebad1a8df00cd7673b3d240b831cb",
       "pipeline_version": "0.4.0-video-calibration",
       "schema_version": "1.3.0",
       "rooms": [
@@ -67,9 +139,9 @@
     }
   ],
   "summary": {
-    "pass": 16,
-    "fail": 9,
-    "skip": 19
+    "pass": 26,
+    "fail": 23,
+    "skip": 45
   },
   "gates": [
     {
@@ -837,6 +909,598 @@
       }
     },
     {
+      "gate": "wall_lengths",
+      "scope": "demo_fourroom",
+      "tier": "photo",
+      "status": "SKIP",
+      "metric": "no wall ground truth",
+      "threshold": "-",
+      "value": null,
+      "detail": {
+        "reason": "ground truth contains no wall lengths matching this plan's wall ids"
+      }
+    },
+    {
+      "gate": "ceiling_height",
+      "scope": "demo_fourroom",
+      "tier": "photo",
+      "status": "SKIP",
+      "metric": "no ceiling ground truth",
+      "threshold": "-",
+      "value": null,
+      "detail": {
+        "reason": "ground truth contains no ceiling_height rows for this plan's rooms"
+      }
+    },
+    {
+      "gate": "opening_widths",
+      "scope": "demo_fourroom",
+      "tier": "photo",
+      "status": "SKIP",
+      "metric": "no opening ground truth",
+      "threshold": "-",
+      "value": null,
+      "detail": {
+        "reason": "ground truth contains no opening widths for this plan's rooms"
+      }
+    },
+    {
+      "gate": "footprint",
+      "scope": "demo_fourroom",
+      "tier": "photo",
+      "status": "FAIL",
+      "metric": "53.93 m2 vs 10.08 m2 (435.1%)",
+      "threshold": "within +-8.0%",
+      "value": 4.35058,
+      "detail": {
+        "predicted_m2": 53.9338,
+        "truth_m2": 10.08,
+        "interval_covers_truth": false,
+        "drift_correction_enabled": true,
+        "drift_method": "plane_anchored"
+      }
+    },
+    {
+      "gate": "interval_coverage",
+      "scope": "demo_fourroom",
+      "tier": "photo",
+      "status": "FAIL",
+      "metric": "0/1 covered (0.0%), mean +-3247.2 cm",
+      "threshold": ">= 90.0% of 95% intervals",
+      "value": 0.0,
+      "detail": {
+        "checks": [
+          {
+            "kind": "footprint_area",
+            "element_id": "property",
+            "predicted": 53.9338,
+            "truth": 10.08,
+            "half_width": 32.4724,
+            "covered": false
+          }
+        ],
+        "mean_half_width_m": 32.4724
+      }
+    },
+    {
+      "gate": "room_overlap",
+      "scope": "demo_fourroom",
+      "tier": "photo",
+      "status": "PASS",
+      "metric": "no overlap above 0.02 m2 across 2 room(s)",
+      "threshold": "<= 0.02 m2 for every room pair",
+      "value": 0.0,
+      "detail": {
+        "overlapping_pairs": [],
+        "room_count": 2
+      }
+    },
+    {
+      "gate": "adjacency_correctness",
+      "scope": "demo_fourroom",
+      "tier": "photo",
+      "status": "SKIP",
+      "metric": "no adjacency ground truth",
+      "threshold": "-",
+      "value": null,
+      "detail": {
+        "reason": "ground truth contains no element=adjacency rows"
+      }
+    },
+    {
+      "gate": "wall_lengths",
+      "scope": "demo_office_7scenes",
+      "tier": "photo",
+      "status": "SKIP",
+      "metric": "no wall ground truth",
+      "threshold": "-",
+      "value": null,
+      "detail": {
+        "reason": "ground truth contains no wall lengths matching this plan's wall ids"
+      }
+    },
+    {
+      "gate": "ceiling_height",
+      "scope": "demo_office_7scenes",
+      "tier": "photo",
+      "status": "SKIP",
+      "metric": "no ceiling ground truth",
+      "threshold": "-",
+      "value": null,
+      "detail": {
+        "reason": "ground truth contains no ceiling_height rows for this plan's rooms"
+      }
+    },
+    {
+      "gate": "opening_widths",
+      "scope": "demo_office_7scenes",
+      "tier": "photo",
+      "status": "SKIP",
+      "metric": "no opening ground truth",
+      "threshold": "-",
+      "value": null,
+      "detail": {
+        "reason": "ground truth contains no opening widths for this plan's rooms"
+      }
+    },
+    {
+      "gate": "footprint",
+      "scope": "demo_office_7scenes",
+      "tier": "photo",
+      "status": "FAIL",
+      "metric": "17.17 m2 vs 10.08 m2 (70.4%)",
+      "threshold": "within +-8.0%",
+      "value": 0.70356,
+      "detail": {
+        "predicted_m2": 17.1719,
+        "truth_m2": 10.08,
+        "interval_covers_truth": true,
+        "drift_correction_enabled": true,
+        "drift_method": "plane_anchored"
+      }
+    },
+    {
+      "gate": "interval_coverage",
+      "scope": "demo_office_7scenes",
+      "tier": "photo",
+      "status": "PASS",
+      "metric": "1/1 covered (100.0%), mean +-1031.6 cm",
+      "threshold": ">= 90.0% of 95% intervals",
+      "value": 1.0,
+      "detail": {
+        "checks": [
+          {
+            "kind": "footprint_area",
+            "element_id": "property",
+            "predicted": 17.1719,
+            "truth": 10.08,
+            "half_width": 10.316,
+            "covered": true
+          }
+        ],
+        "mean_half_width_m": 10.316
+      }
+    },
+    {
+      "gate": "room_overlap",
+      "scope": "demo_office_7scenes",
+      "tier": "photo",
+      "status": "SKIP",
+      "metric": "single room",
+      "threshold": "-",
+      "value": null,
+      "detail": {
+        "reason": "overlap is only meaningful with more than one room"
+      }
+    },
+    {
+      "gate": "adjacency_correctness",
+      "scope": "demo_office_7scenes",
+      "tier": "photo",
+      "status": "SKIP",
+      "metric": "no adjacency ground truth",
+      "threshold": "-",
+      "value": null,
+      "detail": {
+        "reason": "ground truth contains no element=adjacency rows"
+      }
+    },
+    {
+      "gate": "wall_lengths",
+      "scope": "living_room_photos_02",
+      "tier": "photo",
+      "status": "SKIP",
+      "metric": "no wall ground truth",
+      "threshold": "-",
+      "value": null,
+      "detail": {
+        "reason": "ground truth contains no wall lengths matching this plan's wall ids"
+      }
+    },
+    {
+      "gate": "ceiling_height",
+      "scope": "living_room_photos_02",
+      "tier": "photo",
+      "status": "SKIP",
+      "metric": "no ceiling ground truth",
+      "threshold": "-",
+      "value": null,
+      "detail": {
+        "reason": "ground truth contains no ceiling_height rows for this plan's rooms"
+      }
+    },
+    {
+      "gate": "opening_widths",
+      "scope": "living_room_photos_02",
+      "tier": "photo",
+      "status": "SKIP",
+      "metric": "no opening ground truth",
+      "threshold": "-",
+      "value": null,
+      "detail": {
+        "reason": "ground truth contains no opening widths for this plan's rooms"
+      }
+    },
+    {
+      "gate": "footprint",
+      "scope": "living_room_photos_02",
+      "tier": "photo",
+      "status": "FAIL",
+      "metric": "15.38 m2 vs 10.08 m2 (52.5%)",
+      "threshold": "within +-8.0%",
+      "value": 0.52539,
+      "detail": {
+        "predicted_m2": 15.3759,
+        "truth_m2": 10.08,
+        "interval_covers_truth": true,
+        "drift_correction_enabled": true,
+        "drift_method": "plane_anchored"
+      }
+    },
+    {
+      "gate": "interval_coverage",
+      "scope": "living_room_photos_02",
+      "tier": "photo",
+      "status": "PASS",
+      "metric": "1/1 covered (100.0%), mean +-923.7 cm",
+      "threshold": ">= 90.0% of 95% intervals",
+      "value": 1.0,
+      "detail": {
+        "checks": [
+          {
+            "kind": "footprint_area",
+            "element_id": "property",
+            "predicted": 15.3759,
+            "truth": 10.08,
+            "half_width": 9.2371,
+            "covered": true
+          }
+        ],
+        "mean_half_width_m": 9.2371
+      }
+    },
+    {
+      "gate": "room_overlap",
+      "scope": "living_room_photos_02",
+      "tier": "photo",
+      "status": "SKIP",
+      "metric": "single room",
+      "threshold": "-",
+      "value": null,
+      "detail": {
+        "reason": "overlap is only meaningful with more than one room"
+      }
+    },
+    {
+      "gate": "adjacency_correctness",
+      "scope": "living_room_photos_02",
+      "tier": "photo",
+      "status": "SKIP",
+      "metric": "no adjacency ground truth",
+      "threshold": "-",
+      "value": null,
+      "detail": {
+        "reason": "ground truth contains no element=adjacency rows"
+      }
+    },
+    {
+      "gate": "wall_lengths",
+      "scope": "living_room_photos_03",
+      "tier": "photo",
+      "status": "SKIP",
+      "metric": "no wall ground truth",
+      "threshold": "-",
+      "value": null,
+      "detail": {
+        "reason": "ground truth contains no wall lengths matching this plan's wall ids"
+      }
+    },
+    {
+      "gate": "ceiling_height",
+      "scope": "living_room_photos_03",
+      "tier": "photo",
+      "status": "SKIP",
+      "metric": "no ceiling ground truth",
+      "threshold": "-",
+      "value": null,
+      "detail": {
+        "reason": "ground truth contains no ceiling_height rows for this plan's rooms"
+      }
+    },
+    {
+      "gate": "opening_widths",
+      "scope": "living_room_photos_03",
+      "tier": "photo",
+      "status": "SKIP",
+      "metric": "no opening ground truth",
+      "threshold": "-",
+      "value": null,
+      "detail": {
+        "reason": "ground truth contains no opening widths for this plan's rooms"
+      }
+    },
+    {
+      "gate": "footprint",
+      "scope": "living_room_photos_03",
+      "tier": "photo",
+      "status": "FAIL",
+      "metric": "34.20 m2 vs 10.08 m2 (239.2%)",
+      "threshold": "within +-8.0%",
+      "value": 2.39242,
+      "detail": {
+        "predicted_m2": 34.1956,
+        "truth_m2": 10.08,
+        "interval_covers_truth": false,
+        "drift_correction_enabled": true,
+        "drift_method": "plane_anchored"
+      }
+    },
+    {
+      "gate": "interval_coverage",
+      "scope": "living_room_photos_03",
+      "tier": "photo",
+      "status": "FAIL",
+      "metric": "0/1 covered (0.0%), mean +-2058.8 cm",
+      "threshold": ">= 90.0% of 95% intervals",
+      "value": 0.0,
+      "detail": {
+        "checks": [
+          {
+            "kind": "footprint_area",
+            "element_id": "property",
+            "predicted": 34.1956,
+            "truth": 10.08,
+            "half_width": 20.5885,
+            "covered": false
+          }
+        ],
+        "mean_half_width_m": 20.5885
+      }
+    },
+    {
+      "gate": "room_overlap",
+      "scope": "living_room_photos_03",
+      "tier": "photo",
+      "status": "PASS",
+      "metric": "no overlap above 0.02 m2 across 3 room(s)",
+      "threshold": "<= 0.02 m2 for every room pair",
+      "value": 0.0,
+      "detail": {
+        "overlapping_pairs": [],
+        "room_count": 3
+      }
+    },
+    {
+      "gate": "adjacency_correctness",
+      "scope": "living_room_photos_03",
+      "tier": "photo",
+      "status": "SKIP",
+      "metric": "no adjacency ground truth",
+      "threshold": "-",
+      "value": null,
+      "detail": {
+        "reason": "ground truth contains no element=adjacency rows"
+      }
+    },
+    {
+      "gate": "wall_lengths",
+      "scope": "apartment_video_01",
+      "tier": "video",
+      "status": "SKIP",
+      "metric": "no wall ground truth",
+      "threshold": "-",
+      "value": null,
+      "detail": {
+        "reason": "ground truth contains no wall lengths matching this plan's wall ids"
+      }
+    },
+    {
+      "gate": "ceiling_height",
+      "scope": "apartment_video_01",
+      "tier": "video",
+      "status": "SKIP",
+      "metric": "no ceiling ground truth",
+      "threshold": "-",
+      "value": null,
+      "detail": {
+        "reason": "ground truth contains no ceiling_height rows for this plan's rooms"
+      }
+    },
+    {
+      "gate": "opening_widths",
+      "scope": "apartment_video_01",
+      "tier": "video",
+      "status": "SKIP",
+      "metric": "no opening ground truth",
+      "threshold": "-",
+      "value": null,
+      "detail": {
+        "reason": "ground truth contains no opening widths for this plan's rooms"
+      }
+    },
+    {
+      "gate": "footprint",
+      "scope": "apartment_video_01",
+      "tier": "video",
+      "status": "FAIL",
+      "metric": "28.18 m2 vs 10.08 m2 (179.6%)",
+      "threshold": "within +-3.0%",
+      "value": 1.79591,
+      "detail": {
+        "predicted_m2": 28.1828,
+        "truth_m2": 10.08,
+        "interval_covers_truth": false,
+        "drift_correction_enabled": true,
+        "drift_method": "plane_anchored"
+      }
+    },
+    {
+      "gate": "interval_coverage",
+      "scope": "apartment_video_01",
+      "tier": "video",
+      "status": "FAIL",
+      "metric": "0/1 covered (0.0%), mean +-1696.8 cm",
+      "threshold": ">= 90.0% of 95% intervals",
+      "value": 0.0,
+      "detail": {
+        "checks": [
+          {
+            "kind": "footprint_area",
+            "element_id": "property",
+            "predicted": 28.1828,
+            "truth": 10.08,
+            "half_width": 16.9683,
+            "covered": false
+          }
+        ],
+        "mean_half_width_m": 16.9683
+      }
+    },
+    {
+      "gate": "room_overlap",
+      "scope": "apartment_video_01",
+      "tier": "video",
+      "status": "PASS",
+      "metric": "no overlap above 0.02 m2 across 2 room(s)",
+      "threshold": "<= 0.02 m2 for every room pair",
+      "value": 0.0002,
+      "detail": {
+        "overlapping_pairs": [],
+        "room_count": 2
+      }
+    },
+    {
+      "gate": "adjacency_correctness",
+      "scope": "apartment_video_01",
+      "tier": "video",
+      "status": "SKIP",
+      "metric": "no adjacency ground truth",
+      "threshold": "-",
+      "value": null,
+      "detail": {
+        "reason": "ground truth contains no element=adjacency rows"
+      }
+    },
+    {
+      "gate": "wall_lengths",
+      "scope": "room_video_01",
+      "tier": "video",
+      "status": "SKIP",
+      "metric": "no wall ground truth",
+      "threshold": "-",
+      "value": null,
+      "detail": {
+        "reason": "ground truth contains no wall lengths matching this plan's wall ids"
+      }
+    },
+    {
+      "gate": "ceiling_height",
+      "scope": "room_video_01",
+      "tier": "video",
+      "status": "SKIP",
+      "metric": "no ceiling ground truth",
+      "threshold": "-",
+      "value": null,
+      "detail": {
+        "reason": "ground truth contains no ceiling_height rows for this plan's rooms"
+      }
+    },
+    {
+      "gate": "opening_widths",
+      "scope": "room_video_01",
+      "tier": "video",
+      "status": "SKIP",
+      "metric": "no opening ground truth",
+      "threshold": "-",
+      "value": null,
+      "detail": {
+        "reason": "ground truth contains no opening widths for this plan's rooms"
+      }
+    },
+    {
+      "gate": "footprint",
+      "scope": "room_video_01",
+      "tier": "video",
+      "status": "FAIL",
+      "metric": "24.06 m2 vs 10.08 m2 (138.7%)",
+      "threshold": "within +-3.0%",
+      "value": 1.38673,
+      "detail": {
+        "predicted_m2": 24.0582,
+        "truth_m2": 10.08,
+        "interval_covers_truth": true,
+        "drift_correction_enabled": true,
+        "drift_method": "plane_anchored"
+      }
+    },
+    {
+      "gate": "interval_coverage",
+      "scope": "room_video_01",
+      "tier": "video",
+      "status": "PASS",
+      "metric": "1/1 covered (100.0%), mean +-1448.5 cm",
+      "threshold": ">= 90.0% of 95% intervals",
+      "value": 1.0,
+      "detail": {
+        "checks": [
+          {
+            "kind": "footprint_area",
+            "element_id": "property",
+            "predicted": 24.0582,
+            "truth": 10.08,
+            "half_width": 14.485,
+            "covered": true
+          }
+        ],
+        "mean_half_width_m": 14.485
+      }
+    },
+    {
+      "gate": "room_overlap",
+      "scope": "room_video_01",
+      "tier": "video",
+      "status": "PASS",
+      "metric": "no overlap above 0.02 m2 across 3 room(s)",
+      "threshold": "<= 0.02 m2 for every room pair",
+      "value": 0.0,
+      "detail": {
+        "overlapping_pairs": [],
+        "room_count": 3
+      }
+    },
+    {
+      "gate": "adjacency_correctness",
+      "scope": "room_video_01",
+      "tier": "video",
+      "status": "SKIP",
+      "metric": "no adjacency ground truth",
+      "threshold": "-",
+      "value": null,
+      "detail": {
+        "reason": "ground truth contains no element=adjacency rows"
+      }
+    },
+    {
       "gate": "repeatability",
       "scope": "lidar:room_a",
       "tier": "lidar",
@@ -1250,6 +1914,238 @@
       }
     },
     {
+      "gate": "repeatability",
+      "scope": "photo:living_room",
+      "tier": "photo",
+      "status": "FAIL",
+      "metric": "worst 367.8 cm on living_room_w1, 12 wall pair(s)",
+      "threshold": "<= 1 cm or 0.5% per wall",
+      "value": 3.6779,
+      "detail": {
+        "captures": [
+          "demo_fourroom",
+          "living_room_photos_02",
+          "living_room_photos_03"
+        ],
+        "comparisons": [
+          {
+            "wall_id": "living_room_w0",
+            "capture_a": "demo_fourroom",
+            "capture_b": "living_room_photos_02",
+            "a_m": 5.0421,
+            "b_m": 3.3551,
+            "diff_m": 1.687,
+            "within_tolerance": false
+          },
+          {
+            "wall_id": "living_room_w1",
+            "capture_a": "demo_fourroom",
+            "capture_b": "living_room_photos_02",
+            "a_m": 7.291,
+            "b_m": 4.5828,
+            "diff_m": 2.7082,
+            "within_tolerance": false
+          },
+          {
+            "wall_id": "living_room_w2",
+            "capture_a": "demo_fourroom",
+            "capture_b": "living_room_photos_02",
+            "a_m": 5.0421,
+            "b_m": 3.3551,
+            "diff_m": 1.687,
+            "within_tolerance": false
+          },
+          {
+            "wall_id": "living_room_w3",
+            "capture_a": "demo_fourroom",
+            "capture_b": "living_room_photos_02",
+            "a_m": 7.291,
+            "b_m": 4.5828,
+            "diff_m": 2.7082,
+            "within_tolerance": false
+          },
+          {
+            "wall_id": "living_room_w0",
+            "capture_a": "demo_fourroom",
+            "capture_b": "living_room_photos_03",
+            "a_m": 5.0421,
+            "b_m": 2.8234,
+            "diff_m": 2.2187,
+            "within_tolerance": false
+          },
+          {
+            "wall_id": "living_room_w1",
+            "capture_a": "demo_fourroom",
+            "capture_b": "living_room_photos_03",
+            "a_m": 7.291,
+            "b_m": 3.6131,
+            "diff_m": 3.6779,
+            "within_tolerance": false
+          },
+          {
+            "wall_id": "living_room_w2",
+            "capture_a": "demo_fourroom",
+            "capture_b": "living_room_photos_03",
+            "a_m": 5.0421,
+            "b_m": 2.8234,
+            "diff_m": 2.2187,
+            "within_tolerance": false
+          },
+          {
+            "wall_id": "living_room_w3",
+            "capture_a": "demo_fourroom",
+            "capture_b": "living_room_photos_03",
+            "a_m": 7.291,
+            "b_m": 3.6131,
+            "diff_m": 3.6779,
+            "within_tolerance": false
+          },
+          {
+            "wall_id": "living_room_w0",
+            "capture_a": "living_room_photos_02",
+            "capture_b": "living_room_photos_03",
+            "a_m": 3.3551,
+            "b_m": 2.8234,
+            "diff_m": 0.5317,
+            "within_tolerance": false
+          },
+          {
+            "wall_id": "living_room_w1",
+            "capture_a": "living_room_photos_02",
+            "capture_b": "living_room_photos_03",
+            "a_m": 4.5828,
+            "b_m": 3.6131,
+            "diff_m": 0.9697,
+            "within_tolerance": false
+          },
+          {
+            "wall_id": "living_room_w2",
+            "capture_a": "living_room_photos_02",
+            "capture_b": "living_room_photos_03",
+            "a_m": 3.3551,
+            "b_m": 2.8234,
+            "diff_m": 0.5317,
+            "within_tolerance": false
+          },
+          {
+            "wall_id": "living_room_w3",
+            "capture_a": "living_room_photos_02",
+            "capture_b": "living_room_photos_03",
+            "a_m": 4.5828,
+            "b_m": 3.6131,
+            "diff_m": 0.9697,
+            "within_tolerance": false
+          }
+        ]
+      }
+    },
+    {
+      "gate": "repeatability",
+      "scope": "video:room_3",
+      "tier": "video",
+      "status": "FAIL",
+      "metric": "worst 154.7 cm on room_3_w0, 4 wall pair(s)",
+      "threshold": "<= 1 cm or 0.5% per wall",
+      "value": 1.5468,
+      "detail": {
+        "captures": [
+          "apartment_video_01",
+          "room_video_01"
+        ],
+        "comparisons": [
+          {
+            "wall_id": "room_3_w0",
+            "capture_a": "apartment_video_01",
+            "capture_b": "room_video_01",
+            "a_m": 2.6796,
+            "b_m": 4.2264,
+            "diff_m": 1.5468,
+            "within_tolerance": false
+          },
+          {
+            "wall_id": "room_3_w1",
+            "capture_a": "apartment_video_01",
+            "capture_b": "room_video_01",
+            "a_m": 1.7318,
+            "b_m": 2.3642,
+            "diff_m": 0.6324,
+            "within_tolerance": false
+          },
+          {
+            "wall_id": "room_3_w2",
+            "capture_a": "apartment_video_01",
+            "capture_b": "room_video_01",
+            "a_m": 2.6796,
+            "b_m": 4.2264,
+            "diff_m": 1.5468,
+            "within_tolerance": false
+          },
+          {
+            "wall_id": "room_3_w3",
+            "capture_a": "apartment_video_01",
+            "capture_b": "room_video_01",
+            "a_m": 1.7318,
+            "b_m": 2.3642,
+            "diff_m": 0.6324,
+            "within_tolerance": false
+          }
+        ]
+      }
+    },
+    {
+      "gate": "repeatability",
+      "scope": "video:room_4",
+      "tier": "video",
+      "status": "FAIL",
+      "metric": "worst 534.1 cm on room_4_w0, 4 wall pair(s)",
+      "threshold": "<= 1 cm or 0.5% per wall",
+      "value": 5.3412,
+      "detail": {
+        "captures": [
+          "apartment_video_01",
+          "room_video_01"
+        ],
+        "comparisons": [
+          {
+            "wall_id": "room_4_w0",
+            "capture_a": "apartment_video_01",
+            "capture_b": "room_video_01",
+            "a_m": 8.2842,
+            "b_m": 2.943,
+            "diff_m": 5.3412,
+            "within_tolerance": false
+          },
+          {
+            "wall_id": "room_4_w1",
+            "capture_a": "apartment_video_01",
+            "capture_b": "room_video_01",
+            "a_m": 2.8419,
+            "b_m": 1.9961,
+            "diff_m": 0.8458,
+            "within_tolerance": false
+          },
+          {
+            "wall_id": "room_4_w2",
+            "capture_a": "apartment_video_01",
+            "capture_b": "room_video_01",
+            "a_m": 8.2842,
+            "b_m": 2.943,
+            "diff_m": 5.3412,
+            "within_tolerance": false
+          },
+          {
+            "wall_id": "room_4_w3",
+            "capture_a": "apartment_video_01",
+            "capture_b": "room_video_01",
+            "a_m": 2.8419,
+            "b_m": 1.9961,
+            "diff_m": 0.8458,
+            "within_tolerance": false
+          }
+        ]
+      }
+    },
+    {
       "gate": "ceiling_spread",
       "scope": "lidar:room_a",
       "tier": "lidar",
@@ -1291,6 +2187,73 @@
           {
             "capture_id": "synthetic_room",
             "ceiling_m": 2.4963
+          }
+        ]
+      }
+    },
+    {
+      "gate": "ceiling_spread",
+      "scope": "photo:living_room",
+      "tier": "photo",
+      "status": "PASS",
+      "metric": "spread 0.0 cm across 3 captures",
+      "threshold": "<= 1 cm",
+      "value": 0.0,
+      "detail": {
+        "values": [
+          {
+            "capture_id": "demo_fourroom",
+            "ceiling_m": 2.44
+          },
+          {
+            "capture_id": "living_room_photos_02",
+            "ceiling_m": 2.44
+          },
+          {
+            "capture_id": "living_room_photos_03",
+            "ceiling_m": 2.44
+          }
+        ]
+      }
+    },
+    {
+      "gate": "ceiling_spread",
+      "scope": "video:room_3",
+      "tier": "video",
+      "status": "PASS",
+      "metric": "spread 0.0 cm across 2 captures",
+      "threshold": "<= 1 cm",
+      "value": 0.0,
+      "detail": {
+        "values": [
+          {
+            "capture_id": "apartment_video_01",
+            "ceiling_m": 2.44
+          },
+          {
+            "capture_id": "room_video_01",
+            "ceiling_m": 2.44
+          }
+        ]
+      }
+    },
+    {
+      "gate": "ceiling_spread",
+      "scope": "video:room_4",
+      "tier": "video",
+      "status": "PASS",
+      "metric": "spread 0.0 cm across 2 captures",
+      "threshold": "<= 1 cm",
+      "value": 0.0,
+      "detail": {
+        "values": [
+          {
+            "capture_id": "apartment_video_01",
+            "ceiling_m": 2.44
+          },
+          {
+            "capture_id": "room_video_01",
+            "ceiling_m": 2.44
           }
         ]
       }
@@ -1358,6 +2321,32 @@
       "detail": {
         "n": 8,
         "mean_half_width": 0.052
+      }
+    },
+    {
+      "gate": "interval_coverage_by_kind",
+      "scope": "photo:footprint_area",
+      "tier": "photo",
+      "status": "FAIL",
+      "metric": "2/4 covered (50.0%), mean +-18.1535",
+      "threshold": ">= 90.0% of 95% intervals (footprint_area)",
+      "value": 0.5,
+      "detail": {
+        "n": 4,
+        "mean_half_width": 18.1535
+      }
+    },
+    {
+      "gate": "interval_coverage_by_kind",
+      "scope": "video:footprint_area",
+      "tier": "video",
+      "status": "FAIL",
+      "metric": "1/2 covered (50.0%), mean +-15.7266",
+      "threshold": ">= 90.0% of 95% intervals (footprint_area)",
+      "value": 0.5,
+      "detail": {
+        "n": 2,
+        "mean_half_width": 15.7266
       }
     }
   ],
@@ -1441,6 +2430,206 @@
       "n_captures": 2,
       "pass_rate": 1.0,
       "worst_value": 1.0
+    },
+    {
+      "tier": "photo",
+      "device_class": "Oneplus nord 2T",
+      "gate": "ceiling_height",
+      "n_captures": 0,
+      "pass_rate": null,
+      "worst_value": null
+    },
+    {
+      "tier": "photo",
+      "device_class": "Oneplus nord 2T",
+      "gate": "footprint",
+      "n_captures": 2,
+      "pass_rate": 0.0,
+      "worst_value": 2.3924
+    },
+    {
+      "tier": "photo",
+      "device_class": "Oneplus nord 2T",
+      "gate": "interval_coverage",
+      "n_captures": 2,
+      "pass_rate": 0.5,
+      "worst_value": 0.0
+    },
+    {
+      "tier": "photo",
+      "device_class": "Oneplus nord 2T",
+      "gate": "opening_widths",
+      "n_captures": 0,
+      "pass_rate": null,
+      "worst_value": null
+    },
+    {
+      "tier": "photo",
+      "device_class": "Oneplus nord 2T",
+      "gate": "wall_lengths",
+      "n_captures": 0,
+      "pass_rate": null,
+      "worst_value": null
+    },
+    {
+      "tier": "photo",
+      "device_class": "unknown",
+      "gate": "ceiling_height",
+      "n_captures": 0,
+      "pass_rate": null,
+      "worst_value": null
+    },
+    {
+      "tier": "photo",
+      "device_class": "unknown",
+      "gate": "footprint",
+      "n_captures": 1,
+      "pass_rate": 0.0,
+      "worst_value": 4.3506
+    },
+    {
+      "tier": "photo",
+      "device_class": "unknown",
+      "gate": "interval_coverage",
+      "n_captures": 1,
+      "pass_rate": 0.0,
+      "worst_value": 0.0
+    },
+    {
+      "tier": "photo",
+      "device_class": "unknown",
+      "gate": "opening_widths",
+      "n_captures": 0,
+      "pass_rate": null,
+      "worst_value": null
+    },
+    {
+      "tier": "photo",
+      "device_class": "unknown",
+      "gate": "wall_lengths",
+      "n_captures": 0,
+      "pass_rate": null,
+      "worst_value": null
+    },
+    {
+      "tier": "photo",
+      "device_class": "unknown (Kinect RGB, MSR 7-Scenes dataset)",
+      "gate": "ceiling_height",
+      "n_captures": 0,
+      "pass_rate": null,
+      "worst_value": null
+    },
+    {
+      "tier": "photo",
+      "device_class": "unknown (Kinect RGB, MSR 7-Scenes dataset)",
+      "gate": "footprint",
+      "n_captures": 1,
+      "pass_rate": 0.0,
+      "worst_value": 0.7036
+    },
+    {
+      "tier": "photo",
+      "device_class": "unknown (Kinect RGB, MSR 7-Scenes dataset)",
+      "gate": "interval_coverage",
+      "n_captures": 1,
+      "pass_rate": 1.0,
+      "worst_value": 1.0
+    },
+    {
+      "tier": "photo",
+      "device_class": "unknown (Kinect RGB, MSR 7-Scenes dataset)",
+      "gate": "opening_widths",
+      "n_captures": 0,
+      "pass_rate": null,
+      "worst_value": null
+    },
+    {
+      "tier": "photo",
+      "device_class": "unknown (Kinect RGB, MSR 7-Scenes dataset)",
+      "gate": "wall_lengths",
+      "n_captures": 0,
+      "pass_rate": null,
+      "worst_value": null
+    },
+    {
+      "tier": "video",
+      "device_class": "Mac Pro",
+      "gate": "ceiling_height",
+      "n_captures": 0,
+      "pass_rate": null,
+      "worst_value": null
+    },
+    {
+      "tier": "video",
+      "device_class": "Mac Pro",
+      "gate": "footprint",
+      "n_captures": 1,
+      "pass_rate": 0.0,
+      "worst_value": 1.3867
+    },
+    {
+      "tier": "video",
+      "device_class": "Mac Pro",
+      "gate": "interval_coverage",
+      "n_captures": 1,
+      "pass_rate": 1.0,
+      "worst_value": 1.0
+    },
+    {
+      "tier": "video",
+      "device_class": "Mac Pro",
+      "gate": "opening_widths",
+      "n_captures": 0,
+      "pass_rate": null,
+      "worst_value": null
+    },
+    {
+      "tier": "video",
+      "device_class": "Mac Pro",
+      "gate": "wall_lengths",
+      "n_captures": 0,
+      "pass_rate": null,
+      "worst_value": null
+    },
+    {
+      "tier": "video",
+      "device_class": "iPhone (Pro-class, LiDAR) (LiDAR)",
+      "gate": "ceiling_height",
+      "n_captures": 0,
+      "pass_rate": null,
+      "worst_value": null
+    },
+    {
+      "tier": "video",
+      "device_class": "iPhone (Pro-class, LiDAR) (LiDAR)",
+      "gate": "footprint",
+      "n_captures": 1,
+      "pass_rate": 0.0,
+      "worst_value": 1.7959
+    },
+    {
+      "tier": "video",
+      "device_class": "iPhone (Pro-class, LiDAR) (LiDAR)",
+      "gate": "interval_coverage",
+      "n_captures": 1,
+      "pass_rate": 0.0,
+      "worst_value": 0.0
+    },
+    {
+      "tier": "video",
+      "device_class": "iPhone (Pro-class, LiDAR) (LiDAR)",
+      "gate": "opening_widths",
+      "n_captures": 0,
+      "pass_rate": null,
+      "worst_value": null
+    },
+    {
+      "tier": "video",
+      "device_class": "iPhone (Pro-class, LiDAR) (LiDAR)",
+      "gate": "wall_lengths",
+      "n_captures": 0,
+      "pass_rate": null,
+      "worst_value": null
     }
   ]
 }

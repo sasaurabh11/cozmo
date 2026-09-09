@@ -1,0 +1,140 @@
+GATE                       SCOPE                  TIER   MEASURED                                           GATE THRESHOLD                              STATUS
+-------------------------  ---------------------  -----  -------------------------------------------------  ------------------------------------------  ------
+wall_lengths               apartment_lidar_01     lidar  no wall ground truth                               -                                           SKIP
+ceiling_height             apartment_lidar_01     lidar  no ceiling ground truth                            -                                           SKIP
+opening_widths             apartment_lidar_01     lidar  no opening ground truth                            -                                           SKIP
+footprint                  apartment_lidar_01     lidar  17.82 m2 vs 10.08 m2 (76.8%)                       within +-2.0%                               FAIL
+interval_coverage          apartment_lidar_01     lidar  0/1 covered (0.0%), mean +-71.3 cm                 >= 90.0% of 95% intervals                   FAIL
+room_overlap               apartment_lidar_01     lidar  single room                                        -                                           SKIP
+adjacency_correctness      apartment_lidar_01     lidar  no adjacency ground truth                          -                                           SKIP
+wall_lengths               scan_floor_only        lidar  no wall ground truth                               -                                           SKIP
+ceiling_height             scan_floor_only        lidar  no ceiling ground truth                            -                                           SKIP
+opening_widths             scan_floor_only        lidar  no opening ground truth                            -                                           SKIP
+footprint                  scan_floor_only        lidar  51.33 m2 vs 10.08 m2 (409.2%)                      within +-2.0%                               FAIL
+interval_coverage          scan_floor_only        lidar  0/1 covered (0.0%), mean +-205.3 cm                >= 90.0% of 95% intervals                   FAIL
+room_overlap               scan_floor_only        lidar  single room                                        -                                           SKIP
+adjacency_correctness      scan_floor_only        lidar  no adjacency ground truth                          -                                           SKIP
+wall_lengths               scan_with_ceiling      lidar  no wall ground truth                               -                                           SKIP
+ceiling_height             scan_with_ceiling      lidar  no ceiling ground truth                            -                                           SKIP
+opening_widths             scan_with_ceiling      lidar  no opening ground truth                            -                                           SKIP
+footprint                  scan_with_ceiling      lidar  39.01 m2 vs 10.08 m2 (287.0%)                      within +-2.0%                               FAIL
+interval_coverage          scan_with_ceiling      lidar  0/1 covered (0.0%), mean +-156.0 cm                >= 90.0% of 95% intervals                   FAIL
+room_overlap               scan_with_ceiling      lidar  single room                                        -                                           SKIP
+adjacency_correctness      scan_with_ceiling      lidar  no adjacency ground truth                          -                                           SKIP
+wall_lengths               synthetic_no_ceiling   lidar  4/4 within tol (100.0%), worst 0.1 cm              <= max(2.0 cm, 1.0%) on >= 85.0%            PASS
+ceiling_height             synthetic_no_ceiling   lidar  worst 0.5 cm (test_room), 1 room(s)                <= 1.5 cm every room                        PASS
+opening_widths             synthetic_no_ceiling   lidar  2/2 (100.0%); 0 missed, 0 phantom                  <= 2 cm on >= 85.0% incl. detection         PASS
+footprint                  synthetic_no_ceiling   lidar  10.08 m2 vs 10.08 m2 (0.0%)                        within +-2.0%                               PASS
+interval_coverage          synthetic_no_ceiling   lidar  9/9 covered (100.0%), mean +-14.6 cm               >= 90.0% of 95% intervals                   PASS
+room_overlap               synthetic_no_ceiling   lidar  single room                                        -                                           SKIP
+adjacency_correctness      synthetic_no_ceiling   lidar  no adjacency ground truth                          -                                           SKIP
+wall_lengths               synthetic_room         lidar  4/4 within tol (100.0%), worst 0.1 cm              <= max(2.0 cm, 1.0%) on >= 85.0%            PASS
+ceiling_height             synthetic_room         lidar  worst 0.4 cm (test_room), 1 room(s)                <= 1.5 cm every room                        PASS
+opening_widths             synthetic_room         lidar  2/2 (100.0%); 0 missed, 0 phantom                  <= 2 cm on >= 85.0% incl. detection         PASS
+footprint                  synthetic_room         lidar  10.08 m2 vs 10.08 m2 (0.0%)                        within +-2.0%                               PASS
+interval_coverage          synthetic_room         lidar  9/9 covered (100.0%), mean +-12.7 cm               >= 90.0% of 95% intervals                   PASS
+room_overlap               synthetic_room         lidar  single room                                        -                                           SKIP
+adjacency_correctness      synthetic_room         lidar  no adjacency ground truth                          -                                           SKIP
+wall_lengths               demo_fourroom          photo  no wall ground truth                               -                                           SKIP
+ceiling_height             demo_fourroom          photo  no ceiling ground truth                            -                                           SKIP
+opening_widths             demo_fourroom          photo  no opening ground truth                            -                                           SKIP
+footprint                  demo_fourroom          photo  53.93 m2 vs 10.08 m2 (435.1%)                      within +-8.0%                               FAIL
+interval_coverage          demo_fourroom          photo  0/1 covered (0.0%), mean +-3247.2 cm               >= 90.0% of 95% intervals                   FAIL
+room_overlap               demo_fourroom          photo  no overlap above 0.02 m2 across 2 room(s)          <= 0.02 m2 for every room pair              PASS
+adjacency_correctness      demo_fourroom          photo  no adjacency ground truth                          -                                           SKIP
+wall_lengths               demo_office_7scenes    photo  no wall ground truth                               -                                           SKIP
+ceiling_height             demo_office_7scenes    photo  no ceiling ground truth                            -                                           SKIP
+opening_widths             demo_office_7scenes    photo  no opening ground truth                            -                                           SKIP
+footprint                  demo_office_7scenes    photo  17.17 m2 vs 10.08 m2 (70.4%)                       within +-8.0%                               FAIL
+interval_coverage          demo_office_7scenes    photo  1/1 covered (100.0%), mean +-1031.6 cm             >= 90.0% of 95% intervals                   PASS
+room_overlap               demo_office_7scenes    photo  single room                                        -                                           SKIP
+adjacency_correctness      demo_office_7scenes    photo  no adjacency ground truth                          -                                           SKIP
+wall_lengths               living_room_photos_02  photo  no wall ground truth                               -                                           SKIP
+ceiling_height             living_room_photos_02  photo  no ceiling ground truth                            -                                           SKIP
+opening_widths             living_room_photos_02  photo  no opening ground truth                            -                                           SKIP
+footprint                  living_room_photos_02  photo  15.38 m2 vs 10.08 m2 (52.5%)                       within +-8.0%                               FAIL
+interval_coverage          living_room_photos_02  photo  1/1 covered (100.0%), mean +-923.7 cm              >= 90.0% of 95% intervals                   PASS
+room_overlap               living_room_photos_02  photo  single room                                        -                                           SKIP
+adjacency_correctness      living_room_photos_02  photo  no adjacency ground truth                          -                                           SKIP
+wall_lengths               living_room_photos_03  photo  no wall ground truth                               -                                           SKIP
+ceiling_height             living_room_photos_03  photo  no ceiling ground truth                            -                                           SKIP
+opening_widths             living_room_photos_03  photo  no opening ground truth                            -                                           SKIP
+footprint                  living_room_photos_03  photo  34.20 m2 vs 10.08 m2 (239.2%)                      within +-8.0%                               FAIL
+interval_coverage          living_room_photos_03  photo  0/1 covered (0.0%), mean +-2058.8 cm               >= 90.0% of 95% intervals                   FAIL
+room_overlap               living_room_photos_03  photo  no overlap above 0.02 m2 across 3 room(s)          <= 0.02 m2 for every room pair              PASS
+adjacency_correctness      living_room_photos_03  photo  no adjacency ground truth                          -                                           SKIP
+wall_lengths               apartment_video_01     video  no wall ground truth                               -                                           SKIP
+ceiling_height             apartment_video_01     video  no ceiling ground truth                            -                                           SKIP
+opening_widths             apartment_video_01     video  no opening ground truth                            -                                           SKIP
+footprint                  apartment_video_01     video  28.18 m2 vs 10.08 m2 (179.6%)                      within +-3.0%                               FAIL
+interval_coverage          apartment_video_01     video  0/1 covered (0.0%), mean +-1696.8 cm               >= 90.0% of 95% intervals                   FAIL
+room_overlap               apartment_video_01     video  no overlap above 0.02 m2 across 2 room(s)          <= 0.02 m2 for every room pair              PASS
+adjacency_correctness      apartment_video_01     video  no adjacency ground truth                          -                                           SKIP
+wall_lengths               room_video_01          video  no wall ground truth                               -                                           SKIP
+ceiling_height             room_video_01          video  no ceiling ground truth                            -                                           SKIP
+opening_widths             room_video_01          video  no opening ground truth                            -                                           SKIP
+footprint                  room_video_01          video  24.06 m2 vs 10.08 m2 (138.7%)                      within +-3.0%                               FAIL
+interval_coverage          room_video_01          video  1/1 covered (100.0%), mean +-1448.5 cm             >= 90.0% of 95% intervals                   PASS
+room_overlap               room_video_01          video  no overlap above 0.02 m2 across 3 room(s)          <= 0.02 m2 for every room pair              PASS
+adjacency_correctness      room_video_01          video  no adjacency ground truth                          -                                           SKIP
+repeatability              lidar:room_a           lidar  worst 718.4 cm on room_a_w0, 38 wall pair(s)       <= 1 cm or 0.5% per wall                    FAIL
+repeatability              lidar:test_room        lidar  worst 0.0 cm on test_room_w0, 4 wall pair(s)       <= 1 cm or 0.5% per wall                    PASS
+repeatability              photo:living_room      photo  worst 367.8 cm on living_room_w1, 12 wall pair(s)  <= 1 cm or 0.5% per wall                    FAIL
+repeatability              video:room_3           video  worst 154.7 cm on room_3_w0, 4 wall pair(s)        <= 1 cm or 0.5% per wall                    FAIL
+repeatability              video:room_4           video  worst 534.1 cm on room_4_w0, 4 wall pair(s)        <= 1 cm or 0.5% per wall                    FAIL
+ceiling_spread             lidar:room_a           lidar  spread 37.4 cm across 3 captures                   <= 1 cm                                     FAIL
+ceiling_spread             lidar:test_room        lidar  spread 0.1 cm across 2 captures                    <= 1 cm                                     PASS
+ceiling_spread             photo:living_room      photo  spread 0.0 cm across 3 captures                    <= 1 cm                                     PASS
+ceiling_spread             video:room_3           video  spread 0.0 cm across 2 captures                    <= 1 cm                                     PASS
+ceiling_spread             video:room_4           video  spread 0.0 cm across 2 captures                    <= 1 cm                                     PASS
+interval_coverage_by_kind  lidar:ceiling_height   lidar  2/2 covered (100.0%), mean +-0.1150                >= 90.0% of 95% intervals (ceiling_height)  PASS
+interval_coverage_by_kind  lidar:floor_area       lidar  2/2 covered (100.0%), mean +-0.4031                >= 90.0% of 95% intervals (floor_area)      PASS
+interval_coverage_by_kind  lidar:footprint_area   lidar  2/5 covered (40.0%), mean +-1.0265                 >= 90.0% of 95% intervals (footprint_area)  FAIL
+interval_coverage_by_kind  lidar:opening_width    lidar  4/4 covered (100.0%), mean +-0.0500                >= 90.0% of 95% intervals (opening_width)   PASS
+interval_coverage_by_kind  lidar:wall_length      lidar  8/8 covered (100.0%), mean +-0.0520                >= 90.0% of 95% intervals (wall_length)     PASS
+interval_coverage_by_kind  photo:footprint_area   photo  2/4 covered (50.0%), mean +-18.1535                >= 90.0% of 95% intervals (footprint_area)  FAIL
+interval_coverage_by_kind  video:footprint_area   video  1/2 covered (50.0%), mean +-15.7266                >= 90.0% of 95% intervals (footprint_area)  FAIL
+
+26 PASS   23 FAIL   45 SKIP
+SKIP means no ground truth covered that gate. It is not a pass.
+
+Device matrix (generated from this run's captures, not written by hand):
+TIER   DEVICE                                             GATE               N  PASS RATE  WORST VALUE
+-----  -------------------------------------------------  -----------------  -  ---------  -----------
+lidar  iPhone (Pro-class, LiDAR) (LiDAR)                  ceiling_height     0  -          -
+lidar  iPhone (Pro-class, LiDAR) (LiDAR)                  footprint          3  0%         4.0923
+lidar  iPhone (Pro-class, LiDAR) (LiDAR)                  interval_coverage  3  0%         0.0000
+lidar  iPhone (Pro-class, LiDAR) (LiDAR)                  opening_widths     0  -          -
+lidar  iPhone (Pro-class, LiDAR) (LiDAR)                  wall_lengths       0  -          -
+lidar  synthetic (LiDAR)                                  ceiling_height     2  100%       0.0051
+lidar  synthetic (LiDAR)                                  footprint          2  100%       0.0002
+lidar  synthetic (LiDAR)                                  interval_coverage  2  100%       1.0000
+lidar  synthetic (LiDAR)                                  opening_widths     2  100%       1.0000
+lidar  synthetic (LiDAR)                                  wall_lengths       2  100%       1.0000
+photo  Oneplus nord 2T                                    ceiling_height     0  -          -
+photo  Oneplus nord 2T                                    footprint          2  0%         2.3924
+photo  Oneplus nord 2T                                    interval_coverage  2  50%        0.0000
+photo  Oneplus nord 2T                                    opening_widths     0  -          -
+photo  Oneplus nord 2T                                    wall_lengths       0  -          -
+photo  unknown (Kinect RGB, MSR 7-Scenes dataset)         ceiling_height     0  -          -
+photo  unknown (Kinect RGB, MSR 7-Scenes dataset)         footprint          1  0%         0.7036
+photo  unknown (Kinect RGB, MSR 7-Scenes dataset)         interval_coverage  1  100%       1.0000
+photo  unknown (Kinect RGB, MSR 7-Scenes dataset)         opening_widths     0  -          -
+photo  unknown (Kinect RGB, MSR 7-Scenes dataset)         wall_lengths       0  -          -
+photo  unknown (Kinect RGB, MSR 7-Scenes public dataset)  ceiling_height     0  -          -
+photo  unknown (Kinect RGB, MSR 7-Scenes public dataset)  footprint          1  0%         4.3506
+photo  unknown (Kinect RGB, MSR 7-Scenes public dataset)  interval_coverage  1  0%         0.0000
+photo  unknown (Kinect RGB, MSR 7-Scenes public dataset)  opening_widths     0  -          -
+photo  unknown (Kinect RGB, MSR 7-Scenes public dataset)  wall_lengths       0  -          -
+video  Mac Pro                                            ceiling_height     0  -          -
+video  Mac Pro                                            footprint          1  0%         1.3867
+video  Mac Pro                                            interval_coverage  1  100%       1.0000
+video  Mac Pro                                            opening_widths     0  -          -
+video  Mac Pro                                            wall_lengths       0  -          -
+video  iPhone (Pro-class, LiDAR) (LiDAR)                  ceiling_height     0  -          -
+video  iPhone (Pro-class, LiDAR) (LiDAR)                  footprint          1  0%         1.7959
+video  iPhone (Pro-class, LiDAR) (LiDAR)                  interval_coverage  1  0%         0.0000
+video  iPhone (Pro-class, LiDAR) (LiDAR)                  opening_widths     0  -          -
+video  iPhone (Pro-class, LiDAR) (LiDAR)                  wall_lengths       0  -          -
+
+results      fixloop/after/results.json

@@ -5,19 +5,19 @@
   "git": {
     "commit": "fa8465d009c19b372446051fa794f57a96dfd0ab",
     "branch": "main",
-    "describe": "fa8465d",
+    "describe": "fa8465d-dirty",
     "dirty": true
   },
-  "command": "cozmo run --input captures/apartment_lidar --out fixloop/before/apartment_lidar --no-semantics --quiet",
+  "command": "cozmo run --input captures/apartment_lidar --out benchmark_runs/apartment_lidar --quiet --no-semantics",
   "argv": [
     "cozmo",
     "run",
     "--input",
     "captures/apartment_lidar",
     "--out",
-    "fixloop/before/apartment_lidar",
-    "--no-semantics",
-    "--quiet"
+    "benchmark_runs/apartment_lidar",
+    "--quiet",
+    "--no-semantics"
   ],
   "seed": {
     "seed": 20260908,
@@ -35,9 +35,9 @@
   },
   "input": {
     "path": "/Users/saurabh/Documents/Cozmo/captures/apartment_lidar",
-    "sha256": "b13d8a5f00034d8935bf6283fc7f5f096aa406daf3390ba85935f0056825efa5",
-    "file_count": 5,
-    "total_bytes": 44496164
+    "sha256": "ddfea134497d39b14e587de76d4ff8cb9c5e1e5890d7ad58cc35e1788834464c",
+    "file_count": 3435,
+    "total_bytes": 88503865
   },
   "capture": {
     "capture_id": "apartment_lidar_01",
@@ -85,9 +85,9 @@
     ]
   },
   "outputs": {
-    "plan.json": "54e221109f65fc648fcb8d4b3f5d56b47775cb831d07961e803b4e6c5ffe1890",
+    "plan.json": "1e8d48883eaa818c16a4efc6e006082822b48a5a87b3305db9d48eb35b80e8a6",
     "plan.png": "b489b3fd53c73f9b3ed998ee3c898001f6962987b6f7e36b541886384e3f0c28",
-    "plan.svg": "2a0041c2d4c41e8008fd97d803982763d174047fb0c46b6a0862b959cb2cd843"
+    "plan.svg": "791ccb3955c63af23be364e5bc8240353aa255f134c5cecb4bafc6b169be1fc4"
   },
   "reconstruction": {
     "fusion": {
@@ -207,13 +207,13 @@
     "openings": [],
     "ablation_floor_area_m2": 16.697,
     "timings_s": {
-      "drift_s": 2.119,
-      "fuse_s": 0.42,
+      "drift_s": 2.188,
+      "fuse_s": 0.452,
       "floor_s": 0.007,
-      "layout_s": 0.397,
+      "layout_s": 0.404,
       "ceiling_s": 0.0,
       "openings_s": 0.056,
-      "ablation_s": 0.602
+      "ablation_s": 0.613
     }
   },
   "reconstruction_settings": {
@@ -233,8 +233,8 @@
   "environment": {
     "python": "3.9.6",
     "platform": "macOS-26.6.2-arm64-arm-64bit",
-    "source_date_epoch": null
+    "source_date_epoch": "1756728000"
   },
-  "started_at": "2026-09-09T17:49:36.168843+00:00",
-  "duration_s": 4.4919
+  "started_at": "2026-09-09T18:15:43.440326+00:00",
+  "duration_s": 5.1474
 }

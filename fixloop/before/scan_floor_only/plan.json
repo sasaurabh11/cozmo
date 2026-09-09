@@ -3,7 +3,7 @@
   "capture_id": "scan_floor_only",
   "tier": "lidar",
   "pipeline_version": "0.4.0-video-calibration",
-  "generated_at": "2026-09-09T17:58:48.845349Z",
+  "generated_at": "2025-09-01T12:00:00Z",
   "scale": {
     "source": "lidar_depth",
     "scale_factor": {

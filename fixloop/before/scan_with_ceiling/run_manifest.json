@@ -8,16 +8,16 @@
     "describe": "fa8465d-dirty",
     "dirty": true
   },
-  "command": "cozmo run --input captures/scan_with_ceiling --out /tmp/run_scan_with_ceiling --no-semantics --verbose",
+  "command": "cozmo run --input captures/scan_with_ceiling --out benchmark_runs/scan_with_ceiling --quiet --no-semantics",
   "argv": [
     "cozmo",
     "run",
     "--input",
     "captures/scan_with_ceiling",
     "--out",
-    "/tmp/run_scan_with_ceiling",
-    "--no-semantics",
-    "--verbose"
+    "benchmark_runs/scan_with_ceiling",
+    "--quiet",
+    "--no-semantics"
   ],
   "seed": {
     "seed": 20260908,
@@ -80,9 +80,9 @@
     "warnings": []
   },
   "outputs": {
-    "plan.json": "fb1797064ffc1d4a592cbe8074f9d60a84732dccbe384cde7d9cbf7b363ea98b",
+    "plan.json": "d9b90a56a695d3e0d6f5c048f223de76c89c5b2196e0b1e929a0655f8ae299e1",
     "plan.png": "4b508f76fa009eee7b494e3f14d40634d5e8255e9834b8d7d2f7eac8170aa9bb",
-    "plan.svg": "c2db05ed4ee9611dceace93ab73afae1b465d72d536a4367b7581dac9641d153"
+    "plan.svg": "92654ab46b89d249465e5c7b8afc264ef610a262bcdce63d6a119e374e29db6d"
   },
   "reconstruction": {
     "fusion": {
@@ -190,13 +190,13 @@
     "openings": [],
     "ablation_floor_area_m2": 42.7144,
     "timings_s": {
-      "drift_s": 51.227,
-      "fuse_s": 3.745,
-      "floor_s": 0.035,
-      "layout_s": 2.546,
+      "drift_s": 51.806,
+      "fuse_s": 3.585,
+      "floor_s": 0.034,
+      "layout_s": 2.495,
       "ceiling_s": 0.019,
-      "openings_s": 0.312,
-      "ablation_s": 4.134
+      "openings_s": 0.344,
+      "ablation_s": 5.014
     }
   },
   "reconstruction_settings": {
@@ -216,8 +216,8 @@
   "environment": {
     "python": "3.9.6",
     "platform": "macOS-26.6.2-arm64-arm-64bit",
-    "source_date_epoch": null
+    "source_date_epoch": "1756728000"
   },
-  "started_at": "2026-09-09T17:57:21.188643+00:00",
-  "duration_s": 66.0531
+  "started_at": "2026-09-09T18:15:50.038689+00:00",
+  "duration_s": 67.3304
 }

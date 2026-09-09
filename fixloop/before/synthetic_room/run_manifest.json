@@ -5,19 +5,19 @@
   "git": {
     "commit": "fa8465d009c19b372446051fa794f57a96dfd0ab",
     "branch": "main",
-    "describe": "fa8465d",
+    "describe": "fa8465d-dirty",
     "dirty": true
   },
-  "command": "cozmo run --input tests/fixtures/captures/synthetic_room --out fixloop/before/synthetic_room --no-semantics --quiet",
+  "command": "cozmo run --input tests/fixtures/captures/synthetic_room --out benchmark_runs/synthetic_room --quiet --no-semantics",
   "argv": [
     "cozmo",
     "run",
     "--input",
     "tests/fixtures/captures/synthetic_room",
     "--out",
-    "fixloop/before/synthetic_room",
-    "--no-semantics",
-    "--quiet"
+    "benchmark_runs/synthetic_room",
+    "--quiet",
+    "--no-semantics"
   ],
   "seed": {
     "seed": 20260908,
@@ -150,9 +150,9 @@
     "warnings": []
   },
   "outputs": {
-    "plan.json": "e89bad859c88f5f3a07d5b20737b1a4462626f4f7727ced0919391a2e644945e",
+    "plan.json": "7b5bf7173629b7eb98021b6e23fc9e4175bebad1a8df00cd7673b3d240b831cb",
     "plan.png": "2f83a43cc275cc3942cfcaf9f112c402ba63cb782934eefae84fb7cadea6bf3f",
-    "plan.svg": "7ef213920c6ac267bffa7f3201081c14a5b409e62cf71b771da53e43cf048b81"
+    "plan.svg": "b7c3203f4c39e7494d72e8a6a7871674a710855a640cc85375dd21f730541761"
   },
   "reconstruction": {
     "fusion": {
@@ -268,9 +268,9 @@
     "ablation_floor_area_m2": 13.4093,
     "timings_s": {
       "drift_s": 0.001,
-      "fuse_s": 0.012,
-      "floor_s": 0.002,
-      "layout_s": 0.024,
+      "fuse_s": 0.013,
+      "floor_s": 0.001,
+      "layout_s": 0.029,
       "ceiling_s": 0.001,
       "openings_s": 0.007,
       "ablation_s": 0.081
@@ -293,8 +293,8 @@
   "environment": {
     "python": "3.9.6",
     "platform": "macOS-26.6.2-arm64-arm-64bit",
-    "source_date_epoch": null
+    "source_date_epoch": "1756728000"
   },
-  "started_at": "2026-09-09T17:48:29.203046+00:00",
-  "duration_s": 0.9817
+  "started_at": "2026-09-09T18:15:38.086310+00:00",
+  "duration_s": 1.0976
 }

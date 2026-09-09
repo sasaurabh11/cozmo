@@ -1,0 +1,21 @@
+/Users/saurabh/Documents/Cozmo/cozmo/recon/layout.py:446: RuntimeWarning: divide by zero encountered in matmul
+  reconstruction.frame_points_local[p.frame_index] @ p.R.T + p.t
+/Users/saurabh/Documents/Cozmo/cozmo/recon/layout.py:446: RuntimeWarning: overflow encountered in matmul
+  reconstruction.frame_points_local[p.frame_index] @ p.R.T + p.t
+/Users/saurabh/Documents/Cozmo/cozmo/recon/layout.py:446: RuntimeWarning: invalid value encountered in matmul
+  reconstruction.frame_points_local[p.frame_index] @ p.R.T + p.t
+WARNING cozmo.geometry.layout: only 1 wall line(s) across u; bounding it by floor evidence
+WARNING cozmo.geometry.layout: only 1 wall line(s) across v; bounding it by floor evidence
+/Users/saurabh/Documents/Cozmo/cozmo/recon/layout.py:446: RuntimeWarning: divide by zero encountered in matmul
+  reconstruction.frame_points_local[p.frame_index] @ p.R.T + p.t
+/Users/saurabh/Documents/Cozmo/cozmo/recon/layout.py:446: RuntimeWarning: overflow encountered in matmul
+  reconstruction.frame_points_local[p.frame_index] @ p.R.T + p.t
+/Users/saurabh/Documents/Cozmo/cozmo/recon/layout.py:446: RuntimeWarning: invalid value encountered in matmul
+  reconstruction.frame_points_local[p.frame_index] @ p.R.T + p.t
+WARNING cozmo.recon.layout: no usable wall cluster; using a low-confidence rectangle from floor evidence
+/Users/saurabh/Documents/Cozmo/cozmo/recon/layout.py:446: RuntimeWarning: divide by zero encountered in matmul
+  reconstruction.frame_points_local[p.frame_index] @ p.R.T + p.t
+/Users/saurabh/Documents/Cozmo/cozmo/recon/layout.py:446: RuntimeWarning: overflow encountered in matmul
+  reconstruction.frame_points_local[p.frame_index] @ p.R.T + p.t
+/Users/saurabh/Documents/Cozmo/cozmo/recon/layout.py:446: RuntimeWarning: invalid value encountered in matmul
+  reconstruction.frame_points_local[p.frame_index] @ p.R.T + p.t

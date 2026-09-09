@@ -1,0 +1,261 @@
+{
+  "pipeline_version": "0.4.0-video-calibration",
+  "schema_version": "1.3.0",
+  "package_version": "0.1.0",
+  "git": {
+    "commit": "62aff1d2dd2716bf8e24832002e2212a7efd7e54",
+    "branch": "main",
+    "describe": "62aff1d-dirty",
+    "dirty": true
+  },
+  "command": "cozmo run --input captures/demo_office --out fixloop/after/demo_office --quiet --backbone vggt --no-semantics",
+  "argv": [
+    "cozmo",
+    "run",
+    "--input",
+    "captures/demo_office",
+    "--out",
+    "fixloop/after/demo_office",
+    "--quiet",
+    "--backbone",
+    "vggt",
+    "--no-semantics"
+  ],
+  "seed": {
+    "seed": 20260908,
+    "seeded": [
+      "random",
+      "numpy",
+      "open3d",
+      "torch"
+    ],
+    "unavailable": []
+  },
+  "options": {
+    "drift_correction": true,
+    "ignore_calibration": false
+  },
+  "input": {
+    "path": "/Users/saurabh/Documents/Cozmo/captures/demo_office",
+    "sha256": "e5cff7c85312702ebd4d6722d7197f271cd5fe03e1b177d93ef05c4d2f2d36ac",
+    "file_count": 8,
+    "total_bytes": 422312
+  },
+  "capture": {
+    "capture_id": "demo_office_7scenes",
+    "space_id": "demo_office_7scenes",
+    "tier": "photo",
+    "device": {
+      "model": "unknown (Kinect RGB, MSR 7-Scenes dataset)",
+      "os_version": null,
+      "has_lidar": false
+    },
+    "rooms": [
+      "office"
+    ],
+    "payload": {
+      "layout": "rooms/<room>/*",
+      "room_count": 1,
+      "image_count": 7,
+      "photos_per_room": {
+        "office": 7
+      },
+      "warnings": []
+    },
+    "warnings": []
+  },
+  "outputs": {
+    "plan.json": "34e4a1b25aedf1174562499337ef9fbcda3f201a38256ec6c6e7a4498e79d2e3",
+    "plan.png": "71e53bc81930da57412d64815789d66543da3542be5c4c1909b1f6095e5dc6f0",
+    "plan.svg": "7dfa1eaeb7ee4cd66f28eb6fd1e40e09f95aec69df696599f49b95f7440fbd9d"
+  },
+  "reconstruction": {
+    "backbone": "vggt",
+    "reconstruction_stats": {
+      "device": "mps",
+      "image_size": 518,
+      "confidence_threshold": 1.0002,
+      "frames": 7
+    },
+    "layout": {
+      "manhattan_score": 0.4169,
+      "view_details": {
+        "0": {
+          "views": [
+            0,
+            1,
+            4,
+            6
+          ],
+          "view_count": 4,
+          "agreement": 0.0
+        },
+        "1": {
+          "views": [
+            2
+          ],
+          "view_count": 1,
+          "agreement": 1.0
+        },
+        "2": {
+          "views": [
+            3
+          ],
+          "view_count": 1,
+          "agreement": 1.0
+        },
+        "3": {
+          "views": [
+            5
+          ],
+          "view_count": 1,
+          "agreement": 1.0
+        }
+      },
+      "cells_kept": 1,
+      "bounds_uv": [
+        -1.288,
+        -0.791,
+        2.08,
+        1.791
+      ],
+      "axis_fallback": []
+    },
+    "layout_method": "per_view_merge",
+    "view_plane_counts": {
+      "floor_views": 7,
+      "ceiling_views": 7,
+      "wall_clusters": 4,
+      "wall_lines": 4
+    },
+    "scale": {
+      "scale_factor": 3.40404,
+      "ci_95": [
+        2.38283,
+        4.42525
+      ],
+      "agreement": 0.3,
+      "method": "single_cue",
+      "cues": [
+        {
+          "name": "metric_depth",
+          "fired": false,
+          "scale_factor": null,
+          "relative_sd": null,
+          "reason": "disabled for this run",
+          "detail": {}
+        },
+        {
+          "name": "door_height",
+          "fired": false,
+          "scale_factor": null,
+          "relative_sd": null,
+          "reason": "disabled for this run",
+          "detail": {}
+        },
+        {
+          "name": "ceiling_height",
+          "fired": true,
+          "scale_factor": 3.40404,
+          "relative_sd": 0.123,
+          "reason": "floor-to-ceiling span 0.717 (scale-free) against a 2.44 m +- 0.3 m prior",
+          "detail": {
+            "span_scalefree": 0.7168
+          }
+        }
+      ]
+    },
+    "frames": {
+      "frame_count": 7,
+      "intrinsics_sources": [
+        "fov_default",
+        "fov_default",
+        "fov_default",
+        "fov_default",
+        "fov_default",
+        "fov_default",
+        "fov_default"
+      ],
+      "focal_px": [
+        502.3,
+        502.3,
+        502.3,
+        502.3,
+        502.3,
+        502.3,
+        502.3
+      ],
+      "sizes": [
+        [
+          640,
+          480
+        ],
+        [
+          640,
+          480
+        ],
+        [
+          640,
+          480
+        ],
+        [
+          640,
+          480
+        ],
+        [
+          640,
+          480
+        ],
+        [
+          640,
+          480
+        ],
+        [
+          640,
+          480
+        ]
+      ]
+    },
+    "openings": [
+      {
+        "wall_index": 1,
+        "kind": "window",
+        "width_m": 0.876,
+        "confidence": 0.31202929019927983,
+        "sources": [
+          "semantic"
+        ]
+      }
+    ],
+    "opening_detector": {
+      "detector": "grounding-dino-tiny",
+      "device": "mps",
+      "detections": 9
+    },
+    "timings_s": {
+      "load_frames_s": 0.012,
+      "reconstruct_s": 28.985,
+      "layout_s": 0.911,
+      "scale_s": 0.0,
+      "opening_detector_s": 9.911,
+      "openings_s": 9.939
+    }
+  },
+  "reconstruction_settings": {
+    "backbone": "vggt",
+    "weights_dir": null
+  },
+  "calibration": {
+    "loaded": false,
+    "path": "calibration/calibration.json",
+    "calibration_version": null,
+    "fitted_at": null
+  },
+  "environment": {
+    "python": "3.9.6",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "source_date_epoch": "1756728000"
+  },
+  "started_at": "2026-09-09T20:23:40.464557+00:00",
+  "duration_s": 40.5408
+}

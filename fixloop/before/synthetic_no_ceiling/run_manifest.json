@@ -5,19 +5,19 @@
   "git": {
     "commit": "fa8465d009c19b372446051fa794f57a96dfd0ab",
     "branch": "main",
-    "describe": "fa8465d",
+    "describe": "fa8465d-dirty",
     "dirty": true
   },
-  "command": "cozmo run --input tests/fixtures/captures/synthetic_no_ceiling --out fixloop/before/synthetic_no_ceiling --no-semantics --quiet",
+  "command": "cozmo run --input tests/fixtures/captures/synthetic_no_ceiling --out benchmark_runs/synthetic_no_ceiling --quiet --no-semantics",
   "argv": [
     "cozmo",
     "run",
     "--input",
     "tests/fixtures/captures/synthetic_no_ceiling",
     "--out",
-    "fixloop/before/synthetic_no_ceiling",
-    "--no-semantics",
-    "--quiet"
+    "benchmark_runs/synthetic_no_ceiling",
+    "--quiet",
+    "--no-semantics"
   ],
   "seed": {
     "seed": 20260908,
@@ -150,9 +150,9 @@
     "warnings": []
   },
   "outputs": {
-    "plan.json": "c048504f6d3923579fcc2a1b5b7a3756bb7aa7ec9e1945a2a27c6726f5db3f23",
+    "plan.json": "8584ff989c72eb3443a204503a4cf4c0602a952e3fb7ee6906a2305081ac86fe",
     "plan.png": "73e19459b528c4987bfd6be6b4ddc9ba011aa2773bdf8c8aaab15acafabff0e7",
-    "plan.svg": "732550bf9220ddf011450f16193f0c68536ca8b83bb97f761e27ee88fddc304f"
+    "plan.svg": "0562d161a7eec0a8304be0102a021868102fa26f50f65248fe00468394b77769"
   },
   "reconstruction": {
     "fusion": {
@@ -266,12 +266,12 @@
     "ablation_floor_area_m2": 13.4093,
     "timings_s": {
       "drift_s": 0.001,
-      "fuse_s": 0.012,
+      "fuse_s": 0.013,
       "floor_s": 0.001,
-      "layout_s": 0.024,
+      "layout_s": 0.026,
       "ceiling_s": 0.001,
       "openings_s": 0.007,
-      "ablation_s": 0.077
+      "ablation_s": 0.084
     }
   },
   "reconstruction_settings": {
@@ -291,8 +291,8 @@
   "environment": {
     "python": "3.9.6",
     "platform": "macOS-26.6.2-arm64-arm-64bit",
-    "source_date_epoch": null
+    "source_date_epoch": "1756728000"
   },
-  "started_at": "2026-09-09T17:48:31.910315+00:00",
-  "duration_s": 0.8153
+  "started_at": "2026-09-09T18:15:40.793855+00:00",
+  "duration_s": 0.9384
 }
