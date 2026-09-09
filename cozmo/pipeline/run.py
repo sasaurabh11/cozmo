@@ -26,6 +26,7 @@ import os
 import platform
 import subprocess
 import sys
+import tempfile
 import time
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -42,6 +43,9 @@ from ..geometry.planes import estimate_ceiling, fit_floor
 from ..geometry.render import render_plan
 from ..io.capture import CaptureBundle, load_capture
 from ..io.lidar import LidarCapture
+from ..semantics.project import surfaces_from_layout
+from ..semantics.stage import DEFAULT_FRAME_STRIDE, DEFAULT_MAX_FRAMES, SemanticResult
+from ..semantics.worker import surface_to_dict
 from ..schema import (
     Adjacency,
     ConcealedFlag,
@@ -458,6 +462,127 @@ def build_stub_plan(
 
 
 # --------------------------------------------------------------------------
+# The semantic stage, in its own process
+# --------------------------------------------------------------------------
+
+SEMANTICS_TIMEOUT_S = 1800
+
+
+def run_semantics_subprocess(
+    capture_root: Path,
+    layout: Any,
+    ceiling_height_m: float,
+    geometric_openings: Sequence[Any],
+    room_id: str,
+    weights_dir: Optional[Path] = None,
+    frame_stride: int = DEFAULT_FRAME_STRIDE,
+    max_frames: int = DEFAULT_MAX_FRAMES,
+    timeout_s: int = SEMANTICS_TIMEOUT_S,
+) -> SemanticResult:
+    """Run detection, projection, rules and scope in a child process.
+
+    open3d and torch cannot share an address space on macOS: each bundles its
+    own OpenMP runtime, and a process holding both aborts with OMP error 179 or
+    deadlocks inside the first inference call. Geometry has already used open3d
+    by this point, so the semantic stage gets its own interpreter. The surfaces
+    it needs cross as JSON, which also keeps the stage honestly tier-agnostic --
+    it cannot reach back into geometry even by accident.
+    """
+    openings_by_wall: Dict[int, int] = {}
+    for detection in geometric_openings:
+        openings_by_wall[detection.wall_index] = openings_by_wall.get(detection.wall_index, 0) + 1
+
+    surfaces = surfaces_from_layout(
+        layout.walls, layout.frame, room_id, ceiling_height_m,
+        layout.floor_area_m2, openings_by_wall,
+    )
+
+    request = {
+        "capture_root": str(capture_root),
+        "room_id": room_id,
+        "wall_count": len(layout.walls),
+        "ceiling_height_m": ceiling_height_m,
+        "surfaces": [surface_to_dict(s) for s in surfaces],
+        "geometric_openings": [
+            {
+                "wall_index": d.wall_index, "kind": d.kind, "width_m": d.width_m,
+                "height_m": d.height_m, "offset_along_wall_m": d.offset_along_wall_m,
+                "sill_height_m": d.sill_height_m, "confidence": d.confidence,
+            }
+            for d in geometric_openings
+        ],
+        "weights_dir": str(weights_dir) if weights_dir else None,
+        "frame_stride": frame_stride,
+        "max_frames": max_frames,
+    }
+
+    with tempfile.TemporaryDirectory(prefix="cozmo-semantics-") as directory:
+        request_path = Path(directory) / "request.json"
+        response_path = Path(directory) / "response.json"
+        request_path.write_text(json.dumps(request))
+
+        command = [sys.executable, "-m", "cozmo.semantics.worker",
+                   str(request_path), str(response_path)]
+        log.info("running the semantic stage in a child process")
+        try:
+            completed = subprocess.run(
+                command, capture_output=True, text=True, timeout=timeout_s, check=False
+            )
+        except subprocess.TimeoutExpired:
+            message = f"semantic stage timed out after {timeout_s}s; plan carries geometry only"
+            log.warning(message)
+            return SemanticResult(warnings=[message], details={"detector": "timeout"})
+
+        if not response_path.is_file():
+            message = (
+                f"semantic stage produced no response (exit {completed.returncode}); "
+                f"plan carries geometry only"
+            )
+            log.warning("%s: %s", message, (completed.stderr or "").strip()[-500:])
+            return SemanticResult(
+                warnings=[message],
+                details={"detector": "failed", "exit_code": completed.returncode,
+                         "stderr_tail": (completed.stderr or "").strip()[-2000:]},
+            )
+
+        payload = json.loads(response_path.read_text())
+
+    if not payload.get("ok"):
+        message = f"semantic stage failed: {payload.get('error')}; plan carries geometry only"
+        log.warning(message)
+        return SemanticResult(
+            warnings=[message],
+            details={"detector": "failed", "error": payload.get("error"),
+                     "traceback": payload.get("traceback")},
+        )
+
+    return SemanticResult(
+        damage=[DamageRegion.model_validate(d) for d in payload["damage"]],
+        concealed_flags=[ConcealedFlag.model_validate(f) for f in payload["concealed_flags"]],
+        scope=[ScopeItem.model_validate(s) for s in payload["scope"]],
+        openings=[_ConsensusOpening(o) for o in payload["openings"]],
+        warnings=list(payload.get("warnings", [])),
+        details=dict(payload.get("details", {})),
+        available=bool(payload.get("available")),
+    )
+
+
+class _ConsensusOpening:
+    """A cross-checked opening, rebuilt from the worker's JSON."""
+
+    def __init__(self, data: Dict[str, Any]) -> None:
+        self.wall_index = int(data["wall_index"])
+        self.kind = str(data["kind"])
+        self.width_m = float(data["width_m"])
+        self.height_m = float(data["height_m"])
+        self.offset_along_wall_m = float(data["offset_along_wall_m"])
+        self.sill_height_m = float(data.get("sill_height_m", 0.0))
+        self.sources = list(data.get("sources", []))
+        self.confidence = float(data.get("confidence", 0.0))
+        self.note = data.get("note", "")
+
+
+# --------------------------------------------------------------------------
 # LiDAR tier: the real reconstruction
 # --------------------------------------------------------------------------
 
@@ -488,6 +613,10 @@ def build_lidar_plan(
     stride: int = DEFAULT_STRIDE,
     voxel_size_m: float = DEFAULT_VOXEL_M,
     run_ablation: bool = True,
+    semantics: bool = True,
+    weights_dir: Optional[Path] = None,
+    frame_stride: int = DEFAULT_FRAME_STRIDE,
+    max_frames: int = DEFAULT_MAX_FRAMES,
 ) -> Tuple[Plan, Dict[str, Any]]:
     """Reconstruct one room from a LiDAR capture.
 
@@ -548,6 +677,25 @@ def build_lidar_plan(
         timings["ablation_s"] = round(time.time() - mark, 3)
 
     room_id = (bundle.manifest.declared_rooms or ["room_1"])[0]
+
+    # The semantic half of the contract: damage, concealed flags, scope, and a
+    # second opinion on the openings. Degrades to geometry-only if the detector
+    # or the weights are missing.
+    semantic = None
+    if semantics:
+        mark = time.time()
+        semantic = run_semantics_subprocess(
+            capture_root=lidar.root,
+            layout=layout,
+            ceiling_height_m=ceiling.height_above_floor_m,
+            geometric_openings=detections,
+            room_id=room_id,
+            weights_dir=weights_dir,
+            frame_stride=frame_stride,
+            max_frames=max_frames,
+        )
+        timings["semantics_s"] = round(time.time() - mark, 3)
+
     ceiling_measurement = Measurement(
         value=round(ceiling.height_above_floor_m, 4),
         ci_95=(round(ceiling.ci_95[0], 4), round(ceiling.ci_95[1], 4)),
@@ -556,8 +704,13 @@ def build_lidar_plan(
     walls: List[Wall] = []
     surfaces: List[Surface] = []
     openings: List[Opening] = []
+    # Openings come from the cross-check when it ran, so a detector-only
+    # opening reaches the plan and every opening records which sources agreed.
+    opening_source: Sequence[Any] = (
+        semantic.openings if semantic is not None and semantic.openings else detections
+    )
     by_wall: Dict[int, List[Any]] = {}
-    for detection in detections:
+    for detection in opening_source:
         by_wall.setdefault(detection.wall_index, []).append(detection)
 
     for index, segment in enumerate(layout.walls):
@@ -567,18 +720,26 @@ def build_lidar_plan(
         for number, detection in enumerate(wall_openings):
             opening_id = f"{wall_id}_op{number}"
             opening_ids.append(opening_id)
+            sources = list(getattr(detection, "sources", ["geometry"]))
+            # A detector-only opening is bounded by a projected mask, not
+            # measured from depth, so its interval is widened to say so.
+            half = LIDAR_OPENING_ABS_M if "geometry" in sources else 3 * LIDAR_OPENING_ABS_M
             openings.append(Opening(
                 id=opening_id,
                 wall_id=wall_id,
                 type=OpeningType.DOOR if detection.kind == "door" else OpeningType.WINDOW,
-                width=_opening_measurement(detection.width_m),
-                height=_opening_measurement(detection.height_m),
-                offset_along_wall=_opening_measurement(detection.offset_along_wall_m),
+                width=Measurement.symmetric(round(detection.width_m, 4), half),
+                height=Measurement.symmetric(round(detection.height_m, 4), half),
+                offset_along_wall=Measurement.symmetric(
+                    round(detection.offset_along_wall_m, 4), half
+                ),
                 sill_height=(
-                    _opening_measurement(detection.sill_height_m)
+                    Measurement.symmetric(round(detection.sill_height_m, 4), half)
                     if detection.kind == "window" else None
                 ),
                 detection_confidence=round(float(detection.confidence), 3),
+                detection_sources=sources,
+                source_note=getattr(detection, "note", "") or None,
             ))
 
         walls.append(Wall(
@@ -627,6 +788,15 @@ def build_lidar_plan(
 
     degradations: List[str] = []
     warnings_out: List[str] = list(bundle.warnings)
+    if semantic is not None:
+        warnings_out.extend(semantic.warnings)
+    elif semantics:
+        warnings_out.append("semantic stage did not run")
+    if not semantics:
+        warnings_out.append(
+            "semantic detection disabled for this run; damage, concealed flags and "
+            "scope are empty because nothing looked for them"
+        )
     if not ceiling.measured:
         degradations.append(f"ceiling not measured ({ceiling.method})")
     if layout.stats.get("manhattan_score", 1.0) < 0.5:
@@ -694,9 +864,9 @@ def build_lidar_plan(
         ),
         rooms=[room],
         adjacencies=[],
-        damage=[],
-        concealed_flags=[],
-        scope=[],
+        damage=list(semantic.damage) if semantic else [],
+        concealed_flags=list(semantic.concealed_flags) if semantic else [],
+        scope=list(semantic.scope) if semantic else [],
         quality=QualityReport(
             overall_confidence=0.70 if ceiling.measured else 0.55,
             interval_method=(
@@ -706,6 +876,7 @@ def build_lidar_plan(
             ),
             calibration_note="Uncalibrated. Do not read these intervals as verified coverage.",
             ceiling_method=ceiling.method,
+            semantics_available=bool(semantic.available) if semantic else False,
             degradations=degradations,
             warnings=warnings_out,
             coverage={
@@ -727,6 +898,7 @@ def build_lidar_plan(
         "layout": layout.summary(),
         "ceiling": ceiling.summary(),
         "wall_observation_fraction": [round(f, 3) for f in observation],
+        "semantics": semantic.details if semantic else {"detector": "disabled"},
         "openings": [
             {
                 "wall_index": d.wall_index, "kind": d.kind,
@@ -874,6 +1046,10 @@ def run_capture(
     command: Optional[Sequence[str]] = None,
     stride: int = DEFAULT_STRIDE,
     voxel_size_m: float = DEFAULT_VOXEL_M,
+    semantics: bool = True,
+    weights_dir: Optional[Path] = None,
+    frame_stride: int = DEFAULT_FRAME_STRIDE,
+    max_frames: int = DEFAULT_MAX_FRAMES,
 ) -> RunResult:
     """Run one capture: load, reconstruct, write plan, manifest and drawing."""
     started = time.time()
@@ -895,6 +1071,10 @@ def run_capture(
             generated_at=generated_at,
             stride=stride,
             voxel_size_m=voxel_size_m,
+            semantics=semantics,
+            weights_dir=weights_dir,
+            frame_stride=frame_stride,
+            max_frames=max_frames,
         )
         layout = details.pop("layout_result")
         try:
@@ -939,7 +1119,12 @@ def run_capture(
         },
         "reconstruction": reconstruction,
         "reconstruction_settings": (
-            {"stride": stride, "voxel_size_m": voxel_size_m}
+            {
+                "stride": stride, "voxel_size_m": voxel_size_m,
+                "semantics": semantics, "frame_stride": frame_stride,
+                "max_frames": max_frames,
+                "weights_dir": str(weights_dir) if weights_dir else None,
+            }
             if bundle.tier is Tier.LIDAR else None
         ),
         "environment": {

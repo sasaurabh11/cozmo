@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.1.0",
+  "schema_version": "1.2.0",
   "capture_id": "cap_lidar_a",
   "tier": "lidar",
   "pipeline_version": "0.1.0-fixture",
@@ -230,7 +230,9 @@
           },
           "sill_height": null,
           "connects_room_id": null,
-          "detection_confidence": 1.0
+          "detection_confidence": 1.0,
+          "detection_sources": [],
+          "source_note": null
         },
         {
           "id": "op_lr_window",
@@ -262,7 +264,9 @@
           },
           "sill_height": null,
           "connects_room_id": null,
-          "detection_confidence": 1.0
+          "detection_confidence": 1.0,
+          "detection_sources": [],
+          "source_note": null
         }
       ],
       "surfaces": [
@@ -516,7 +520,9 @@
           },
           "sill_height": null,
           "connects_room_id": null,
-          "detection_confidence": 1.0
+          "detection_confidence": 1.0,
+          "detection_sources": [],
+          "source_note": null
         }
       ],
       "surfaces": [
@@ -718,6 +724,8 @@
       "triggered_by_damage_ids": [
         "dmg_water_01"
       ],
+      "triggering_values": {},
+      "severity": null,
       "probability": 0.66,
       "recommended_action": "Moisture-meter the lower 0.6 m of the wall.",
       "inspection_priority": 2
@@ -741,6 +749,7 @@
         ],
         "unit": "m2"
       },
+      "basis": null,
       "notes": null
     }
   ],
@@ -748,6 +757,7 @@
     "overall_confidence": 0.88,
     "interval_method": "Fixture: intervals asserted by hand to exercise the calibration row.",
     "ceiling_method": null,
+    "semantics_available": false,
     "calibration_note": null,
     "degradations": [],
     "warnings": [],

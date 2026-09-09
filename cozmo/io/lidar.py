@@ -17,7 +17,7 @@ from typing import Any, Dict, List, Optional
 
 import numpy as np
 
-from .stray import CONFIDENCE_HIGH, StrayCapture, sanity_check
+from .stray import CONFIDENCE_HIGH, StrayCapture, quaternion_to_rotation, sanity_check
 
 log = logging.getLogger("cozmo.io.lidar")
 
@@ -100,6 +100,69 @@ def load_lidar_capture(root: Path) -> LidarCapture:
         )
 
     return LidarCapture(root=root, capture=capture, sanity=sanity, warnings=warnings_out)
+
+
+def iter_rgb_frames(
+    lidar: LidarCapture,
+    stride: int = 100,
+    max_frames: Optional[int] = None,
+    long_edge: Optional[int] = None,
+):
+    """Yield ``(index, rgb, R, t, K)`` for sampled frames.
+
+    The video is walked sequentially with ``grab()`` and decoded only on the
+    frames wanted: seeking per frame re-opens and re-seeks the stream, which on
+    a 1715-frame HEVC file costs more than decoding the whole thing.
+
+    ``K`` comes back scaled to the returned image, so a caller that downscales
+    for detection still projects correctly -- the single most likely place to
+    introduce a silent metric error.
+    """
+    import cv2
+
+    capture = lidar.capture
+    video_path = capture.root / "rgb.mp4"
+    if not video_path.is_file():
+        log.warning("no rgb.mp4 in %s; semantic detection cannot run", capture.root)
+        return
+
+    video = cv2.VideoCapture(str(video_path))
+    try:
+        wanted = list(range(0, len(capture), max(1, stride)))
+        if max_frames is not None:
+            wanted = wanted[:max_frames]
+        wanted_set = set(wanted)
+        emitted = 0
+
+        for index in range(len(capture)):
+            if index not in wanted_set:
+                video.grab()
+                continue
+            ok, bgr = video.read()
+            if not ok:
+                break
+
+            scale = 1.0
+            if long_edge:
+                longest = max(bgr.shape[0], bgr.shape[1])
+                if longest > long_edge:
+                    scale = long_edge / longest
+                    bgr = cv2.resize(
+                        bgr, (int(bgr.shape[1] * scale), int(bgr.shape[0] * scale))
+                    )
+
+            row = capture.odometry.iloc[index]
+            R = quaternion_to_rotation(row.qx, row.qy, row.qz, row.qw)
+            t = np.array([row.x, row.y, row.z], dtype=float)
+
+            K = capture.rgb_K.copy()
+            K[:2, :] *= scale
+
+            yield index, cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB), R, t, K
+            emitted += 1
+        log.info("iterated %d RGB frame(s) at stride %d", emitted, stride)
+    finally:
+        video.release()
 
 
 def summarize(lidar: LidarCapture) -> Dict[str, Any]:

@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.1.0",
+  "schema_version": "1.2.0",
   "capture_id": "cap_photo_a",
   "tier": "photo",
   "pipeline_version": "0.1.0-fixture",
@@ -230,7 +230,9 @@
           },
           "sill_height": null,
           "connects_room_id": null,
-          "detection_confidence": 1.0
+          "detection_confidence": 1.0,
+          "detection_sources": [],
+          "source_note": null
         },
         {
           "id": "op_lr_phantom_closet",
@@ -262,7 +264,9 @@
           },
           "sill_height": null,
           "connects_room_id": null,
-          "detection_confidence": 1.0
+          "detection_confidence": 1.0,
+          "detection_sources": [],
+          "source_note": null
         }
       ],
       "surfaces": [
@@ -516,7 +520,9 @@
           },
           "sill_height": null,
           "connects_room_id": null,
-          "detection_confidence": 1.0
+          "detection_confidence": 1.0,
+          "detection_sources": [],
+          "source_note": null
         }
       ],
       "surfaces": [
@@ -623,6 +629,7 @@
     "overall_confidence": 0.83,
     "interval_method": "Fixture: intervals asserted by hand to exercise the calibration row.",
     "ceiling_method": null,
+    "semantics_available": false,
     "calibration_note": null,
     "degradations": [],
     "warnings": [

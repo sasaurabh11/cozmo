@@ -23,10 +23,13 @@ dependencies = [
     "scipy>=1.10",
     "shapely>=2.0",
     "matplotlib>=3.7",
+    "pyyaml>=6.0",
 ]
+
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0"]
+semantics = ["torch>=2.2", "transformers>=4.56", "accelerate>=0.30"]
 
 [project.scripts]
 cozmo = "cozmo.cli:app"

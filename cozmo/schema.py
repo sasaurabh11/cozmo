@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
@@ -208,6 +208,11 @@ class Opening(StrictModel):
     # Room id on the far side, when we believe the opening connects two rooms.
     connects_room_id: Optional[str] = None
     detection_confidence: float = Field(ge=0.0, le=1.0, default=1.0)
+    # Which detectors found this opening: "geometry" (a hole in the wall plane),
+    # "semantic" (an open-vocabulary detection), or both. The two fail in
+    # different ways, so knowing which agreed is part of the finding.
+    detection_sources: List[str] = Field(default_factory=list)
+    source_note: Optional[str] = None
 
 
 class Surface(StrictModel):
@@ -306,6 +311,10 @@ class ConcealedFlag(StrictModel):
     rule_id: str
     rule_text: str
     triggered_by_damage_ids: List[str] = Field(default_factory=list)
+    # The input values that satisfied the rule. The contract asks for the rule
+    # that fired; a rule id without its inputs cannot be argued with.
+    triggering_values: Dict[str, Any] = Field(default_factory=dict)
+    severity: Optional[str] = None
     probability: float = Field(ge=0.0, le=1.0)
     recommended_action: str
     inspection_priority: int = Field(ge=1, le=5, default=3)
@@ -321,6 +330,10 @@ class ScopeItem(StrictModel):
     code: str
     description: str
     quantity: Measurement
+    # How the quantity was arrived at, in words: which measurement, what
+    # cut-back margin, what waste factor. A quantity nobody can check is a
+    # quantity nobody will accept.
+    basis: Optional[str] = None
     notes: Optional[str] = None
 
 
@@ -371,6 +384,9 @@ class QualityReport(StrictModel):
     # | scan_cutoff_prior | prior. A capture that never looks up cannot measure a
     # ceiling, and the plan has to say so rather than quietly returning a number.
     ceiling_method: Optional[str] = None
+    # Whether the semantic detector actually ran. Empty damage with this False
+    # means nobody looked, which is not the same as nothing being there.
+    semantics_available: bool = False
     calibration_note: Optional[str] = None
     # Named degradations we detected: mirrors, glass, wet-look floor, low light.
     degradations: List[str] = Field(default_factory=list)

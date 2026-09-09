@@ -7,7 +7,7 @@ stubs, and say so in their own output.
 
 | Tier | Status |
 |---|---|
-| `lidar` | Real reconstruction: fuse → floor plane → wall layout → ceiling → openings → render |
+| `lidar` | Real reconstruction: fuse → floor plane → wall layout → ceiling → openings → render, then damage → concealed-damage rules → scope |
 | `video` | Stub. Emits a hardcoded property with `STUB PIPELINE` in `quality.warnings` |
 | `photo` | Stub, as above |
 
@@ -211,6 +211,92 @@ These are asserted, not calibrated, and `quality.calibration_note` says so. The
 ceiling interval is the exception — it comes from the estimator and means
 something.
 
+## Damage, concealed flags and scope
+
+[cozmo/semantics/](cozmo/semantics/) is tier-agnostic by construction: it takes a
+metric point cloud, RGB frames with poses, and fitted surfaces, and knows nothing
+about how they were obtained. Any tier that can supply those three gets damage
+regions, concealed-damage flags and scope out of it unchanged.
+
+| Module | What it does |
+|---|---|
+| [detect.py](cozmo/semantics/detect.py) | Grounding DINO (open-vocabulary boxes) + SAM 2 (mask refinement), and the opening cross-check |
+| [project.py](cozmo/semantics/project.py) | Projects a mask onto a fitted plane; measures extent in m²; merges across frames |
+| [rules.py](cozmo/semantics/rules.py) | YAML rule engine for concealed damage |
+| [scope.py](cozmo/semantics/scope.py) | CSV lookup → line items with cut-back margins and a `basis` string |
+| [worker.py](cozmo/semantics/worker.py) | Runs the stage in its own process (see below) |
+
+Prompts are `door`, `window`, `doorway` for openings, and `water stain`,
+`mould`, `cracked drywall`, `burn mark`, `missing drywall` for damage. Weights
+come from `scripts/fetch_weights.sh`, pinned to a Hugging Face commit revision
+and checked by sha256, loaded `local_files_only` and never committed.
+
+### The stage runs in a separate process
+
+open3d and torch each bundle their own OpenMP runtime. A process holding both
+either aborts (`OMP: Error #179: pthread_mutex_init failed`) or **deadlocks
+inside the first inference call at 0% CPU with no error at all** — reproducibly,
+on this machine, in both import orders. `KMP_DUPLICATE_LIB_OK` papers over it and
+is documented as unsafe, so the semantic stage gets its own interpreter and
+everything crossing the boundary is JSON. It costs one interpreter start, and it
+also means a detector that dies on a bad frame loses the damage findings rather
+than the whole run. Nothing under `cozmo/semantics/` may import
+`cozmo.geometry`; a test asserts it.
+
+For the same reason the detector tests are opt-in — pytest would otherwise load
+open3d and torch together:
+
+```bash
+COZMO_TEST_DETECTOR=1 pytest tests/test_semantics.py -k Detector
+```
+
+### Openings are cross-checked, not replaced
+
+Geometry finds a doorway as a hole in a wall plane; the detector finds one as a
+door. They fail differently — a mirror or a dark recess fools the geometry, an
+unobserved wall defeats it entirely, and a poster of a door fools the detector —
+so an opening is reported when **either** source fires, and `detection_sources`
+records which agreed. Detector-only openings carry three times the interval,
+because their extent comes from a projected mask rather than from depth, and
+they are held to the same plausible width bands, so a partial mask implying a
+0.42 m "door" is dropped rather than becoming a phantom.
+
+### Concealed damage is a rule engine, not a model
+
+The contract requires the rule that fired, so [rules.yaml](cozmo/semantics/rules.yaml)
+holds seven rules with structured predicates — `all_of` / `any_of` / `none_of`
+over `{field, op, value}` leaves. There is no `eval`: a rule file is a data file,
+and a data file that can execute arbitrary Python is not one. A rule naming an
+unknown field is a **load error**, because the failure mode of a rule engine is a
+rule that quietly never fires. Every flag carries `triggering_values` — the
+actual numbers that satisfied it:
+
+```json
+{
+  "rule_id": "CD-WATER-SUBFLOOR-01",
+  "triggering_values": {"damage_class": "water", "surface_kind": "wall",
+                        "min_height_above_floor_m": 0.0},
+  "probability": 0.72, "inspection_priority": 1
+}
+```
+
+### Scope quantities show their arithmetic
+
+[scope_items.csv](cozmo/semantics/scope_items.csv) maps (damage class, surface
+kind) to line items with a cut-back margin, a waste factor and a minimum charge.
+Four bases: `area` (the patch, grown by the cut-back), `surface` (the whole
+surface, for work that cannot stop at the damage — a repaint flashes, soot is not
+confined to the scorch mark), `extent` (linear work), `count`. Every line states
+how it got its number:
+
+```
+DRY-RMV-2   1.80 m2  basis: damaged patch 0.62 x 0.74 m, cut back 0.30 m each
+                            side -> 1.22 x 1.34 m = 1.63 m2, +10% waste = 1.80 m2
+```
+
+A (damage class, surface kind) pair with no catalogue row produces **no line
+item** rather than a guess.
+
 ## Output contract
 
 [schema.py](cozmo/schema.py), pydantic v2, `extra="forbid"`. One rule runs
@@ -355,8 +441,11 @@ scripts/fetch_weights.sh
   Manhattan/plane-anchored correction described above, and the plan claims
   exactly that and nothing more.
 - **Calibrated intervals.** See above — LiDAR intervals are asserted.
-- **Damage, concealed-damage rules and scope** at the LiDAR tier. The contract
-  carries them and the stub populates them; the reconstruction does not.
+- **Detector precision.** Open-vocabulary prompts are noisy: "cracked drywall"
+  at a low threshold returns the wall. Damage is held to a higher score
+  threshold than openings and masks covering more than 35% of a frame are
+  dropped, but nothing here is validated against damage ground truth yet — the
+  benchmark has no damage rows.
 - **Spatial matching of openings in the scorer.** Ground truth is matched to
   plans by id, so opening ground truth has to be keyed to the reconstruction's
   ids. Openings should be matched by position along the wall instead.

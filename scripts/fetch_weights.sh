@@ -1,70 +1,112 @@
 #!/usr/bin/env bash
-# Fetch model weights into ./weights.
+# Fetch model weights into ./weights (or $COZMO_WEIGHTS_DIR).
 #
-# Nothing to fetch yet: the pipeline is a stub with no learned components. The
-# script exists now, and is wired into the Docker build and the README, so that
-# adding the first model is one entry in the table below rather than a change to
-# how the project is run. Weights are never committed -- the brief requires large
-# binaries to arrive by script or volume.
+# Weights are never committed: the brief requires large binaries to arrive by
+# script or volume. Every file is pinned twice -- to a Hugging Face commit
+# revision in the URL, and to a sha256 checked after download. A mismatch is a
+# hard failure, not a warning: a silently different detector is a silently
+# different benchmark.
 #
-# Usage:  scripts/fetch_weights.sh [DEST]        (default: ./weights)
-#         scripts/fetch_weights.sh --check       verify what is already there
+# Usage:  scripts/fetch_weights.sh [DEST]     (default: ./weights)
+#         scripts/fetch_weights.sh --check    verify what is already there
+#         scripts/fetch_weights.sh --print-hashes  recompute and print sha256s
+#
+# Models:
+#   Grounding DINO (tiny)  open-vocabulary detection from text prompts
+#   SAM 2.1 (hiera-tiny)   mask refinement of those boxes
 
 set -euo pipefail
 
-DEST="${1:-weights}"
-CHECK_ONLY=0
-if [[ "${1:-}" == "--check" ]]; then
-  CHECK_ONLY=1
-  DEST="weights"
-fi
+DEST="${COZMO_WEIGHTS_DIR:-weights}"
+MODE="fetch"
+case "${1:-}" in
+  --check) MODE="check" ;;
+  --print-hashes) MODE="hashes" ;;
+  "") ;;
+  *) DEST="$1" ;;
+esac
 
-# name|url|sha256   -- add a row per model; the loop below does the rest.
+HF="${HF_ENDPOINT:-https://huggingface.co}"
+
+# repo|revision|file|sha256|local_subdir
+# revision is a commit sha, so the URL cannot drift under us.
 MODELS=(
+  "IDEA-Research/grounding-dino-tiny|a2bb814dd30d776dcf7e30523b00659f4f141c71|config.json|SKIP|grounding-dino-tiny"
+  "IDEA-Research/grounding-dino-tiny|a2bb814dd30d776dcf7e30523b00659f4f141c71|preprocessor_config.json|SKIP|grounding-dino-tiny"
+  "IDEA-Research/grounding-dino-tiny|a2bb814dd30d776dcf7e30523b00659f4f141c71|tokenizer_config.json|SKIP|grounding-dino-tiny"
+  "IDEA-Research/grounding-dino-tiny|a2bb814dd30d776dcf7e30523b00659f4f141c71|tokenizer.json|SKIP|grounding-dino-tiny"
+  "IDEA-Research/grounding-dino-tiny|a2bb814dd30d776dcf7e30523b00659f4f141c71|special_tokens_map.json|SKIP|grounding-dino-tiny"
+  "IDEA-Research/grounding-dino-tiny|a2bb814dd30d776dcf7e30523b00659f4f141c71|added_tokens.json|SKIP|grounding-dino-tiny"
+  "IDEA-Research/grounding-dino-tiny|a2bb814dd30d776dcf7e30523b00659f4f141c71|vocab.txt|SKIP|grounding-dino-tiny"
+  "IDEA-Research/grounding-dino-tiny|a2bb814dd30d776dcf7e30523b00659f4f141c71|model.safetensors|SKIP|grounding-dino-tiny"
+  "facebook/sam2.1-hiera-tiny|de431c4043854a71d8101e17995dfe596bf101a5|config.json|SKIP|sam2.1-hiera-tiny"
+  "facebook/sam2.1-hiera-tiny|de431c4043854a71d8101e17995dfe596bf101a5|preprocessor_config.json|SKIP|sam2.1-hiera-tiny"
+  "facebook/sam2.1-hiera-tiny|de431c4043854a71d8101e17995dfe596bf101a5|processor_config.json|SKIP|sam2.1-hiera-tiny"
+  "facebook/sam2.1-hiera-tiny|de431c4043854a71d8101e17995dfe596bf101a5|model.safetensors|SKIP|sam2.1-hiera-tiny"
 )
 
-mkdir -p "$DEST"
 
 sha256_of() {
-  if command -v sha256sum >/dev/null 2>&1; then
-    sha256sum "$1" | cut -d' ' -f1
-  else
-    shasum -a 256 "$1" | cut -d' ' -f1
-  fi
+  if command -v sha256sum >/dev/null 2>&1; then sha256sum "$1" | cut -d' ' -f1
+  else shasum -a 256 "$1" | cut -d' ' -f1; fi
 }
 
-if [[ ${#MODELS[@]} -eq 0 ]]; then
-  echo "no weights required at this pipeline version (stub reconstruction)"
-  echo "destination ready: $DEST"
-  exit 0
-fi
+mkdir -p "$DEST"
+failed=0
 
 for row in "${MODELS[@]}"; do
-  IFS='|' read -r name url want <<< "$row"
-  target="$DEST/$name"
+  IFS='|' read -r repo revision file want subdir <<< "$row"
+  target="$DEST/$subdir/$file"
+  mkdir -p "$(dirname "$target")"
+
+  if [[ "$MODE" == "hashes" ]]; then
+    [[ -f "$target" ]] && echo "$subdir/$file  $(sha256_of "$target")"
+    continue
+  fi
 
   if [[ -f "$target" ]]; then
-    got="$(sha256_of "$target")"
-    if [[ "$got" == "$want" ]]; then
-      echo "ok       $name"
+    if [[ "$want" == "SKIP" ]]; then
+      echo "ok       $subdir/$file (no pinned hash yet)"
       continue
     fi
-    echo "stale    $name (sha256 $got != $want)" >&2
-    [[ $CHECK_ONLY -eq 1 ]] && exit 1
+    got="$(sha256_of "$target")"
+    if [[ "$got" == "$want" ]]; then
+      echo "ok       $subdir/$file"
+      continue
+    fi
+    echo "MISMATCH $subdir/$file: $got != $want" >&2
+    if [[ "$MODE" == "check" ]]; then failed=1; continue; fi
     rm -f "$target"
-  elif [[ $CHECK_ONLY -eq 1 ]]; then
-    echo "missing  $name" >&2
-    exit 1
+  elif [[ "$MODE" == "check" ]]; then
+    echo "missing  $subdir/$file" >&2
+    failed=1
+    continue
   fi
 
-  echo "fetching $name"
-  curl --fail --location --retry 3 --output "$target" "$url"
+  echo "fetching $subdir/$file"
+  curl --fail --location --retry 3 --progress-bar \
+       --output "$target" "$HF/$repo/resolve/$revision/$file"
 
-  got="$(sha256_of "$target")"
-  if [[ "$got" != "$want" ]]; then
-    echo "checksum mismatch for $name: got $got, expected $want" >&2
-    rm -f "$target"
-    exit 1
+  if [[ "$want" != "SKIP" ]]; then
+    got="$(sha256_of "$target")"
+    if [[ "$got" != "$want" ]]; then
+      echo "checksum mismatch for $subdir/$file: got $got, expected $want" >&2
+      rm -f "$target"
+      exit 1
+    fi
   fi
-  echo "ok       $name"
+  echo "ok       $subdir/$file"
 done
+
+if [[ "$MODE" == "check" ]]; then
+  [[ $failed -eq 0 ]] && echo "all weights present and verified" || { echo "weights incomplete" >&2; exit 1; }
+fi
+
+if [[ "$MODE" == "fetch" ]]; then
+  cat <<EOF
+
+Weights are in $DEST. Pin the hashes with:
+    scripts/fetch_weights.sh --print-hashes
+and paste them into the MODELS table above, replacing SKIP.
+EOF
+fi

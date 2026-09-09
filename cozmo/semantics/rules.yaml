@@ -1,0 +1,133 @@
+# Concealed-damage rules.
+#
+# The output contract requires the rule that fired, not just the flag, so this
+# is an explicit rule engine and not a model. Each rule states its own reasoning
+# in `text`, and the engine records the actual value of every leaf condition it
+# evaluated, so a flag can always be argued back to the numbers behind it.
+#
+# Predicate grammar (see rules.py):
+#   {all_of: [...]} | {any_of: [...]} | {none_of: [...]}
+#   {field: <name>, op: <lt|lte|gt|gte|eq|ne|in|not_in|contains>, value: <x>}
+#
+# Fields available on each damage region are listed in rules.py: RULE_FIELDS.
+
+version: 1
+
+rules:
+  - id: CD-WATER-SUBFLOOR-01
+    text: >-
+      Water staining that reaches within 0.15 m of the floor implies moisture
+      has tracked down behind the wall finish into the floor junction. The
+      subfloor and the wall cavity below the visible stain are likely wet even
+      though nothing is visible there.
+    severity: high
+    probability: 0.72
+    recommended_action: >-
+      Moisture-meter the lower 0.6 m of the wall and the floor within 1 m of it.
+      Lift a floor covering sample at the wall junction if readings exceed 18% WME.
+    inspection_priority: 1
+    predicate:
+      all_of:
+        - {field: damage_class, op: in, value: [water, stain]}
+        - {field: surface_kind, op: eq, value: wall}
+        - {field: min_height_above_floor_m, op: lte, value: 0.15}
+
+  - id: CD-MOULD-THERMAL-BRIDGE-01
+    text: >-
+      Mould on a ceiling within 0.5 m of an exterior corner is the signature of a
+      cold spot: either a thermal bridge at the wall/roof junction or water
+      ingress from above. The visible growth is the surface expression of a
+      cavity that stays damp.
+    severity: high
+    probability: 0.66
+    recommended_action: >-
+      Thermal-image the ceiling/wall junction from inside, and inspect the roof
+      void or the flat-roof membrane directly above this corner.
+    inspection_priority: 1
+    predicate:
+      all_of:
+        - {field: damage_class, op: eq, value: mold}
+        - {field: surface_kind, op: eq, value: ceiling}
+        - {field: distance_to_exterior_corner_m, op: lte, value: 0.50}
+
+  - id: CD-WATER-CEILING-ABOVE-01
+    text: >-
+      Water staining on a ceiling means the source is in the void above it. The
+      wetted area is characteristically larger than the stain, because the stain
+      marks only where water reached the finish and dried.
+    severity: high
+    probability: 0.80
+    recommended_action: >-
+      Inspect the void above this ceiling over an area at least twice the stain
+      extent, and trace services running through it.
+    inspection_priority: 1
+    predicate:
+      all_of:
+        - {field: damage_class, op: in, value: [water, stain]}
+        - {field: surface_kind, op: eq, value: ceiling}
+
+  - id: CD-CRACK-STRUCTURAL-01
+    text: >-
+      A crack longer than 1.0 m that reaches the floor junction is unlikely to be
+      shrinkage alone. Movement of that length usually continues behind the
+      finish and into the substrate.
+    severity: medium
+    probability: 0.55
+    recommended_action: >-
+      Expose the crack ends, check for displacement across it, and re-inspect
+      after 4 weeks to establish whether it is live.
+    inspection_priority: 2
+    predicate:
+      all_of:
+        - {field: damage_class, op: eq, value: crack}
+        - {field: max_extent_m, op: gte, value: 1.00}
+        - {field: min_height_above_floor_m, op: lte, value: 0.30}
+
+  - id: CD-MISSING-CAVITY-01
+    text: >-
+      Missing wall material exposes the cavity directly. Whatever caused the loss
+      acted on the cavity too, and insulation and services behind the opening
+      cannot be assumed intact.
+    severity: medium
+    probability: 0.85
+    recommended_action: >-
+      Inspect the cavity through the existing opening before closing it, and
+      check insulation continuity and any services crossing the void.
+    inspection_priority: 2
+    predicate:
+      all_of:
+        - {field: damage_class, op: in, value: [missing_material, impact]}
+        - {field: area_m2, op: gte, value: 0.05}
+
+  - id: CD-FIRE-CAVITY-SPREAD-01
+    text: >-
+      Smoke and burn damage on a surface implies deposits in every cavity that
+      surface vents into. Soot travels further than heat, so the contaminated
+      area exceeds the discoloured one.
+    severity: high
+    probability: 0.70
+    recommended_action: >-
+      Swab-test cavities adjacent to the burn for soot deposition, including the
+      ceiling void if the damage reaches the wall head.
+    inspection_priority: 1
+    predicate:
+      all_of:
+        - {field: damage_class, op: eq, value: fire_smoke}
+
+  - id: CD-WATER-SHARED-WALL-01
+    text: >-
+      Water staining on a wall that carries an opening to a wet area implies the
+      leak path runs inside the wall rather than across its face. The cavity
+      around the opening reveal is the likely route.
+    severity: medium
+    probability: 0.58
+    recommended_action: >-
+      Moisture-meter both faces of this wall around the opening reveal, and check
+      any service penetrations through it.
+    inspection_priority: 2
+    predicate:
+      all_of:
+        - {field: damage_class, op: in, value: [water, mold, stain]}
+        - {field: surface_kind, op: eq, value: wall}
+        - {field: wall_has_opening, op: eq, value: true}
+        - {field: min_height_above_floor_m, op: gt, value: 0.15}

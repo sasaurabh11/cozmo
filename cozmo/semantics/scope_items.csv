@@ -1,0 +1,20 @@
+damage_class,surface_kind,code,description,unit,basis,cut_back_m,waste_factor,min_quantity,notes
+water,wall,DRY-RMV-2,Remove water-damaged drywall and dispose,m2,area,0.3,0.1,0.5,Cut back to sound material beyond the visible stain line
+water,wall,PNT-WALL-2,Stain-block primer and repaint affected wall,m2,surface,0.0,0.05,1.0,Full surface; spot painting flashes against the existing finish
+water,ceiling,DRY-RMV-CLG-2,Remove water-damaged ceiling board and dispose,m2,area,0.3,0.15,0.75,Overhead work; larger cut-back for fixing centres
+water,ceiling,PNT-CLG-2,Stain-block primer and repaint ceiling,m2,surface,0.0,0.05,1.0,Full surface
+water,floor,FLR-DRY-1,Lift floor covering and dry substrate,m2,area,0.25,0.1,1.0,
+mold,wall,MLD-REM-3,Remove mould-affected material under containment,m2,area,0.5,0.15,1.0,Containment and negative air; cut back beyond visible growth
+mold,wall,MLD-TRT-1,Antimicrobial treatment to exposed substrate,m2,area,0.5,0.1,1.0,
+mold,ceiling,MLD-REM-CLG-3,Remove mould-affected ceiling under containment,m2,area,0.5,0.2,1.0,
+fire_smoke,wall,FIRE-CLN-2,Soot removal and degrease affected surface,m2,surface,0.0,0.05,2.0,Whole surface; soot travels beyond the visible burn
+fire_smoke,wall,FIRE-SEAL-1,Odour-seal affected substrate,m2,surface,0.0,0.05,2.0,
+fire_smoke,ceiling,FIRE-CLN-CLG-2,Soot removal to ceiling,m2,surface,0.0,0.05,2.0,
+impact,wall,DRY-PATCH-1,Patch impact damage: cut square; board; tape and sand,ea,count,0.15,0.0,1.0,Priced per penetration
+impact,wall,PNT-SPOT-1,Prime and paint patched area,m2,area,0.3,0.1,0.5,
+crack,wall,CRK-FILL-1,Rake out; fill and tape crack,m,extent,0.1,0.1,0.5,Priced on crack length plus overrun each end
+crack,ceiling,CRK-FILL-CLG-1,Rake out; fill and tape ceiling crack,m,extent,0.1,0.15,0.5,
+stain,wall,PNT-STAIN-1,Stain-block and repaint affected area,m2,area,0.2,0.1,0.5,
+stain,ceiling,PNT-STAIN-CLG-1,Stain-block and repaint ceiling area,m2,area,0.2,0.1,0.5,
+missing_material,wall,DRY-REPL-2,Replace missing drywall: board; tape; skim,m2,area,0.2,0.15,0.5,
+missing_material,ceiling,DRY-REPL-CLG-2,Replace missing ceiling board,m2,area,0.2,0.2,0.75,

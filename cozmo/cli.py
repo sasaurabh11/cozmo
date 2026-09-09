@@ -24,6 +24,7 @@ from . import PIPELINE_VERSION, SCHEMA_VERSION, __version__
 from .benchmark.score import render_table, score_results, write_results
 from .geometry.fuse import DEFAULT_STRIDE, DEFAULT_VOXEL_M
 from .pipeline.run import run_capture
+from .semantics.stage import DEFAULT_FRAME_STRIDE, DEFAULT_MAX_FRAMES
 from .seed import DEFAULT_SEED
 
 app = typer.Typer(
@@ -70,6 +71,22 @@ def run(
         DEFAULT_VOXEL_M, "--voxel-size", min=0.0,
         help="LiDAR tier: voxel downsample size in metres. 0 disables downsampling.",
     ),
+    semantics: bool = typer.Option(
+        True, "--semantics/--no-semantics",
+        help="Run damage detection, concealed-damage rules and scope. Needs model "
+             "weights (scripts/fetch_weights.sh).",
+    ),
+    weights_dir: Optional[Path] = typer.Option(
+        None, "--weights-dir", help="Where the model weights live. Default: ./weights."
+    ),
+    frame_stride: int = typer.Option(
+        DEFAULT_FRAME_STRIDE, "--frame-stride", min=1,
+        help="Detect on every Nth RGB frame.",
+    ),
+    max_frames: int = typer.Option(
+        DEFAULT_MAX_FRAMES, "--max-frames", min=1,
+        help="Cap on RGB frames sent to the detector.",
+    ),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Log each reconstruction stage."),
     quiet: bool = typer.Option(False, "--quiet", "-q", help="Suppress the summary."),
 ) -> None:
@@ -87,6 +104,10 @@ def run(
             command=["cozmo", *sys.argv[1:]],
             stride=stride,
             voxel_size_m=voxel_size,
+            semantics=semantics,
+            weights_dir=weights_dir,
+            frame_stride=frame_stride,
+            max_frames=max_frames,
         )
     except (FileNotFoundError, NotADirectoryError, ValueError) as exc:
         _err(f"run failed: {exc}")
@@ -118,7 +139,17 @@ def run(
         walls = ", ".join(f"{w.length.value:.2f}" for w in room.walls[:8])
         typer.echo(f"walls        {len(room.walls)}: {walls}{' ...' if len(room.walls) > 8 else ''} m")
         typer.echo(f"openings     {len(room.openings)}")
-    typer.echo(f"damage       {len(plan.damage)} region(s), {len(plan.concealed_flags)} concealed flag(s)")
+    typer.echo(
+        f"damage       {len(plan.damage)} region(s), {len(plan.concealed_flags)} concealed flag(s), "
+        f"{len(plan.scope)} scope line(s)"
+    )
+    for region in plan.damage:
+        typer.echo(
+            f"  - {region.damage_class.value:<16} {region.area.value:.2f} m2 "
+            f"[{region.area.ci_95[0]:.2f}, {region.area.ci_95[1]:.2f}] on {region.surface_id}"
+        )
+    for flag in plan.concealed_flags:
+        typer.echo(f"  ! {flag.rule_id:<26} p={flag.probability:.2f}  {flag.triggering_values}")
     typer.echo(f"plan         {result.plan_path}")
     typer.echo(f"manifest     {result.manifest_path}")
     for path in result.rendered:
