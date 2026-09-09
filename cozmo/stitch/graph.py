@@ -273,13 +273,21 @@ def build_edges(
         doorway_result = _doorway_transform(match, room_a, room_b)
 
         if keypoint_result and keypoint_result[2] >= MIN_TRANSFORM_INLIERS:
-            t, yaw, inliers = keypoint_result
+            keypoint_t, keypoint_yaw, inliers = keypoint_result
+            # Keypoints establish that the two images overlap, but a small
+            # set of matches across a doorway can fit a plausible transform
+            # that attaches the rooms at a corner. When both signals exist,
+            # use the doorway's wall-normal geometry for the pose and retain
+            # the keypoints as confidence evidence.
+            if doorway_result:
+                t, yaw, wall_a, wall_b, via_a, via_b = doorway_result
+            else:
+                t, yaw = keypoint_t, keypoint_yaw
+                wall_a = wall_b = via_a = via_b = None
             confidence = min(EDGE_WEIGHT_MAX, EDGE_WEIGHT_PER_MATCH * inliers)
             source = "keypoints"
-            via_a = via_b = wall_a = wall_b = None
             if doorway_result:
                 source = "keypoints+doorway"
-                _, _, wall_a, wall_b, via_a, via_b = doorway_result
                 confidence += EDGE_WEIGHT_DOORWAY
             edges.append(StitchEdge(
                 match.room_a, match.room_b, t, yaw, min(confidence, EDGE_WEIGHT_MAX * 2),

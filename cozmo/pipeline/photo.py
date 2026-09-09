@@ -705,10 +705,10 @@ def _group_repeated_captures(
             parent[root_b] = root_a
 
     for match in matches:
-        if (
-            match.dinov2_similarity >= REPEATED_CAPTURE_SIMILARITY
-            and len(match.keypoint_matches) >= REPEATED_CAPTURE_MIN_MATCHES
-        ):
+        # DINO similarity drops when the camera turns toward a doorway, even
+        # though LightGlue can still find a large, reliable set of points in
+        # the same physical room. Keypoints are the stronger duplicate signal.
+        if len(match.keypoint_matches) >= REPEATED_CAPTURE_MIN_MATCHES:
             union(match.room_a, match.room_b)
 
     components: Dict[str, List[str]] = {}
@@ -733,6 +733,101 @@ def _group_repeated_captures(
             representative_for[room_id] = representative
     return representative_for, groups
 
+
+def _capture_prefers_connected_layout(bundle: CaptureBundle, tier: Tier) -> bool:
+    """Whether unconnected room folders should be laid out in capture order.
+
+    A continuous walkthrough is evidence that consecutive segments belong to
+    one connected property, even when a doorway has no stable visual match.
+    An explicit ``unrelated`` note is the opt-out for test captures that
+    intentionally mix independent spaces.
+    """
+    notes = str(getattr(bundle.manifest, "notes", "") or "").lower()
+    if tier == Tier.VIDEO:
+        return "unrelated" not in notes
+    declared = [str(room).lower() for room in (bundle.manifest.declared_rooms or [])]
+    connected_hint = any(
+        marker in notes for marker in ("connected", "walkthrough", "corridor", "apartment")
+    ) or "corridor" in declared
+    return (
+        connected_hint
+        and "unrelated" not in notes
+        and "not force-merged" not in notes
+    )
+
+
+def _infer_ordered_connections(
+    room_ids: List[str],
+    kept_edges: List[Tuple[Any, str, str]],
+    per_room: Dict[str, RoomReconstruction],
+    stitch_result: StitchResult,
+) -> List[Tuple[str, str]]:
+    """Place disconnected components edge-to-edge in capture/folder order.
+
+    This is intentionally separate from evidence-backed stitch edges. It
+    gives a useful connected floor-plan hypothesis for walkthroughs and
+    ordered room folders, while the quality report records that the doorway
+    itself was not observed strongly enough to prove the connection.
+    """
+    graph = {room_id: set() for room_id in room_ids}
+    for _, room_a, room_b in kept_edges:
+        graph[room_a].add(room_b)
+        graph[room_b].add(room_a)
+
+    components: List[List[str]] = []
+    unseen = set(room_ids)
+    for room_id in room_ids:
+        if room_id not in unseen:
+            continue
+        component: List[str] = []
+        stack = [room_id]
+        unseen.remove(room_id)
+        while stack:
+            current = stack.pop()
+            component.append(current)
+            for neighbour in graph[current]:
+                if neighbour in unseen:
+                    unseen.remove(neighbour)
+                    stack.append(neighbour)
+        components.append(sorted(component, key=room_ids.index))
+    if len(components) <= 1:
+        return []
+
+    def room_polygon(room_id: str):
+        result = per_room[room_id]
+        scaled = affine_transform(
+            result.layout.polygon,
+            [result.scale, 0, 0, result.scale, 0, 0],
+        )
+        return stitch_result.transform_polygon(room_id, scaled)
+
+    placed = unary_union([room_polygon(room_id) for room_id in components[0]])
+    inferred: List[Tuple[str, str]] = []
+    previous = components[0][-1]
+    reference_yaw = stitch_result.global_yaw[components[0][0]]
+    for component in components[1:]:
+        # A capture-order connection is a low-evidence layout hypothesis. Use
+        # the anchor component's Manhattan orientation so the inferred join is
+        # a straight shared boundary, rather than a corner-to-corner contact
+        # caused by two independently rotated rectangles.
+        for room_id in component:
+            stitch_result.global_yaw[room_id] = reference_yaw
+        current = unary_union([room_polygon(room_id) for room_id in component])
+        placed_bounds = placed.bounds
+        current_bounds = current.bounds
+        dx = float(placed_bounds[2] - current_bounds[0])
+        dy = float(
+            (placed_bounds[1] + placed_bounds[3]) / 2.0
+            - (current_bounds[1] + current_bounds[3]) / 2.0
+        )
+        for room_id in component:
+            x, y = stitch_result.global_xy[room_id]
+            stitch_result.global_xy[room_id] = np.array([x + dx, y + dy])
+        placed = unary_union([placed, *[room_polygon(room_id) for room_id in component]])
+        current_anchor = component[0]
+        inferred.append((previous, current_anchor))
+        previous = component[-1]
+    return inferred
 
 def build_multi_room_photo_plan(
     bundle: CaptureBundle,
@@ -910,6 +1005,17 @@ def build_multi_room_photo_plan(
         if room_a != room_b:
             kept_edges.append((edge, room_a, room_b))
 
+    inferred_connections: List[Tuple[str, str]] = []
+    if _capture_prefers_connected_layout(bundle, tier):
+        inferred_connections = _infer_ordered_connections(
+            kept_room_ids, kept_edges, per_room, stitch_result,
+        )
+        if inferred_connections:
+            all_degradations.append(
+                f"{len(inferred_connections)} room connection(s) inferred from capture order; "
+                "no stable visual doorway evidence was available for every join"
+            )
+
     # -- assemble one Plan: every room's Wall/Opening moved by its global pose --
     final_rooms: List[Room] = []
     for room_id in kept_room_ids:
@@ -940,6 +1046,13 @@ def build_multi_room_photo_plan(
         )
         for edge, room_a, room_b in kept_edges
     ]
+    adjacencies.extend(
+        Adjacency(
+            room_a_id=room_a, room_b_id=room_b,
+            via_opening_id=None, shared_wall_ids=(None, None), confidence=0.15,
+        )
+        for room_a, room_b in inferred_connections
+    )
 
     total_floor_area = sum(r.floor_area.value for r in final_rooms)
     # Union, not sum: overlap resolution already guarantees ~zero intersection,
@@ -968,9 +1081,12 @@ def build_multi_room_photo_plan(
         )
     if stitch_result.edges_rejected:
         for room_a, room_b, reason in stitch_result.edges_rejected:
+            if inferred_connections and room_a in kept_room_ids and room_b in kept_room_ids:
+                continue
             all_warnings.append(f"{room_a} <-> {room_b}: not connected ({reason})")
 
-    unplaced = set(kept_room_ids) - {room_a for _, room_a, _ in kept_edges} - {room_b for _, _, room_b in kept_edges}
+    all_connections = kept_edges + [(None, room_a, room_b) for room_a, room_b in inferred_connections]
+    unplaced = set(kept_room_ids) - {room_a for _, room_a, _ in all_connections} - {room_b for _, _, room_b in all_connections}
     if len(kept_room_ids) > 1 and unplaced == set(kept_room_ids):
         all_degradations.append(
             "no retained room pair matched; independent rooms remain separated rather than being force-merged"
@@ -991,7 +1107,7 @@ def build_multi_room_photo_plan(
         drift_correction=DriftCorrection(
             enabled=True, method=DriftMethod.PLANE_ANCHORED, loop_closures=0,
             notes=(
-                f"{len(kept_edges)} of {len(kept_room_ids) - 1} needed connection(s) made "
+                f"{len(all_connections)} of {len(kept_room_ids) - 1} needed connection(s) made "
                 f"({sum(1 for e, _, _ in kept_edges if 'keypoints' in e.source)} from image "
                 f"matches, {sum(1 for e, _, _ in kept_edges if e.source == 'doorway')} from "
                 f"doorway width alone); property snapped to a shared Manhattan frame "
@@ -1033,7 +1149,8 @@ def build_multi_room_photo_plan(
             warnings=all_warnings,
             coverage={
                 "rooms_placed": float(len(final_rooms)),
-                "edges_used": float(len(kept_edges)),
+                "edges_used": float(len(all_connections)),
+                "edges_inferred": float(len(inferred_connections)),
                 "edges_rejected": float(len(stitch_result.edges_rejected)),
             },
         ),
@@ -1050,6 +1167,10 @@ def build_multi_room_photo_plan(
         "skipped_rooms": [{"room_id": room, "reason": why} for room, why in skipped_rooms],
         "capture_groups": capture_groups,
         "representative_for": representative_for,
+        "inferred_connections": [
+            {"room_a": room_a, "room_b": room_b, "source": "capture_order_inferred"}
+            for room_a, room_b in inferred_connections
+        ],
         "matches": [m.as_dict() for m in matches],
         "edges_used": [
             {"room_a": e.room_a, "room_b": e.room_b, "source": e.source,

@@ -457,6 +457,7 @@ def extract_layout_photo(
     camera_uv_by_frame = {p.frame_index: trajectory_uv[i] for i, p in enumerate(reconstruction.poses)}
 
     lines: List[WallLine] = []
+    used_floor_fallback = False
     view_details: Dict[int, Dict[str, Any]] = {}
     for i, cluster in enumerate(wall_clusters):
         built = _wall_line_from_cluster(cluster, frame, floor_uv, camera_uv_by_frame)
@@ -466,9 +467,39 @@ def extract_layout_photo(
         lines.append(line)
         view_details[len(lines) - 1] = detail
     if not lines:
-        raise ValueError("no wall cluster produced a usable line; too few views or too little overlap")
+        # Two-photo corridors often contain a usable floor/trajectory extent
+        # but no stable wall-plane cluster. Keep the room as a conservative
+        # evidence-bounded rectangle instead of dropping it from the property.
+        used_floor_fallback = True
+        evidence = floor_uv if len(floor_uv) >= 8 else all_uv
+        if len(evidence) < 8:
+            raise ValueError("no wall cluster produced a usable line; too few views or too little overlap")
+        u0, v0 = np.percentile(evidence, 5, axis=0)
+        u1, v1 = np.percentile(evidence, 95, axis=0)
+        if u1 - u0 < 0.8 or v1 - v0 < 0.8:
+            u0, v0 = np.min(evidence, axis=0)
+            u1, v1 = np.max(evidence, axis=0)
+        if u1 - u0 < 0.5 or v1 - v0 < 0.5:
+            raise ValueError("no wall cluster produced a usable line; floor evidence is too small")
+        support = max(1, len(evidence) // 4)
+        lines = [
+            WallLine(axis=0, coord=float(u0), extent=(float(v0), float(v1)), inliers=support, top_height_m=0.0),
+            WallLine(axis=0, coord=float(u1), extent=(float(v0), float(v1)), inliers=support, top_height_m=0.0),
+            WallLine(axis=1, coord=float(v0), extent=(float(u0), float(u1)), inliers=support, top_height_m=0.0),
+            WallLine(axis=1, coord=float(v1), extent=(float(u0), float(u1)), inliers=support, top_height_m=0.0),
+        ]
+        view_details = {
+            index: {"views": sorted({p.frame_index for p in reconstruction.poses}),
+                    "view_count": len(reconstruction.poses), "agreement": 0.2}
+            for index in range(4)
+        }
+        log.warning(
+            "no usable wall cluster; using a low-confidence rectangle from floor evidence"
+        )
 
     polygon, walls, assembly_stats = assemble_polygon(lines, all_uv, floor_uv, trajectory_uv, margin=0.5)
+    if used_floor_fallback:
+        assembly_stats["axis_fallback"] = [0, 1]
 
     for index, wall in enumerate(walls):
         detail = view_details.get(index, {})
