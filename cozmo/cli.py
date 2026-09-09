@@ -25,6 +25,7 @@ from .benchmark.score import render_table, score_results, write_results
 from .geometry.fuse import DEFAULT_STRIDE, DEFAULT_VOXEL_M
 from .pipeline.run import run_capture
 from .semantics.stage import DEFAULT_FRAME_STRIDE, DEFAULT_MAX_FRAMES
+from .pipeline.photo import DEFAULT_BACKBONE
 from .seed import DEFAULT_SEED
 
 app = typer.Typer(
@@ -87,6 +88,16 @@ def run(
         DEFAULT_MAX_FRAMES, "--max-frames", min=1,
         help="Cap on RGB frames sent to the detector.",
     ),
+    backbone: str = typer.Option(
+        DEFAULT_BACKBONE, "--backbone",
+        help="Photo tier: reconstruction backbone (config-swappable; see cozmo.recon.backbone.BACKBONES).",
+    ),
+    unsafe_scale_cues: bool = typer.Option(
+        False, "--unsafe-scale-cues",
+        help="Photo tier: also run the door-height and metric-depth scale cues in this "
+             "process. Off by default -- they load torch here, which already has open3d "
+             "loaded for the LiDAR path, and the two cannot share a process (see README).",
+    ),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Log each reconstruction stage."),
     quiet: bool = typer.Option(False, "--quiet", "-q", help="Suppress the summary."),
 ) -> None:
@@ -108,6 +119,8 @@ def run(
             weights_dir=weights_dir,
             frame_stride=frame_stride,
             max_frames=max_frames,
+            backbone_name=backbone,
+            unsafe_scale_cues=unsafe_scale_cues,
         )
     except (FileNotFoundError, NotADirectoryError, ValueError) as exc:
         _err(f"run failed: {exc}")

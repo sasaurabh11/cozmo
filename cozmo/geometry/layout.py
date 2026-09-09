@@ -509,8 +509,53 @@ def extract_layout(
     floor_uv = frame.project(points[np.abs(heights) <= FLOOR_BAND_M])
     trajectory_uv = frame.project(trajectory) if len(trajectory) else np.empty((0, 2))
 
-    margin = 0.2
     extent_uv = np.vstack([band_uv, floor_uv, trajectory_uv]) if len(floor_uv) else band_uv
+    polygon, walls, assembly_stats = assemble_polygon(lines, extent_uv, floor_uv, trajectory_uv)
+
+    result = LayoutResult(
+        frame=frame,
+        polygon=polygon,
+        walls=walls,
+        lines=lines,
+        floor_area_m2=float(polygon.area),
+        perimeter_m=float(polygon.exterior.length),
+        manhattan_snap=manhattan_snap,
+        rotation_deg=float(np.degrees(rotation)),
+        wall_band=band,
+        wall_band_uv=band_uv,
+        wall_band_height=band_heights,
+        points_uv=all_uv,
+        points_height=heights,
+        stats={
+            "manhattan_score": round(manhattan_score, 4),
+            "wall_band_points": int(len(band)),
+            "vertical_points": int(vertical.sum()),
+            **assembly_stats,
+        },
+    )
+    log.info(
+        "layout: %.2f m2, %d walls, rotation %.1f deg, manhattan score %.2f",
+        result.floor_area_m2, len(walls), result.rotation_deg, manhattan_score,
+    )
+    return result
+
+
+def assemble_polygon(
+    lines: Sequence[WallLine],
+    extent_uv: np.ndarray,
+    floor_uv: np.ndarray,
+    trajectory_uv: np.ndarray,
+    margin: float = 0.2,
+) -> Tuple[Polygon, List[WallSegment], Dict[str, Any]]:
+    """Wall lines -> cell arrangement -> cleaned polygon -> wall segments.
+
+    Shared between the LiDAR path (:func:`extract_layout`, lines from RANSAC on
+    a dense fused cloud) and the photo path
+    (:mod:`cozmo.recon.layout`, lines from clustering per-view plane hypotheses
+    across frames). Both eventually produce the same thing -- a list of
+    :class:`WallLine` in a common floor frame -- so everything downstream of
+    that point is one implementation, not two.
+    """
     bounds = (
         float(extent_uv[:, 0].min()) - margin, float(extent_uv[:, 1].min()) - margin,
         float(extent_uv[:, 0].max()) + margin, float(extent_uv[:, 1].max()) + margin,
@@ -531,8 +576,6 @@ def extract_layout(
                 (trajectory_uv[:, 0] >= us[i]) & (trajectory_uv[:, 0] < us[i + 1])
                 & (trajectory_uv[:, 1] >= vs[j]) & (trajectory_uv[:, 1] < vs[j + 1])
             ))
-            # A cell the operator physically stood in is interior whatever the
-            # floor evidence says: it is the one place we know is not a wall.
             if walked or (patch.size and patch.mean() >= CELL_COVERAGE_MIN):
                 kept.append(cell)
 
@@ -541,8 +584,6 @@ def extract_layout(
 
     merged = unary_union(kept).buffer(0)
     if isinstance(merged, MultiPolygon):
-        # The component the operator actually walked, not merely the biggest:
-        # a large well-scanned area seen through a doorway is not this room.
         merged = max(merged.geoms, key=lambda g: _trajectory_count(g, trajectory_uv) or g.area * 1e-6)
 
     cleaned = (
@@ -553,36 +594,10 @@ def extract_layout(
     if isinstance(cleaned, MultiPolygon):
         cleaned = max(cleaned.geoms, key=lambda g: g.area)
     if cleaned.is_empty or cleaned.area < 0.5 * merged.area:
-        # The cleanup ate the room: keep the raw union rather than a fiction.
         log.warning("polygon cleanup removed too much area; keeping the raw cell union")
         cleaned = merged
     polygon = Polygon(cleaned.exterior).simplify(POLYGON_SIMPLIFY_M)
 
     walls = _walls_from_polygon(polygon, lines)
-    result = LayoutResult(
-        frame=frame,
-        polygon=polygon,
-        walls=walls,
-        lines=lines,
-        floor_area_m2=float(polygon.area),
-        perimeter_m=float(polygon.exterior.length),
-        manhattan_snap=manhattan_snap,
-        rotation_deg=float(np.degrees(rotation)),
-        wall_band=band,
-        wall_band_uv=band_uv,
-        wall_band_height=band_heights,
-        points_uv=all_uv,
-        points_height=heights,
-        stats={
-            "manhattan_score": round(manhattan_score, 4),
-            "wall_band_points": int(len(band)),
-            "vertical_points": int(vertical.sum()),
-            "cells_kept": len(kept),
-            "bounds_uv": [round(b, 3) for b in bounds],
-        },
-    )
-    log.info(
-        "layout: %.2f m2, %d walls, rotation %.1f deg, manhattan score %.2f",
-        result.floor_area_m2, len(walls), result.rotation_deg, manhattan_score,
-    )
-    return result
+    stats = {"cells_kept": len(kept), "bounds_uv": [round(b, 3) for b in bounds]}
+    return polygon, walls, stats

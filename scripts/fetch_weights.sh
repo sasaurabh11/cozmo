@@ -14,6 +14,9 @@
 # Models:
 #   Grounding DINO (tiny)  open-vocabulary detection from text prompts
 #   SAM 2.1 (hiera-tiny)   mask refinement of those boxes
+#   VGGT-1B                photo-tier reconstruction backbone (needs .venv-recon;
+#                          see scripts/setup_recon_env.sh -- numpy<2, Python >= 3.10)
+#   ZoeDepth (NYU)         metric monocular depth, the strongest photo-tier scale cue
 
 set -euo pipefail
 
@@ -43,6 +46,11 @@ MODELS=(
   "facebook/sam2.1-hiera-tiny|de431c4043854a71d8101e17995dfe596bf101a5|preprocessor_config.json|SKIP|sam2.1-hiera-tiny"
   "facebook/sam2.1-hiera-tiny|de431c4043854a71d8101e17995dfe596bf101a5|processor_config.json|SKIP|sam2.1-hiera-tiny"
   "facebook/sam2.1-hiera-tiny|de431c4043854a71d8101e17995dfe596bf101a5|model.safetensors|SKIP|sam2.1-hiera-tiny"
+  "facebook/VGGT-1B|860abec7937da0a4c03c41d3c269c366e82abdf9|config.json|SKIP|vggt-1b"
+  "facebook/VGGT-1B|860abec7937da0a4c03c41d3c269c366e82abdf9|model.safetensors|f164acf60724910d8fe1578bb499d800850c7bb0948db7555c413f9fbe60467e|vggt-1b"
+  "Intel/zoedepth-nyu|52ae69caf7896c927909b3ceab4249c235e16dc1|config.json|SKIP|zoedepth-nyu"
+  "Intel/zoedepth-nyu|52ae69caf7896c927909b3ceab4249c235e16dc1|preprocessor_config.json|SKIP|zoedepth-nyu"
+  "Intel/zoedepth-nyu|52ae69caf7896c927909b3ceab4249c235e16dc1|model.safetensors|b616e347efc30e64822be28d2464c2fcd0b665b5fdbc9a135d53d168c31c77ab|zoedepth-nyu"
 )
 
 

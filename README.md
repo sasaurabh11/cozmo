@@ -8,8 +8,8 @@ stubs, and say so in their own output.
 | Tier | Status |
 |---|---|
 | `lidar` | Real reconstruction: fuse → floor plane → wall layout → ceiling → openings → render, then damage → concealed-damage rules → scope |
+| `photo` | Real reconstruction: VGGT → per-view planes → scale recovery → openings → render. Single room only |
 | `video` | Stub. Emits a hardcoded property with `STUB PIPELINE` in `quality.warnings` |
-| `photo` | Stub, as above |
 
 On a 1715-frame capture of a real room the whole pipeline runs in **2.9 s**.
 On the synthetic fixture, where the answer is known exactly, it recovers
@@ -139,6 +139,137 @@ ingest-time checks live. Its conventions — depth is uint16 millimetres at
 up — are load-bearing everywhere downstream. **Depth is the camera-frame z of the
 hit, not the distance along the ray**; treating it as ray length inflates every
 dimension by 1/cos(angle from the optical axis), about 8% at the frame edge.
+
+## The photo tier: 2-8 unposed stills, no depth, no poses
+
+The hardest tier, and the point of the exercise: recover a dimensioned room
+from photos with no metric sensor behind them at all.
+
+```
+frames (EXIF or FOV default) -> VGGT (scale-free cloud + poses)
+  -> per-view planes -> cluster across views -> room polygon (scale-free)
+  -> scale recovery (3 cues, weighted median) -> metric layout -> openings
+```
+
+### `cozmo/recon/`
+
+| Module | What it does |
+|---|---|
+| [frames.py](cozmo/recon/frames.py) | Loads a photo folder; reads EXIF 35mm-equivalent focal length when present, else assumes a 65° horizontal FOV -- and records which happened |
+| [backbone.py](cozmo/recon/backbone.py) | `Reconstructor` protocol (one method: `reconstruct`) + `VGGTReconstructor`. A second backbone is a registry entry, not a rewrite |
+| [layout.py](cozmo/recon/layout.py) | Per-view plane fitting, cross-view clustering, polygon assembly (Plane-DUSt3R ordering) |
+| [scale.py](cozmo/recon/scale.py) | Three cues -> weighted median -> one scale factor, interval widened by cue disagreement |
+| [worker.py](cozmo/recon/worker.py) | Runs VGGT in its own interpreter (see below) |
+
+### Why per-view planes, not one global RANSAC
+
+Five photos fuse into a few thousand points scattered across a whole room --
+far too sparse for the LiDAR tier's global plane fit, which needs a dense wall
+band to find lines in. So the order inverts: fit floor/ceiling/wall planes
+**per image first**, where that one frame's own points are still dense enough
+to see clearly, then carry each hypothesis into the world frame by that
+frame's pose and cluster the ones that agree. Per-view plane count and
+cross-view agreement are what a sparse reconstruction can actually say about
+its own confidence, and both go straight into each wall's interval.
+
+A single monocular frame can't reveal metric "down" on its own, so per-view
+fitting assumes the phone was held roughly upright (camera-local +Y ≈ gravity)
+-- the ordinary case for a deliberately-taken room photo. A photo shot rolled
+or tilted breaks this per-frame, which is exactly why cross-view agreement,
+not any one frame's split, decides how tight a wall's interval gets.
+
+**Fallback:** with enough frames that the fused cloud is genuinely dense (12+
+views, 20k+ points -- what the video tier will hit), per-view fitting is
+unnecessary and the LiDAR tier's own global RANSAC runs directly. Both paths
+call the *same* polygon-assembly code
+([assemble_polygon](cozmo/geometry/layout.py)) -- refactored out of
+`extract_layout` for exactly this reuse, not forked. Which path ran is
+recorded as `layout_method`.
+
+### Recovering scale: three cues, weighted median, not averaged
+
+A photo reconstruction is correct only up to an unknown global factor. Three
+independent cues estimate it:
+
+| Cue | Source | Strength |
+|---|---|---|
+| Metric depth alignment | ZoeDepth (NYU-indoor, metric) vs. the backbone's own depth | Strongest, when it fires |
+| Door height | Grounding DINO detection × prior N(2.032 m, 0.05 m) | Medium |
+| Ceiling height | Floor-to-ceiling span (scale-free) × prior N(2.44 m, 0.30 m) | Weakest, widest prior |
+
+Combined by **weighted median**, not mean -- one bad cue (a door prior firing
+on a closet) should not drag two correct ones toward it. **Cue disagreement
+widens the interval directly**, on top of each cue's own claimed uncertainty:
+a single cue firing alone is floored at ±30% regardless of how confident it
+claims to be, because one cue cannot be cross-checked against anything. Which
+cues fired, their individual estimates and their spread are all recorded under
+`scale` in the plan.
+
+### VGGT runs in its own interpreter
+
+The upstream `vggt` package pins `numpy<2` and needs Python ≥ 3.10; the rest of
+this project runs numpy 2.x on Python 3.9 (open3d and several geometry fixes
+need the numpy-2 API). Forcing a downgrade into the shared venv to satisfy one
+backbone would silently change behaviour everywhere else, so VGGT gets a
+second virtualenv, built once:
+
+```bash
+scripts/setup_recon_env.sh          # needs python3.11 (or newer) on PATH
+```
+
+`VGGTReconstructor.reconstruct()` dispatches to `python -m cozmo.recon.worker`
+under `.venv-recon` and reads the result back over JSON + npz -- the same
+process-boundary pattern already used to keep open3d and torch apart (see
+"The stage runs in a separate process" above), applied here to keep two numpy
+majors apart instead. The `Reconstructor` protocol does not change; the
+subprocess is this one backbone's own implementation detail.
+
+### Swapping backbones
+
+```python
+from cozmo.recon.backbone import BACKBONES
+BACKBONES["dust3r"] = MyDust3rReconstructor   # or --backbone dust3r on the CLI
+```
+
+`scale.py` and `layout.py` depend only on `ReconstructionResult` (points, poses,
+confidence, optional per-frame local depth), so a fix-loop entry that reads
+"VGGT is the worst-performing gate, try X instead" is one registry line.
+
+### Acceptance
+
+```bash
+cozmo run --input captures/room_photos --out out/room_photos
+```
+
+Single room only -- multi-room stitching is the next phase. Openings reuse
+[geometry/openings.py](cozmo/geometry/openings.py) unchanged, called on the
+merged wall planes once they are in metres; nothing there was forked for this
+tier.
+
+**Honest status on the real capture.** `captures/room_photos` is 7 real stills
+pulled from the apartment video, chosen for sharpness (low odometry speed).
+That selection criterion turned out to pick frames clustered around one close
+range of a kitchen corner -- almost no baseline between them, one wall
+direction visible. The pipeline runs end to end on them (VGGT reconstructs,
+per-view planes fit, scale recovers from the ceiling prior alone) and produces
+a well-formed plan whose own confidence signals say exactly what's wrong: a
+single fired scale cue floored at wide, `layout_method` falling back to the
+data extent on the missing axis, a footprint interval spanning [13.5, 54.3] m².
+That is the machinery working, not failing -- a system that returned a
+confident number here would be the bug. What it does **not** give is a
+verified sub-10% wall-length number against tape, because (a) this real
+capture has no independent laser measurement and (b) these particular seven
+photos are a poor input for room-scale photogrammetry. Getting a genuinely
+good real-photo set (spread around the room, one photo per wall) needs a
+deliberate capture session, which there wasn't time for in this pass -- picking
+better frames from the same walkthrough, or a fresh set of real photos, is the
+immediate next step, not further pipeline work.
+
+`--backbone stub` (a trivial fixed point cloud, no weights, no subprocess) runs
+the CLI/schema/manifest plumbing in under a second and is what the fast test
+suite uses -- `cozmo.recon.backbone.VGGTReconstructor` is exercised for real,
+separately, in `tests/test_recon.py`'s opt-in `TestVGGTBackbone` (needs
+weights + `.venv-recon` + `COZMO_TEST_RECON=1`).
 
 ## The LiDAR reconstruction
 
@@ -430,9 +561,19 @@ scripts/fetch_weights.sh
 
 ## What is deliberately not here yet
 
-- **Photo and video reconstruction.** Both still emit `build_stub_plan` in
-  [run.py](cozmo/pipeline/run.py), which is the seam: replace its body, keep its
-  signature, and the contract, CLI, manifest and scoreboard carry over.
+- **Video reconstruction.** Still emits `build_stub_plan`; the seam is the same
+  one the photo tier just came out of.
+- **Multi-room photo stitching.** One room per photo folder today.
+- **Damage/scope at the photo tier.** `cozmo.semantics` is tier-agnostic and could
+  attach here, but wiring it in is not done yet -- the photo tier's Plan carries
+  empty `damage`/`concealed_flags`/`scope`.
+- **Exact ground truth for the photo tier's own real-capture test.** The
+  synthetic LiDAR fixtures have exact wall lengths because they're ray-traced;
+  VGGT needs real texture to reconstruct anything, so the photo-tier check runs
+  against real photos of the apartment capture with no independent laser
+  measurement -- the acceptance criterion here is a well-formed, plausible
+  reconstruction with intervals that behave correctly (widen on disagreement,
+  bracket the estimate), not a verified sub-10% error against tape.
 - **Multi-room segmentation and stitching.** The LiDAR tier emits one room. On
   the real capture it returns the region the operator actually walked, which is
   one room of a larger apartment; adjacency and whole-property stitching are the

@@ -43,6 +43,7 @@ from ..geometry.planes import estimate_ceiling, fit_floor
 from ..geometry.render import render_plan
 from ..io.capture import CaptureBundle, load_capture
 from ..io.lidar import LidarCapture
+from .photo import DEFAULT_BACKBONE, build_photo_plan
 from ..semantics.project import surfaces_from_layout
 from ..semantics.stage import DEFAULT_FRAME_STRIDE, DEFAULT_MAX_FRAMES, SemanticResult
 from ..semantics.worker import surface_to_dict
@@ -1018,6 +1019,16 @@ class RunResult:
 
 
 @dataclass
+class _RenderWall:
+    """The few fields render_plan needs from a wall, as plain tuples/floats."""
+
+    start: Tuple[float, float]
+    end: Tuple[float, float]
+    length_m: float
+    normal: Tuple[float, float] = (0.0, 0.0)
+
+
+@dataclass
 class _RenderOpening:
     """The few fields the renderer needs from a detected opening."""
 
@@ -1050,6 +1061,8 @@ def run_capture(
     weights_dir: Optional[Path] = None,
     frame_stride: int = DEFAULT_FRAME_STRIDE,
     max_frames: int = DEFAULT_MAX_FRAMES,
+    backbone_name: str = DEFAULT_BACKBONE,
+    unsafe_scale_cues: bool = False,
 ) -> RunResult:
     """Run one capture: load, reconstruct, write plan, manifest and drawing."""
     started = time.time()
@@ -1064,7 +1077,51 @@ def run_capture(
     generated_at = _deterministic_now()
 
     rendered: List[Path] = []
-    if bundle.tier is Tier.LIDAR:
+    if bundle.tier is Tier.PHOTO:
+        plan, reconstruction = build_photo_plan(
+            bundle, generated_at=generated_at, backbone_name=backbone_name,
+            weights_dir=weights_dir,
+            run_metric_depth_cue=unsafe_scale_cues, run_door_cue=unsafe_scale_cues,
+        )
+        photo_layout = reconstruction.pop("layout_result")
+        photo_scale = reconstruction.pop("scale_factor")
+        room = plan.rooms[0] if plan.rooms else None
+        if room is not None:
+            try:
+                from ..geometry.render import render_plan
+
+                # render_plan needs plain (start, end, length_m) wall segments,
+                # in metres -- photo_layout.walls carry the right shape but
+                # scale-free units, so a thin scaled proxy stands in rather
+                # than reusing the pydantic Wall objects the plan itself uses
+                # (those carry Point2D/Measurement, not plain tuples/floats).
+                scaled_walls = [
+                    _RenderWall(
+                        start=(seg.start[0] * photo_scale, seg.start[1] * photo_scale),
+                        end=(seg.end[0] * photo_scale, seg.end[1] * photo_scale),
+                        length_m=wall.length.value,
+                    )
+                    for seg, wall in zip(photo_layout.walls, room.walls)
+                ]
+                rendered = render_plan(
+                    scaled_walls,
+                    [_RenderOpening(wall_index=int(o.wall_id.rsplit("_w", 1)[1].split("_op")[0])
+                                    if "_w" in o.wall_id else 0,
+                                    kind=o.type.value,
+                                    width_m=o.width.value,
+                                    offset_along_wall_m=o.offset_along_wall.value)
+                     for o in room.openings],
+                    out_dir,
+                    title=f"{plan.capture_id} - {room.name}",
+                    subtitle=(
+                        f"{room.floor_area.value:.2f} m2 floor area (photo tier, "
+                        f"{photo_layout.layout_method})"
+                    ),
+                    rotation_deg=float(np.degrees(room.pose.theta_rad)),
+                )
+            except Exception as exc:  # noqa: BLE001 - a failed drawing must not lose the plan
+                log.warning("plan rendering failed: %s", exc)
+    elif bundle.tier is Tier.LIDAR:
         plan, details = build_lidar_plan(
             bundle,
             drift_correction=drift_correction,
@@ -1125,7 +1182,9 @@ def run_capture(
                 "max_frames": max_frames,
                 "weights_dir": str(weights_dir) if weights_dir else None,
             }
-            if bundle.tier is Tier.LIDAR else None
+            if bundle.tier is Tier.LIDAR
+            else {"backbone": backbone_name, "weights_dir": str(weights_dir) if weights_dir else None}
+            if bundle.tier is Tier.PHOTO else None
         ),
         "environment": {
             "python": sys.version.split()[0],

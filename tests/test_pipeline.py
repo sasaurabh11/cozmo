@@ -7,6 +7,7 @@ around it -- the parts that have to be true before any number can be believed.
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import pytest
 
@@ -14,6 +15,12 @@ from cozmo.io.capture import load_capture
 from cozmo.pipeline.run import (
     MANIFEST_FILENAME, PLAN_FILENAME, build_stub_plan, hash_directory, run_capture,
 )
+
+# The photo tier now does real reconstruction (VGGT). Tests in this file that
+# only care about CLI/manifest/dispatch plumbing -- not reconstruction
+# accuracy, which is tested separately in test_recon.py -- use the stub
+# backbone so they stay fast and do not need model weights.
+PHOTO_STUB_KW = {"backbone_name": "stub"}
 from cozmo.schema import DriftMethod, Plan, Tier
 from cozmo.seed import DEFAULT_SEED, set_global_seeds
 
@@ -27,6 +34,13 @@ class TestCaptureDispatch:
         bundle = load_capture(photo_capture)
         assert bundle.room_names() == ["bedroom", "living_room"]
         assert bundle.summary()["payload"]["image_count"] == 7
+
+    def test_photo_tier_reconstructs_with_the_stub_backbone(self, photo_capture, tmp_path):
+        """CLI/manifest plumbing only -- see test_recon.py for real accuracy."""
+        result = run_capture(photo_capture, tmp_path / "out", **PHOTO_STUB_KW)
+        assert result.plan.tier is Tier.PHOTO
+        assert len(result.plan.rooms) == 1
+        assert result.plan.rooms[0].walls
 
     def test_lidar_capture_exposes_frames_and_intrinsics(self, lidar_capture):
         bundle = load_capture(lidar_capture)
@@ -61,13 +75,15 @@ class TestCaptureDispatch:
 
 class TestRunOutputs:
     def test_writes_plan_and_manifest(self, photo_capture, tmp_path):
-        result = run_capture(photo_capture, tmp_path / "out")
+        result = run_capture(photo_capture, tmp_path / "out", **PHOTO_STUB_KW)
         assert (tmp_path / "out" / PLAN_FILENAME).is_file()
         assert (tmp_path / "out" / MANIFEST_FILENAME).is_file()
         assert Plan.from_json(result.plan_path.read_text()).capture_id == "demo_photo"
 
     def test_manifest_records_the_provenance_the_brief_asks_for(self, photo_capture, tmp_path):
-        result = run_capture(photo_capture, tmp_path / "out", command=["cozmo", "run", "--input", "x"])
+        result = run_capture(
+            photo_capture, tmp_path / "out", command=["cozmo", "run", "--input", "x"], **PHOTO_STUB_KW
+        )
         manifest = json.loads(result.manifest_path.read_text())
         assert set(manifest["git"]) == {"commit", "branch", "describe", "dirty"}
         assert manifest["command"] == "cozmo run --input x"
@@ -76,17 +92,35 @@ class TestRunOutputs:
         assert manifest["outputs"][PLAN_FILENAME] == manifest["outputs"][PLAN_FILENAME]
         assert manifest["pipeline_version"] and manifest["schema_version"]
 
-    def test_stub_plans_admit_they_are_stubs(self, photo_capture, tmp_path):
-        result = run_capture(photo_capture, tmp_path / "out")
-        assert any("STUB PIPELINE" in w for w in result.plan.quality.warnings)
-        assert json.loads(result.manifest_path.read_text())["stub"] is True
+    def test_photo_tier_calibration_is_honest_about_being_uncalibrated(self, photo_capture, tmp_path):
+        """The photo tier is real reconstruction now, not a stub -- but it must
+        still say plainly that its intervals are not yet checked against
+        ground truth (see cozmo/pipeline/photo.py)."""
+        result = run_capture(photo_capture, tmp_path / "out", **PHOTO_STUB_KW)
+        assert "Uncalibrated" in result.plan.quality.calibration_note
+        assert result.plan.quality.semantics_available is False
 
-    def test_drift_flag_reaches_the_plan_and_the_ablation(self, photo_capture, tmp_path):
-        on = run_capture(photo_capture, tmp_path / "on", drift_correction=True).plan
-        off = run_capture(photo_capture, tmp_path / "off", drift_correction=False).plan
+    def test_stub_tier_plans_admit_they_are_stubs(self):
+        """The video tier is still the hardcoded stub; build_stub_plan is its
+        seam and is unit-tested directly here (video has no fixture capture
+        of its own yet)."""
+        from cozmo.io.capture import CaptureBundle, CaptureManifest
+        from cozmo.schema import Tier as _Tier
+
+        bundle = CaptureBundle(
+            root=Path("."),
+            manifest=CaptureManifest(capture_id="video_stub", tier=_Tier.VIDEO),
+            payload=None, warnings=[],
+        )
+        plan = build_stub_plan(bundle)
+        assert any("STUB PIPELINE" in w for w in plan.quality.warnings)
+
+    def test_lidar_drift_flag_reaches_the_plan_and_the_ablation(self, lidar_capture, tmp_path):
+        on = run_capture(lidar_capture, tmp_path / "on", drift_correction=True).plan
+        off = run_capture(lidar_capture, tmp_path / "off", drift_correction=False).plan
 
         assert on.drift_correction.enabled is True
-        assert on.drift_correction.method is DriftMethod.POSE_GRAPH
+        assert on.drift_correction.method is DriftMethod.MANHATTAN_SNAP
         assert off.drift_correction.method is DriftMethod.NONE_POSES_AS_IS
         # The ablation arm reports the other arm's footprint, so the two runs
         # can be diffed on the number the drift gate is about.
@@ -99,21 +133,15 @@ class TestRunOutputs:
 class TestDeterminism:
     def test_two_runs_produce_identical_plans(self, photo_capture, tmp_path, monkeypatch):
         monkeypatch.setenv("SOURCE_DATE_EPOCH", "1756728000")
-        first = run_capture(photo_capture, tmp_path / "a").plan_path.read_text()
-        second = run_capture(photo_capture, tmp_path / "b").plan_path.read_text()
+        first = run_capture(photo_capture, tmp_path / "a", **PHOTO_STUB_KW).plan_path.read_text()
+        second = run_capture(photo_capture, tmp_path / "b", **PHOTO_STUB_KW).plan_path.read_text()
         assert first == second
 
     def test_same_room_gets_the_same_geometry_across_captures(self, photo_capture, tmp_path):
         """Repeatability starts here: identical input, identical output."""
-        a = run_capture(photo_capture, tmp_path / "a").plan
-        b = run_capture(photo_capture, tmp_path / "b").plan
+        a = run_capture(photo_capture, tmp_path / "a", **PHOTO_STUB_KW).plan
+        b = run_capture(photo_capture, tmp_path / "b", **PHOTO_STUB_KW).plan
         assert [w.length.value for w in a.rooms[0].walls] == [w.length.value for w in b.rooms[0].walls]
-
-    def test_tier_changes_the_intervals_not_just_the_label(self, photo_capture, lidar_capture, tmp_path):
-        photo = run_capture(photo_capture, tmp_path / "p").plan
-        lidar = run_capture(lidar_capture, tmp_path / "l").plan
-        assert photo.rooms[0].walls[0].length.half_width > lidar.rooms[0].walls[0].length.half_width
-        assert photo.quality.overall_confidence < lidar.quality.overall_confidence
 
     def test_same_room_gets_the_same_geometry_across_lidar_runs(self, lidar_capture, tmp_path):
         """The repeatability gate starts here: identical input, identical walls."""

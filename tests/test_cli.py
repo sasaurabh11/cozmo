@@ -13,7 +13,11 @@ runner = CliRunner()
 
 class TestRunCommand:
     def test_run_on_a_photo_capture(self, photo_capture, tmp_path):
-        result = runner.invoke(app, ["run", "--input", str(photo_capture), "--out", str(tmp_path)])
+        # --backbone stub: real reconstruction (VGGT) is exercised separately
+        # in test_recon.py; this test is about CLI plumbing.
+        result = runner.invoke(app, [
+            "run", "--input", str(photo_capture), "--out", str(tmp_path), "--backbone", "stub",
+        ])
         assert result.exit_code == 0, result.output
         assert "tier         photo   (from capture.json)" in result.output
         assert (tmp_path / "plan.json").is_file()
@@ -35,7 +39,7 @@ class TestRunCommand:
 
     def test_there_is_no_tier_flag(self, photo_capture, tmp_path):
         result = runner.invoke(app, [
-            "run", "-i", str(photo_capture), "-o", str(tmp_path), "--tier", "lidar",
+            "run", "-i", str(photo_capture), "-o", str(tmp_path), "--tier", "lidar", "--backbone", "stub",
         ])
         assert result.exit_code != 0
 
@@ -48,7 +52,7 @@ class TestRunCommand:
 
     def test_seed_is_recorded_in_the_manifest(self, photo_capture, tmp_path):
         result = runner.invoke(app, [
-            "run", "-i", str(photo_capture), "-o", str(tmp_path), "--seed", "77",
+            "run", "-i", str(photo_capture), "-o", str(tmp_path), "--seed", "77", "--backbone", "stub",
         ])
         assert result.exit_code == 0, result.output
         assert json.loads((tmp_path / "run_manifest.json").read_text())["seed"]["seed"] == 77
@@ -93,7 +97,9 @@ class TestBenchmarkCommand:
     def test_run_output_can_be_scored_directly(self, photo_capture, ground_truth_csv, tmp_path):
         """`cozmo run` then `cozmo benchmark` over its output directory."""
         out = tmp_path / "run"
-        assert runner.invoke(app, ["run", "-i", str(photo_capture), "-o", str(out)]).exit_code == 0
+        assert runner.invoke(
+            app, ["run", "-i", str(photo_capture), "-o", str(out), "--backbone", "stub"]
+        ).exit_code == 0
         result = self._run(out, ground_truth_csv, tmp_path / "bench")
         assert result.exit_code == 0, result.output
         # The stub property is not the fixture property, so its gates are SKIP:
