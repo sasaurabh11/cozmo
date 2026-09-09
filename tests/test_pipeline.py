@@ -36,11 +36,16 @@ class TestCaptureDispatch:
         assert bundle.summary()["payload"]["image_count"] == 7
 
     def test_photo_tier_reconstructs_with_the_stub_backbone(self, photo_capture, tmp_path):
-        """CLI/manifest plumbing only -- see test_recon.py for real accuracy."""
+        """CLI/manifest plumbing only -- see test_recon.py for real accuracy,
+        test_stitch.py for the room-to-room graph. photo_capture has two room
+        folders (bedroom, living_room), so this now exercises the multi-room
+        path; its placeholder images have nothing in common, so both rooms
+        are correctly placed independently with the edge rejected."""
         result = run_capture(photo_capture, tmp_path / "out", **PHOTO_STUB_KW)
         assert result.plan.tier is Tier.PHOTO
-        assert len(result.plan.rooms) == 1
-        assert result.plan.rooms[0].walls
+        assert len(result.plan.rooms) == 2
+        assert all(room.walls for room in result.plan.rooms)
+        assert len(result.plan.adjacencies) == 0
 
     def test_lidar_capture_exposes_frames_and_intrinsics(self, lidar_capture):
         bundle = load_capture(lidar_capture)
@@ -120,12 +125,21 @@ class TestRunOutputs:
         off = run_capture(lidar_capture, tmp_path / "off", drift_correction=False).plan
 
         assert on.drift_correction.enabled is True
-        assert on.drift_correction.method is DriftMethod.MANHATTAN_SNAP
+        # On this short, loop-free synthetic walk the pose graph has no
+        # revisit to correct, so it reports POSE_GRAPH (ran, found nothing to
+        # close) rather than LOOP_CLOSURE -- see the real capture's ablation
+        # test for a trajectory where a genuine loop closure fires.
+        assert on.drift_correction.method is DriftMethod.POSE_GRAPH
         assert off.drift_correction.method is DriftMethod.NONE_POSES_AS_IS
         # The ablation arm reports the other arm's footprint, so the two runs
-        # can be diffed on the number the drift gate is about.
+        # can be diffed on the number the drift gate is about. Loose tolerance:
+        # RANSAC inside fit_floor/extract_layout draws from the global RNG, so
+        # the ablation's internal second fuse (run after the main arm's own
+        # RANSAC calls have already advanced that state) lands a hair off a
+        # fresh process's first-and-only fuse -- a real, known source of
+        # sub-0.1% noise, not a drift-correction bug.
         assert off.property_totals.footprint_area.value == pytest.approx(
-            on.drift_correction.ablation_footprint_area.value
+            on.drift_correction.ablation_footprint_area.value, rel=1e-3
         )
         assert off.property_totals.footprint_area.value > on.property_totals.footprint_area.value
 

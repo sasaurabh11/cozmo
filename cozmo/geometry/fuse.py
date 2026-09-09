@@ -8,6 +8,7 @@ because it is the single biggest lever on what the rest of the pipeline sees.
 
 from __future__ import annotations
 
+import dataclasses
 import logging
 import warnings
 from dataclasses import dataclass, field
@@ -85,8 +86,17 @@ def fuse_capture(
     min_confidence: int = CONFIDENCE_HIGH,
     min_depth_m: float = DEFAULT_MIN_DEPTH_M,
     max_depth_m: float = DEFAULT_MAX_DEPTH_M,
+    pose_correction: Optional[Any] = None,
 ) -> FusedCloud:
-    """Unproject every ``stride``-th frame into the world frame and fuse."""
+    """Unproject every ``stride``-th frame into the world frame and fuse.
+
+    ``pose_correction``, when given, is a
+    :class:`cozmo.stitch.drift.DriftCorrectionResult` (or anything with the
+    same ``.apply(frame_index, R, t) -> (R, t)`` shape). Each frame's raw pose
+    is swapped for its corrected one *before* unprojecting -- this is the one
+    place drift correction actually changes the geometry everything downstream
+    sees, rather than being a label on an otherwise-identical fused cloud.
+    """
     capture = lidar.capture
     if len(capture) == 0:
         raise ValueError("capture contains no depth frames")
@@ -107,6 +117,9 @@ def fuse_capture(
         with np.errstate(all="ignore"):
             for index in range(0, len(capture), stride):
                 frame = capture.frame(index)
+                if pose_correction is not None:
+                    R, t = pose_correction.apply(index, frame.R, frame.t)
+                    frame = dataclasses.replace(frame, R=R, t=t)
                 points = capture.unproject(
                     frame,
                     min_confidence=min_confidence,
@@ -134,6 +147,15 @@ def fuse_capture(
     raw = np.concatenate(chunks)
     points = voxel_downsample(raw, voxel_size_m)
     trajectory = lidar.trajectory()
+    if pose_correction is not None:
+        # The interior mask (extract_layout) and the openings scorer both use
+        # the camera path as evidence of where the room's interior is; a
+        # trajectory left uncorrected while the points that came from it were
+        # corrected would be self-contradictory.
+        corrected = np.array([
+            pose_correction.apply(i, np.eye(3), trajectory[i])[1] for i in range(len(trajectory))
+        ])
+        trajectory = corrected
 
     heights = points[:, 1]
     camera_height = float(np.median(trajectory[:, 1])) if len(trajectory) else 0.0

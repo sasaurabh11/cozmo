@@ -140,6 +140,85 @@ up — are load-bearing everywhere downstream. **Depth is the camera-frame z of 
 hit, not the distance along the ray**; treating it as ray length inflates every
 dimension by 1/cos(angle from the optical axis), about 8% at the frame edge.
 
+## Multi-room stitching
+
+`cozmo/stitch/` turns several separately-captured rooms into one connected
+property plan, wired in for the photo tier (`cozmo run` on a capture with
+multiple `rooms/<name>/` folders automatically stitches them; a single folder
+still takes the single-room path, unchanged).
+
+```
+per-room reconstruction (unchanged, one call per room)
+  -> cozmo.stitch.match: DINOv2 coarse retrieval, SuperPoint+LightGlue
+     keypoint matching, doorway-width matching -- run in their own process
+     (torch; this one already has open3d loaded for the LiDAR path)
+  -> cozmo.stitch.graph: lift 2D matches to 3D via each room's own
+     reconstruction, weighted 2D Procrustes per room pair, a small pose graph
+     (x, y, yaw; scipy least-squares, not open3d's PoseGraph -- see below),
+     Manhattan-snap the whole property, push apart anything shapely still
+     says overlaps
+  -> one Plan: every room placed, Adjacency objects naming the connecting
+     opening and wall, confidence from match evidence
+```
+
+**Two evidence sources, not one preferred over the other.** A keypoint-based
+transform is precise when there are enough inliers (`>= 4`, RANSAC-lite
+consensus over the Procrustes fit); a matched doorway (two rooms each
+reporting an opening of matching width) is what still works when a door is
+shut and the two rooms share no visible scene at all -- the case the brief
+calls the strongest signal. Both are recorded per room pair; a pair with
+neither is rejected and reported, not guessed at.
+
+**Verified two ways**, for the same reason the photo tier's single-room work
+was: geometry against exact truth, real models against real photos.
+
+- *Graph assembly* (pose graph, Manhattan snap, overlap resolution, Adjacency
+  emission) is checked against synthetic rooms with known, hand-placed
+  doorways -- 13 tests in `tests/test_stitch.py`, agreement to within the
+  polygon-simplification tolerance.
+- *Real matching* (DINOv2 + SuperPoint + LightGlue, live weights) was run on
+  real photos: two disjoint real rooms correctly score a 0.086 DINOv2
+  similarity and zero keypoint matches; two overlapping views of the same real
+  room score 0.81 and 133 matches. A real 4-folder `cozmo run` (three
+  overlapping views of one real office plus one unrelated real room) placed
+  all four, correctly connected the three related views to each other,
+  correctly left the unrelated room unconnected, and the new benchmark gates
+  (below) confirm it: `room_overlap` PASS, `adjacency_correctness` 3/3.
+
+**What that real run does not give**: a verified sub-8%-of-tape footprint
+number for four rooms of one real house, because no such capture existed to
+run it on in the time available (the honest-status pattern this project has
+followed throughout — see the photo tier's own section above). Building one is
+the natural next step, not further pipeline work.
+
+**Drift correction now does something.** `--drift-correction on|off` used to
+only change which axes a single room's layout was drawn in. It now runs real
+loop-closure detection (spatial revisit search over the trajectory) and pose
+graph correction (translation + yaw per keyframe) *before* the cloud is fused,
+so the flag changes the actual geometry, not just a label. On the real
+apartment capture -- a single continuous walk that happens to cross the same
+hallway twice -- correction finds 5 genuine loop closures and the footprint
+moves from 16.68 m² (off) to 17.82 m² (on): a real ~6.7% difference from a
+real correction, not a synthetic toggle. The optimiser is our own (scipy
+least-squares over x/y/z/yaw, reused by both drift.py and stitch/graph.py),
+not open3d's `PoseGraph` -- that binding segfaults unconditionally on this
+open3d build (0.18.0) the moment a `PoseGraphNode` is constructed, on this
+platform; open3d 0.19 fixes it upstream but is not published for this
+Python/platform combination. Rather than pin the project's whole numpy stack
+around one binding, the graph itself -- four unknowns per node, a residual per
+edge -- was small enough to own directly.
+
+### Benchmark additions
+
+`room_overlap` (fails if any two rooms in one plan share more than 0.02 m² of
+ground -- the brief's own "must be zero") and `adjacency_correctness` (ground
+truth rows `element=adjacency`, `element_id=room_a:room_b`, `value_m` 1 or 0
+for "should" / "should not" be connected; a missed real connection and a
+phantom one both count as a miss, the same rule the opening-detection gate
+already uses). The existing `footprint` gate needed no changes -- it already
+reads `property_totals.footprint_area`, which a stitched plan populates the
+same way a single-room one does.
+
 ## The photo tier: 2-8 unposed stills, no depth, no poses
 
 The hardest tier, and the point of the exercise: recover a dimensioned room

@@ -46,18 +46,32 @@ def render_plan(
     trajectory_uv: Optional[np.ndarray] = None,
     rotation_deg: float = 0.0,
     basename: str = "plan",
+    room_wall_counts: Optional[Sequence[int]] = None,
 ) -> List[Path]:
-    """Draw the plan. ``walls`` carry (start, end, length_m); openings index them."""
+    """Draw the plan. ``walls`` carry (start, end, length_m); openings index them.
+
+    ``room_wall_counts``, when given, is how many consecutive entries in
+    ``walls`` belong to each room (multi-room plans concatenate every room's
+    walls into one flat list, since openings index into it positionally).
+    Without it every wall is treated as one continuous ring -- correct for a
+    single room, and exactly why a multi-room plan must pass this: two
+    unconnected rooms' wall lists filled as one ring draws a phantom floor
+    joining them.
+    """
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
     fig, ax = plt.subplots(figsize=(11, 9))
     ax.set_aspect("equal")
 
-    ring = [np.array(w.start) for w in walls]
-    if ring:
-        polygon = np.array(ring + [ring[0]])
-        ax.fill(polygon[:, 0], polygon[:, 1], color=FLOOR_COLOR, zorder=0)
+    counts = list(room_wall_counts) if room_wall_counts else [len(walls)]
+    cursor = 0
+    for count in counts:
+        ring = [np.array(w.start) for w in walls[cursor:cursor + count]]
+        if ring:
+            polygon = np.array(ring + [ring[0]])
+            ax.fill(polygon[:, 0], polygon[:, 1], color=FLOOR_COLOR, zorder=0)
+        cursor += count
 
     by_wall: Dict[int, List[Any]] = {}
     for opening in openings:

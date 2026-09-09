@@ -43,6 +43,8 @@ from ..geometry.planes import estimate_ceiling, fit_floor
 from ..geometry.render import render_plan
 from ..io.capture import CaptureBundle, load_capture
 from ..io.lidar import LidarCapture
+from ..io.stray import quaternion_to_rotation
+from ..stitch.drift import correct_trajectory
 from .photo import DEFAULT_BACKBONE, build_photo_plan
 from ..semantics.project import surfaces_from_layout
 from ..semantics.stage import DEFAULT_FRAME_STRIDE, DEFAULT_MAX_FRAMES, SemanticResult
@@ -632,8 +634,23 @@ def build_lidar_plan(
 
     timings: Dict[str, float] = {}
 
+    # Trajectory-level drift correction: loop closure detection + a pose graph
+    # over the whole walkthrough. This is the thing --drift-correction actually
+    # switches now -- see cozmo/stitch/drift.py for why it moved off open3d's
+    # own (crashing, on this build) PoseGraph.
     mark = time.time()
-    fused = fuse_capture(lidar, stride=stride, voxel_size_m=voxel_size_m)
+    odometry = lidar.capture.odometry
+    raw_poses = [
+        (i, quaternion_to_rotation(row.qx, row.qy, row.qz, row.qw), np.array([row.x, row.y, row.z]))
+        for i, row in enumerate(odometry.itertuples(index=False))
+    ]
+    pose_correction = correct_trajectory(raw_poses, enabled=drift_correction)
+    timings["drift_s"] = round(time.time() - mark, 3)
+
+    mark = time.time()
+    fused = fuse_capture(
+        lidar, stride=stride, voxel_size_m=voxel_size_m, pose_correction=pose_correction
+    )
     timings["fuse_s"] = round(time.time() - mark, 3)
 
     mark = time.time()
@@ -663,14 +680,24 @@ def build_lidar_plan(
     )
     timings["openings_s"] = round(time.time() - mark, 3)
 
-    # The drift ablation: the same layout with the correction flipped. Required
-    # by the gate, and cheap -- the cloud is already fused.
+    # The drift ablation. This re-fuses with the correction flipped -- not just
+    # a re-run of extract_layout on the same points -- because the point at
+    # this task is that --drift-correction has to change the geometry itself
+    # (corrected poses feed fuse_capture), not merely which axes a room is
+    # drawn in. Costs one extra fuse + floor + layout pass, which is cheap
+    # next to everything else in this pipeline.
     ablation_area: Optional[float] = None
     if run_ablation:
         mark = time.time()
         try:
+            other_correction = correct_trajectory(raw_poses, enabled=not drift_correction)
+            other_fused = fuse_capture(
+                lidar, stride=stride, voxel_size_m=voxel_size_m, pose_correction=other_correction
+            )
+            other_floor = fit_floor(other_fused.points)
             other = extract_layout(
-                fused.points, floor, fused.trajectory, manhattan_snap=not drift_correction
+                other_fused.points, other_floor, other_fused.trajectory,
+                manhattan_snap=not drift_correction,
             )
             ablation_area = other.floor_area_m2
         except ValueError as exc:
@@ -816,25 +843,32 @@ def build_lidar_plan(
             f"absence of openings in them is not evidence they are solid"
         )
 
+    if not drift_correction:
+        drift_method = DriftMethod.NONE_POSES_AS_IS
+    elif pose_correction.loop_closures_used > 0:
+        drift_method = DriftMethod.LOOP_CLOSURE
+    else:
+        drift_method = DriftMethod.POSE_GRAPH
+
     drift = DriftCorrection(
         enabled=drift_correction,
-        method=DriftMethod.MANHATTAN_SNAP if drift_correction else DriftMethod.NONE_POSES_AS_IS,
-        loop_closures=0,
+        method=drift_method,
+        loop_closures=pose_correction.loop_closures_used,
         residual_closure_error=(
-            Measurement.symmetric(float(lidar.sanity.get("loop_closure_gap_m") or 0.0), 0.05)
-            if lidar.sanity.get("loop_closure_gap_m") is not None else None
+            Measurement.symmetric(round(pose_correction.residual_closure_error_m, 4), 0.05)
+            if pose_correction.residual_closure_error_m is not None else None
         ),
         ablation_footprint_area=(
             Measurement.relative(round(ablation_area, 4), LIDAR_AREA_REL, Unit.SQUARE_METERS)
             if ablation_area is not None else None
         ),
         notes=(
-            f"Wall normals give the room's own axes ({layout.rotation_deg:.1f} deg off the pose "
-            f"frame) and the layout is built on them. No loop closure: this walk ends "
-            f"{lidar.sanity.get('loop_closure_gap_m')} m from its start, so there is no loop to close."
+            f"{pose_correction.notes} Wall normals additionally give the room's own axes "
+            f"({layout.rotation_deg:.1f} deg off the pose frame)."
             if drift_correction else
-            "Poses used as-is: the layout is built on ARKit's world axes with no correction. "
-            "This is the ablation arm and fails the drift-accountability gate by design."
+            "Poses used as-is: no loop closure detection, no pose graph, the layout is built "
+            "on ARKit's world axes with no correction. This is the ablation arm and fails the "
+            "drift-accountability gate by design."
         ),
     )
 
@@ -1083,41 +1117,51 @@ def run_capture(
             weights_dir=weights_dir,
             run_metric_depth_cue=unsafe_scale_cues, run_door_cue=unsafe_scale_cues,
         )
-        photo_layout = reconstruction.pop("layout_result")
-        photo_scale = reconstruction.pop("scale_factor")
-        room = plan.rooms[0] if plan.rooms else None
-        if room is not None:
+        reconstruction.pop("layout_result", None)
+        reconstruction.pop("scale_factor", None)
+        if plan.rooms:
             try:
-                from ..geometry.render import render_plan
+                # Every room's Wall already carries its FINAL, globally-placed
+                # coordinates -- build_photo_plan's single room sits at its own
+                # origin (which *is* the global frame for one room);
+                # build_multi_room_photo_plan bakes each room's stitched pose
+                # into its walls directly. So rendering needs nothing from the
+                # reconstruction beyond the plan itself, single- or multi-room
+                # alike -- only a flat wall list (render_plan indexes openings
+                # positionally into it) and plain (start, end, length_m)
+                # segments rather than the pydantic Point2D/Measurement the
+                # plan itself uses.
+                all_walls: List[_RenderWall] = []
+                all_openings: List[_RenderOpening] = []
+                room_wall_counts: List[int] = []
+                for room in plan.rooms:
+                    base = len(all_walls)
+                    room_wall_counts.append(len(room.walls))
+                    wall_index_by_id = {w.id: base + i for i, w in enumerate(room.walls)}
+                    for wall in room.walls:
+                        all_walls.append(_RenderWall(
+                            start=(wall.start.x, wall.start.y), end=(wall.end.x, wall.end.y),
+                            length_m=wall.length.value,
+                        ))
+                    for opening in room.openings:
+                        all_openings.append(_RenderOpening(
+                            wall_index=wall_index_by_id.get(opening.wall_id, base),
+                            kind=opening.type.value, width_m=opening.width.value,
+                            offset_along_wall_m=opening.offset_along_wall.value,
+                        ))
 
-                # render_plan needs plain (start, end, length_m) wall segments,
-                # in metres -- photo_layout.walls carry the right shape but
-                # scale-free units, so a thin scaled proxy stands in rather
-                # than reusing the pydantic Wall objects the plan itself uses
-                # (those carry Point2D/Measurement, not plain tuples/floats).
-                scaled_walls = [
-                    _RenderWall(
-                        start=(seg.start[0] * photo_scale, seg.start[1] * photo_scale),
-                        end=(seg.end[0] * photo_scale, seg.end[1] * photo_scale),
-                        length_m=wall.length.value,
-                    )
-                    for seg, wall in zip(photo_layout.walls, room.walls)
-                ]
+                room_names = ", ".join(r.name for r in plan.rooms[:4])
+                if len(plan.rooms) > 4:
+                    room_names += f" + {len(plan.rooms) - 4} more"
                 rendered = render_plan(
-                    scaled_walls,
-                    [_RenderOpening(wall_index=int(o.wall_id.rsplit("_w", 1)[1].split("_op")[0])
-                                    if "_w" in o.wall_id else 0,
-                                    kind=o.type.value,
-                                    width_m=o.width.value,
-                                    offset_along_wall_m=o.offset_along_wall.value)
-                     for o in room.openings],
-                    out_dir,
-                    title=f"{plan.capture_id} - {room.name}",
+                    all_walls, all_openings, out_dir,
+                    title=f"{plan.capture_id} - {room_names}",
                     subtitle=(
-                        f"{room.floor_area.value:.2f} m2 floor area (photo tier, "
-                        f"{photo_layout.layout_method})"
+                        f"{plan.property_totals.footprint_area.value:.2f} m2 footprint (photo tier, "
+                        f"{len(plan.rooms)} room(s), {len(plan.adjacencies)} connection(s))"
                     ),
-                    rotation_deg=float(np.degrees(room.pose.theta_rad)),
+                    rotation_deg=0.0,   # rooms are already placed in one shared global frame
+                    room_wall_counts=room_wall_counts,
                 )
             except Exception as exc:  # noqa: BLE001 - a failed drawing must not lose the plan
                 log.warning("plan rendering failed: %s", exc)

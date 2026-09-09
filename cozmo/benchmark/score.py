@@ -42,7 +42,7 @@ PASS, FAIL, SKIP = "PASS", "FAIL", "SKIP"
 EPS = 1e-9
 
 AREA_DIMENSIONS = {"floor_area", "footprint_area"}
-VALID_ELEMENTS = {"wall", "opening", "room", "property"}
+VALID_ELEMENTS = {"wall", "opening", "room", "property", "adjacency"}
 
 
 # --------------------------------------------------------------------------
@@ -93,6 +93,9 @@ CEILING_SPREAD_MAX_M = 0.01       # spread across repeat captures of one room
 REPEATABILITY_ABS_M = 0.01        # per wall, between two captures
 REPEATABILITY_REL = 0.005         # ... or 0.5%, whichever is kinder
 INTERVAL_COVERAGE_MIN = 0.90      # 95% intervals; 0.90 allows finite-sample slack
+# Two rooms occupying the same ground: the brief calls this an automatic
+# failure, and this is the slack given only to polygon-simplification noise.
+ROOM_OVERLAP_TOLERANCE_M2 = 0.02
 
 TOLERANCES: Dict[Tier, Tolerances] = {
     Tier.LIDAR: Tolerances(
@@ -451,6 +454,110 @@ def gate_footprint(lp: LoadedPlan, gt: GroundTruth) -> GateResult:
     )
 
 
+def _room_polygon(room: Any) -> Optional["Polygon"]:
+    """A room's own polygon, from its walls' already-placed coordinates."""
+    from shapely.geometry import Polygon
+
+    points = [(w.start.x, w.start.y) for w in room.walls]
+    if len(points) < 3:
+        return None
+    polygon = Polygon(points)
+    return polygon if polygon.is_valid else polygon.buffer(0)
+
+
+def gate_room_overlap(lp: LoadedPlan) -> GateResult:
+    """Two rooms occupying the same ground is a stitching failure the brief
+    calls out by name: overlap area must be zero. No ground truth needed --
+    this is checkable from the plan alone, the same way the schema's own
+    referential-integrity checks are.
+    """
+    rooms = lp.plan.rooms
+    if len(rooms) < 2:
+        return GateResult(
+            gate="room_overlap", scope=lp.capture_id, tier=lp.tier.value, status=SKIP,
+            metric="single room", threshold="-",
+            detail={"reason": "overlap is only meaningful with more than one room"},
+        )
+
+    polygons = {room.id: _room_polygon(room) for room in rooms}
+    pairs = []
+    worst = 0.0
+    for i, room_a in enumerate(rooms):
+        for room_b in rooms[i + 1:]:
+            poly_a, poly_b = polygons[room_a.id], polygons[room_b.id]
+            if poly_a is None or poly_b is None:
+                continue
+            overlap = float(poly_a.intersection(poly_b).area)
+            if overlap > ROOM_OVERLAP_TOLERANCE_M2:
+                pairs.append({"room_a": room_a.id, "room_b": room_b.id, "overlap_m2": round(overlap, 4)})
+            worst = max(worst, overlap)
+
+    return GateResult(
+        gate="room_overlap", scope=lp.capture_id, tier=lp.tier.value,
+        status=PASS if not pairs else FAIL,
+        metric=(
+            f"worst pair overlaps {worst:.3f} m2" if pairs else
+            f"no overlap above {ROOM_OVERLAP_TOLERANCE_M2} m2 across {len(rooms)} room(s)"
+        ),
+        threshold=f"<= {ROOM_OVERLAP_TOLERANCE_M2} m2 for every room pair",
+        value=round(worst, 4),
+        detail={"overlapping_pairs": pairs, "room_count": len(rooms)},
+    )
+
+
+def gate_adjacency_correctness(lp: LoadedPlan, gt: GroundTruth) -> GateResult:
+    """Ground truth rows with ``element=adjacency`` state which room pairs
+    should (``value_m=1``) or should not (``value_m=0``) be connected;
+    ``element_id`` is ``room_a_id:room_b_id``. A missed real connection and a
+    phantom one both count as a miss, the same rule the opening-detection gate
+    already uses, for the same reason: a stitcher that only reports the edges
+    it is sure of must not be able to buy accuracy by staying silent.
+    """
+    truth_rows = gt.by_element("adjacency")
+    if not truth_rows:
+        return GateResult(
+            gate="adjacency_correctness", scope=lp.capture_id, tier=lp.tier.value, status=SKIP,
+            metric="no adjacency ground truth", threshold="-",
+            detail={"reason": "ground truth contains no element=adjacency rows"},
+        )
+
+    def pair_key(a: str, b: str) -> Tuple[str, str]:
+        return tuple(sorted((a, b)))
+
+    predicted_pairs = {
+        pair_key(adj.room_a_id, adj.room_b_id) for adj in lp.plan.adjacencies
+    }
+
+    correct = 0
+    mistakes: List[Dict[str, Any]] = []
+    for row in truth_rows:
+        if ":" not in row.element_id:
+            continue
+        a, b = row.element_id.split(":", 1)
+        expected_connected = row.value_m >= 0.5
+        actual_connected = pair_key(a, b) in predicted_pairs
+        if expected_connected == actual_connected:
+            correct += 1
+        else:
+            mistakes.append({
+                "room_a": a, "room_b": b, "expected_connected": expected_connected,
+                "actual_connected": actual_connected,
+            })
+
+    total = correct + len(mistakes)
+    fraction = correct / total if total else 1.0
+    return GateResult(
+        gate="adjacency_correctness", scope=lp.capture_id, tier=lp.tier.value,
+        status=PASS if not mistakes else FAIL,
+        metric=f"{correct}/{total} room pair(s) correct" + (
+            f"; wrong: {[(m['room_a'], m['room_b']) for m in mistakes]}" if mistakes else ""
+        ),
+        threshold="every declared room pair's connectivity matches ground truth",
+        value=round(fraction, 4),
+        detail={"mistakes": mistakes, "predicted_pairs": sorted(predicted_pairs)},
+    )
+
+
 def gate_interval_coverage(lp: LoadedPlan, gt: GroundTruth) -> GateResult:
     """Calibration: do the 95% intervals actually contain the truth?
 
@@ -665,6 +772,8 @@ def score_results(results_dir: Path, ground_truth_csv: Path) -> Report:
         gates.append(gate_opening_widths(lp, gt))
         gates.append(gate_footprint(lp, gt))
         gates.append(gate_interval_coverage(lp, gt))
+        gates.append(gate_room_overlap(lp))
+        gates.append(gate_adjacency_correctness(lp, gt))
     gates.extend(gate_repeatability(plans))
     gates.extend(gate_ceiling_spread(plans))
 

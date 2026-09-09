@@ -10,6 +10,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Optional, Sequence, Tuple
 
+import numpy as np
 import pytest
 
 from cozmo.benchmark.score import (
@@ -365,6 +366,7 @@ class TestFullReport:
         assert {g.gate for g in report.gates} == {
             "wall_lengths", "ceiling_height", "opening_widths", "footprint",
             "interval_coverage", "repeatability", "ceiling_spread",
+            "room_overlap", "adjacency_correctness",
         }
 
     def test_known_fixture_verdicts(self, results_dir, ground_truth_csv):
@@ -392,3 +394,99 @@ class TestFullReport:
         assert "GATE THRESHOLD" in table
         assert "PASS" in table and "FAIL" in table
         assert table.count("\n") >= len(score_results(results_dir, ground_truth_csv).gates)
+
+
+# --------------------------------------------------------------------------
+# stitching gates: room overlap, adjacency correctness
+# --------------------------------------------------------------------------
+
+from cozmo.benchmark.score import gate_adjacency_correctness, gate_room_overlap
+from cozmo.schema import Adjacency
+
+
+def _plan_with_rooms(rooms, adjacencies=()):
+    plan = make_plan("multi", Tier.PHOTO, [4.0]).plan
+    plan.rooms = rooms
+    plan.adjacencies = list(adjacencies)
+    return LoadedPlan(path=Path("/tmp/multi/plan.json"), plan=plan)
+
+
+def _room_at(room_id, x0, y0, width, depth):
+    corners = [(x0, y0), (x0 + width, y0), (x0 + width, y0 + depth), (x0, y0 + depth)]
+    walls = [
+        Wall(
+            id=f"{room_id}_w{i}",
+            start=Point2D(x=corners[i][0], y=corners[i][1]),
+            end=Point2D(x=corners[(i + 1) % 4][0], y=corners[(i + 1) % 4][1]),
+            length=Measurement.symmetric(
+                float(np.hypot(corners[(i + 1) % 4][0] - corners[i][0],
+                              corners[(i + 1) % 4][1] - corners[i][1])), 0.05,
+            ),
+            height=Measurement.symmetric(2.4, 0.05),
+        )
+        for i in range(4)
+    ]
+    return Room(
+        id=room_id, name=room_id, pose=Pose2D(x=x0, y=y0),
+        walls=walls, ceiling_height=Measurement.symmetric(2.4, 0.05),
+        floor_area=Measurement.relative(width * depth, 0.05, Unit.SQUARE_METERS),
+        perimeter=Measurement.relative(2 * (width + depth), 0.05),
+    )
+
+
+class TestRoomOverlapGate:
+    def test_non_overlapping_rooms_pass(self):
+        rooms = [_room_at("a", 0, 0, 3, 3), _room_at("b", 3, 0, 3, 3)]
+        result = gate_room_overlap(_plan_with_rooms(rooms))
+        assert result.status == PASS
+
+    def test_overlapping_rooms_fail(self):
+        rooms = [_room_at("a", 0, 0, 3, 3), _room_at("b", 1, 1, 3, 3)]
+        result = gate_room_overlap(_plan_with_rooms(rooms))
+        assert result.status == FAIL
+        assert result.detail["overlapping_pairs"]
+        assert result.value > 0
+
+    def test_single_room_is_skip(self):
+        result = gate_room_overlap(_plan_with_rooms([_room_at("a", 0, 0, 3, 3)]))
+        assert result.status == SKIP
+
+    def test_a_hair_of_overlap_from_polygon_simplification_still_passes(self):
+        """Rooms placed edge-to-edge, sharing exactly a wall, are not a real
+        overlap -- only genuine ground-sharing should fail this gate."""
+        rooms = [_room_at("a", 0, 0, 3, 3), _room_at("b", 3.0, 0, 3, 3)]
+        assert gate_room_overlap(_plan_with_rooms(rooms)).status == PASS
+
+
+class TestAdjacencyCorrectnessGate:
+    GT = make_gt([
+        ("", "adjacency", "a:b", "connected", 1.0),
+        ("", "adjacency", "a:c", "connected", 0.0),
+    ])
+
+    def test_correct_connections_and_correct_rejections_both_pass(self):
+        rooms = [_room_at("a", 0, 0, 3, 3), _room_at("b", 3, 0, 3, 3), _room_at("c", 0, 10, 3, 3)]
+        adjacencies = [Adjacency(room_a_id="a", room_b_id="b")]
+        result = gate_adjacency_correctness(_plan_with_rooms(rooms, adjacencies), self.GT)
+        assert result.status == PASS
+        assert result.value == pytest.approx(1.0)
+
+    def test_a_missed_real_connection_fails(self):
+        rooms = [_room_at("a", 0, 0, 3, 3), _room_at("b", 3, 0, 3, 3), _room_at("c", 0, 10, 3, 3)]
+        result = gate_adjacency_correctness(_plan_with_rooms(rooms, adjacencies=[]), self.GT)
+        assert result.status == FAIL
+        assert any(m["room_a"] == "a" and m["room_b"] == "b" for m in result.detail["mistakes"])
+
+    def test_a_phantom_connection_also_fails(self):
+        """A connection ground truth says should NOT exist counts as a miss
+        too -- the same detection-is-scored rule the opening gate uses."""
+        rooms = [_room_at("a", 0, 0, 3, 3), _room_at("b", 3, 0, 3, 3), _room_at("c", 0, 10, 3, 3)]
+        adjacencies = [Adjacency(room_a_id="a", room_b_id="b"), Adjacency(room_a_id="a", room_b_id="c")]
+        result = gate_adjacency_correctness(_plan_with_rooms(rooms, adjacencies), self.GT)
+        assert result.status == FAIL
+        assert any(m["room_a"] == "a" and m["room_b"] == "c" for m in result.detail["mistakes"])
+
+    def test_no_adjacency_ground_truth_is_skip(self):
+        rooms = [_room_at("a", 0, 0, 3, 3)]
+        result = gate_adjacency_correctness(_plan_with_rooms(rooms), WALL_GT)
+        assert result.status == SKIP
