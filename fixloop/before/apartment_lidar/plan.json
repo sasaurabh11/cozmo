@@ -1,0 +1,801 @@
+{
+  "schema_version": "1.3.0",
+  "capture_id": "apartment_lidar_01",
+  "tier": "lidar",
+  "pipeline_version": "0.4.0-video-calibration",
+  "generated_at": "2026-09-09T17:49:40.491978Z",
+  "scale": {
+    "source": "lidar_depth",
+    "scale_factor": {
+      "value": 1.0,
+      "ci_95": [
+        0.995,
+        1.005
+      ],
+      "unit": "ratio"
+    },
+    "reference_description": "sensor-metric depth; no external scale reference used",
+    "notes": null
+  },
+  "drift_correction": {
+    "enabled": true,
+    "method": "loop_closure",
+    "loop_closures": 5,
+    "residual_closure_error": {
+      "value": 0.2413,
+      "ci_95": [
+        0.19129999999999997,
+        0.2913
+      ],
+      "unit": "m"
+    },
+    "ablation_footprint_area": {
+      "value": 16.697,
+      "ci_95": [
+        16.02912,
+        17.36488
+      ],
+      "unit": "m2"
+    },
+    "notes": "5 loop closure(s) detected by spatial revisit (<0.25 m, >=15 keyframes apart); pose graph optimised (scipy Levenberg-Marquardt, x/y/z/yaw). Wall normals additionally give the room's own axes (-29.9 deg off the pose frame)."
+  },
+  "property_totals": {
+    "room_count": 1,
+    "total_floor_area": {
+      "value": 17.8193,
+      "ci_95": [
+        17.106527999999997,
+        18.532072
+      ],
+      "unit": "m2"
+    },
+    "footprint_area": {
+      "value": 17.8193,
+      "ci_95": [
+        17.106527999999997,
+        18.532072
+      ],
+      "unit": "m2"
+    },
+    "total_wall_area": {
+      "value": 47.0164,
+      "ci_95": [
+        45.135743999999995,
+        48.897056
+      ],
+      "unit": "m2"
+    },
+    "bounding_box_m": [
+      4.04,
+      5.594
+    ]
+  },
+  "rooms": [
+    {
+      "id": "room_a",
+      "name": "Room A",
+      "pose": {
+        "x": 0.0,
+        "y": 0.0,
+        "theta_rad": -0.5217288779706513
+      },
+      "walls": [
+        {
+          "id": "room_a_w0",
+          "start": {
+            "x": -2.3896,
+            "y": 0.1553
+          },
+          "end": {
+            "x": -1.133,
+            "y": 0.1553
+          },
+          "length": {
+            "value": 1.2566,
+            "ci_95": [
+              1.224,
+              1.2892
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.44,
+            "ci_95": [
+              1.9909,
+              2.99
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [],
+          "observation_note": "observed across 0% of its length, to 1.51 m above floor"
+        },
+        {
+          "id": "room_a_w1",
+          "start": {
+            "x": -1.133,
+            "y": 0.1553
+          },
+          "end": {
+            "x": -1.133,
+            "y": 0.8888
+          },
+          "length": {
+            "value": 0.7335,
+            "ci_95": [
+              0.7062,
+              0.7608
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.44,
+            "ci_95": [
+              1.9909,
+              2.99
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [],
+          "observation_note": "observed across 0% of its length, to 1.99 m above floor"
+        },
+        {
+          "id": "room_a_w2",
+          "start": {
+            "x": -1.133,
+            "y": 0.8888
+          },
+          "end": {
+            "x": -0.4315,
+            "y": 0.8888
+          },
+          "length": {
+            "value": 0.7015,
+            "ci_95": [
+              0.6745,
+              0.7285
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.44,
+            "ci_95": [
+              1.9909,
+              2.99
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [],
+          "observation_note": "observed across 60% of its length, to 1.46 m above floor"
+        },
+        {
+          "id": "room_a_w3",
+          "start": {
+            "x": -0.4315,
+            "y": 1.1192
+          },
+          "end": {
+            "x": 0.7036,
+            "y": 1.1192
+          },
+          "length": {
+            "value": 1.1351,
+            "ci_95": [
+              1.1037,
+              1.1665
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.44,
+            "ci_95": [
+              1.9909,
+              2.99
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [],
+          "observation_note": "observed across 100% of its length, to 1.34 m above floor"
+        },
+        {
+          "id": "room_a_w4",
+          "start": {
+            "x": 0.7036,
+            "y": 0.8888
+          },
+          "end": {
+            "x": 1.1841,
+            "y": 0.8888
+          },
+          "length": {
+            "value": 0.4804,
+            "ci_95": [
+              0.4556,
+              0.5052
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.44,
+            "ci_95": [
+              1.9909,
+              2.99
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [],
+          "observation_note": "observed across 50% of its length, to 1.46 m above floor"
+        },
+        {
+          "id": "room_a_w5",
+          "start": {
+            "x": 1.1841,
+            "y": 0.8888
+          },
+          "end": {
+            "x": 1.1841,
+            "y": -2.3168
+          },
+          "length": {
+            "value": 3.2056,
+            "ci_95": [
+              3.1535,
+              3.2577
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.44,
+            "ci_95": [
+              1.9909,
+              2.99
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [],
+          "observation_note": "observed across 54% of its length, to 1.61 m above floor"
+        },
+        {
+          "id": "room_a_w6",
+          "start": {
+            "x": 1.1841,
+            "y": -2.3168
+          },
+          "end": {
+            "x": 1.6505,
+            "y": -2.3168
+          },
+          "length": {
+            "value": 0.4665,
+            "ci_95": [
+              0.4418,
+              0.4912
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.44,
+            "ci_95": [
+              1.9909,
+              2.99
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [],
+          "observation_note": "observed across 60% of its length, to 1.68 m above floor"
+        },
+        {
+          "id": "room_a_w7",
+          "start": {
+            "x": 1.6505,
+            "y": -2.3168
+          },
+          "end": {
+            "x": 1.6505,
+            "y": -2.8349
+          },
+          "length": {
+            "value": 0.5181,
+            "ci_95": [
+              0.4929,
+              0.5433
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.44,
+            "ci_95": [
+              1.9909,
+              2.99
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [],
+          "observation_note": "observed across 0% of its length, to 1.66 m above floor"
+        },
+        {
+          "id": "room_a_w8",
+          "start": {
+            "x": 1.6505,
+            "y": -2.8349
+          },
+          "end": {
+            "x": 1.1841,
+            "y": -2.8349
+          },
+          "length": {
+            "value": 0.4665,
+            "ci_95": [
+              0.4418,
+              0.4912
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.44,
+            "ci_95": [
+              1.9909,
+              2.99
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [],
+          "observation_note": "observed across 60% of its length, to 1.27 m above floor"
+        },
+        {
+          "id": "room_a_w9",
+          "start": {
+            "x": 1.1841,
+            "y": -2.8349
+          },
+          "end": {
+            "x": 1.1841,
+            "y": -4.4751
+          },
+          "length": {
+            "value": 1.6403,
+            "ci_95": [
+              1.6039,
+              1.6767
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.44,
+            "ci_95": [
+              1.9909,
+              2.99
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [],
+          "observation_note": "observed across 94% of its length, to 1.61 m above floor"
+        },
+        {
+          "id": "room_a_w10",
+          "start": {
+            "x": 1.1841,
+            "y": -4.4751
+          },
+          "end": {
+            "x": -1.133,
+            "y": -4.4751
+          },
+          "length": {
+            "value": 2.3171,
+            "ci_95": [
+              2.2739,
+              2.3603
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.44,
+            "ci_95": [
+              1.9909,
+              2.99
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [],
+          "observation_note": "observed across 98% of its length, to 1.99 m above floor"
+        },
+        {
+          "id": "room_a_w11",
+          "start": {
+            "x": -1.133,
+            "y": -4.4751
+          },
+          "end": {
+            "x": -1.133,
+            "y": -3.7342
+          },
+          "length": {
+            "value": 0.741,
+            "ci_95": [
+              0.7136,
+              0.7684
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.44,
+            "ci_95": [
+              1.9909,
+              2.99
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [],
+          "observation_note": "observed across 100% of its length, to 1.99 m above floor"
+        },
+        {
+          "id": "room_a_w12",
+          "start": {
+            "x": -1.133,
+            "y": -3.7342
+          },
+          "end": {
+            "x": -2.3896,
+            "y": -3.7342
+          },
+          "length": {
+            "value": 1.2566,
+            "ci_95": [
+              1.224,
+              1.2892
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.44,
+            "ci_95": [
+              1.9909,
+              2.99
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [],
+          "observation_note": "observed across 19% of its length, to 1.56 m above floor"
+        },
+        {
+          "id": "room_a_w13",
+          "start": {
+            "x": -2.3896,
+            "y": -3.7342
+          },
+          "end": {
+            "x": -2.3896,
+            "y": 0.1553
+          },
+          "length": {
+            "value": 3.8894,
+            "ci_95": [
+              3.8305000000000002,
+              3.9483
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.44,
+            "ci_95": [
+              1.9909,
+              2.99
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [],
+          "observation_note": "observed across 44% of its length, to 1.24 m above floor"
+        }
+      ],
+      "openings": [],
+      "surfaces": [
+        {
+          "id": "room_a_w0_surface",
+          "room_id": "room_a",
+          "kind": "wall",
+          "wall_id": "room_a_w0",
+          "area": {
+            "value": 3.066,
+            "ci_95": [
+              2.9433599999999998,
+              3.18864
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "room_a_w1_surface",
+          "room_id": "room_a",
+          "kind": "wall",
+          "wall_id": "room_a_w1",
+          "area": {
+            "value": 1.7897,
+            "ci_95": [
+              1.718112,
+              1.861288
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "room_a_w2_surface",
+          "room_id": "room_a",
+          "kind": "wall",
+          "wall_id": "room_a_w2",
+          "area": {
+            "value": 1.7117,
+            "ci_95": [
+              1.643232,
+              1.780168
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "room_a_w3_surface",
+          "room_id": "room_a",
+          "kind": "wall",
+          "wall_id": "room_a_w3",
+          "area": {
+            "value": 2.7697,
+            "ci_95": [
+              2.658912,
+              2.8804879999999997
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "room_a_w4_surface",
+          "room_id": "room_a",
+          "kind": "wall",
+          "wall_id": "room_a_w4",
+          "area": {
+            "value": 1.1723,
+            "ci_95": [
+              1.125408,
+              1.2191919999999998
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "room_a_w5_surface",
+          "room_id": "room_a",
+          "kind": "wall",
+          "wall_id": "room_a_w5",
+          "area": {
+            "value": 7.8216,
+            "ci_95": [
+              7.508736,
+              8.134464
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "room_a_w6_surface",
+          "room_id": "room_a",
+          "kind": "wall",
+          "wall_id": "room_a_w6",
+          "area": {
+            "value": 1.1382,
+            "ci_95": [
+              1.092672,
+              1.1837280000000001
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "room_a_w7_surface",
+          "room_id": "room_a",
+          "kind": "wall",
+          "wall_id": "room_a_w7",
+          "area": {
+            "value": 1.2641,
+            "ci_95": [
+              1.213536,
+              1.314664
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "room_a_w8_surface",
+          "room_id": "room_a",
+          "kind": "wall",
+          "wall_id": "room_a_w8",
+          "area": {
+            "value": 1.1382,
+            "ci_95": [
+              1.092672,
+              1.1837280000000001
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "room_a_w9_surface",
+          "room_id": "room_a",
+          "kind": "wall",
+          "wall_id": "room_a_w9",
+          "area": {
+            "value": 4.0023,
+            "ci_95": [
+              3.842208,
+              4.162392
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "room_a_w10_surface",
+          "room_id": "room_a",
+          "kind": "wall",
+          "wall_id": "room_a_w10",
+          "area": {
+            "value": 5.6537,
+            "ci_95": [
+              5.4275519999999995,
+              5.879848
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "room_a_w11_surface",
+          "room_id": "room_a",
+          "kind": "wall",
+          "wall_id": "room_a_w11",
+          "area": {
+            "value": 1.8079,
+            "ci_95": [
+              1.735584,
+              1.880216
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "room_a_w12_surface",
+          "room_id": "room_a",
+          "kind": "wall",
+          "wall_id": "room_a_w12",
+          "area": {
+            "value": 3.066,
+            "ci_95": [
+              2.9433599999999998,
+              3.18864
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "room_a_w13_surface",
+          "room_id": "room_a",
+          "kind": "wall",
+          "wall_id": "room_a_w13",
+          "area": {
+            "value": 9.4903,
+            "ci_95": [
+              9.110688,
+              9.869912
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "room_a_floor",
+          "room_id": "room_a",
+          "kind": "floor",
+          "wall_id": null,
+          "area": {
+            "value": 17.8193,
+            "ci_95": [
+              17.106527999999997,
+              18.532072
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "room_a_ceiling",
+          "room_id": "room_a",
+          "kind": "ceiling",
+          "wall_id": null,
+          "area": {
+            "value": 17.8193,
+            "ci_95": [
+              17.106527999999997,
+              18.532072
+            ],
+            "unit": "m2"
+          }
+        }
+      ],
+      "ceiling_height": {
+        "value": 2.44,
+        "ci_95": [
+          1.9909,
+          2.99
+        ],
+        "unit": "m"
+      },
+      "floor_area": {
+        "value": 17.8193,
+        "ci_95": [
+          17.106527999999997,
+          18.532072
+        ],
+        "unit": "m2"
+      },
+      "perimeter": {
+        "value": 19.269,
+        "ci_95": [
+          18.8007,
+          19.737299999999998
+        ],
+        "unit": "m"
+      },
+      "source_frame_count": 172
+    }
+  ],
+  "adjacencies": [],
+  "damage": [],
+  "concealed_flags": [],
+  "scope": [],
+  "quality": {
+    "overall_confidence": 0.55,
+    "interval_method": "Asserted intervals: wall +-(2 cm + 1% of length), openings +-5 cm (one occupancy cell), areas +-4%, then scaled by this tier's fitted calibration factor (1.0 if uncalibrated). The ceiling interval is real -- it comes from the ceiling estimator -- and is calibrated the same way.",
+    "ceiling_method": "scan_cutoff_prior",
+    "semantics_available": false,
+    "calibration_note": "Uncalibrated: no calibration file found (run `cozmo calibrate` against a benchmark set with ground truth). Every interval factor defaults to 1.0 -- these are the pipeline's own asserted half-widths, unchecked.",
+    "degradations": [
+      "ceiling not measured (scan_cutoff_prior)",
+      "weak rectilinear structure (score 0.27); the room may not be rectilinear, or wall normals are noisy",
+      "only 5.7% of points above camera height",
+      "walls [0, 1, 4, 5, 7, 12, 13] observed across less than 60% of their length; absence of openings in them is not evidence they are solid"
+    ],
+    "warnings": [
+      "CEILING LIKELY NOT CAPTURED: only 3.7% of points sit above camera height (threshold 15%). Ceiling height will be inferred from wall extent, not measured, and its interval will be wide.",
+      "trajectory ends 3.18 m from where it started; this walk is not a closed loop, so loop closure cannot be used to bound drift",
+      "semantic detection disabled for this run; damage, concealed flags and scope are empty because nothing looked for them"
+    ],
+    "coverage": {
+      "fraction_above_camera": 0.057,
+      "wall_band_points": 158952.0,
+      "mean_wall_observation": 0.5275,
+      "walls_well_observed": 7.0
+    },
+    "video_sampling": null
+  }
+}

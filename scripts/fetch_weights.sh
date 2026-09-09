@@ -25,12 +25,42 @@ set -euo pipefail
 
 DEST="${COZMO_WEIGHTS_DIR:-weights}"
 MODE="fetch"
-case "${1:-}" in
-  --check) MODE="check" ;;
-  --print-hashes) MODE="hashes" ;;
-  "") ;;
-  *) DEST="$1" ;;
-esac
+GROUP="all"
+
+# Groups exist so a reviewer does not have to wait on 6.9 GB to run the tier
+# they care about. The LiDAR tier needs no weights at all.
+#   stitch    dinov2 + superpoint + lightglue   ~0.2 GB  multi-room matching
+#   photo     stitch + VGGT                     ~5.2 GB  photo and video tiers
+#   semantics grounding-dino + sam2 + zoedepth  ~1.7 GB  damage, openings, depth cue
+group_of() {  # subdir -> group
+  case "$1" in
+    dinov2-small|superpoint|lightglue_superpoint) echo "stitch" ;;
+    vggt-1b) echo "photo" ;;
+    *) echo "semantics" ;;
+  esac
+}
+wanted() {
+  local g; g="$(group_of "$1")"
+  case "$GROUP" in
+    all) return 0 ;;
+    photo) [ "$g" = "photo" ] || [ "$g" = "stitch" ] ;;
+    stitch) [ "$g" = "stitch" ] ;;
+    semantics) [ "$g" = "semantics" ] ;;
+    *) return 0 ;;
+  esac
+}
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --check) MODE="check" ;;
+    --print-hashes) MODE="hashes" ;;
+    --group) GROUP="${2:-all}"; shift ;;
+    --help|-h)
+      sed -n '2,25p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    *) DEST="$1" ;;
+  esac
+  shift
+done
 
 HF="${HF_ENDPOINT:-https://huggingface.co}"
 
@@ -44,11 +74,11 @@ MODELS=(
   "IDEA-Research/grounding-dino-tiny|a2bb814dd30d776dcf7e30523b00659f4f141c71|special_tokens_map.json|SKIP|grounding-dino-tiny"
   "IDEA-Research/grounding-dino-tiny|a2bb814dd30d776dcf7e30523b00659f4f141c71|added_tokens.json|SKIP|grounding-dino-tiny"
   "IDEA-Research/grounding-dino-tiny|a2bb814dd30d776dcf7e30523b00659f4f141c71|vocab.txt|SKIP|grounding-dino-tiny"
-  "IDEA-Research/grounding-dino-tiny|a2bb814dd30d776dcf7e30523b00659f4f141c71|model.safetensors|SKIP|grounding-dino-tiny"
+  "IDEA-Research/grounding-dino-tiny|a2bb814dd30d776dcf7e30523b00659f4f141c71|model.safetensors|1a2412ef99bd74bcd3c2a246fa1e48581f8889a1300c9051974741314fc042f3|grounding-dino-tiny"
   "facebook/sam2.1-hiera-tiny|de431c4043854a71d8101e17995dfe596bf101a5|config.json|SKIP|sam2.1-hiera-tiny"
   "facebook/sam2.1-hiera-tiny|de431c4043854a71d8101e17995dfe596bf101a5|preprocessor_config.json|SKIP|sam2.1-hiera-tiny"
   "facebook/sam2.1-hiera-tiny|de431c4043854a71d8101e17995dfe596bf101a5|processor_config.json|SKIP|sam2.1-hiera-tiny"
-  "facebook/sam2.1-hiera-tiny|de431c4043854a71d8101e17995dfe596bf101a5|model.safetensors|SKIP|sam2.1-hiera-tiny"
+  "facebook/sam2.1-hiera-tiny|de431c4043854a71d8101e17995dfe596bf101a5|model.safetensors|48c14467e5cf9e51870511feb72c89688e82dd74523142c0538b663e193ac2a7|sam2.1-hiera-tiny"
   "facebook/VGGT-1B|860abec7937da0a4c03c41d3c269c366e82abdf9|config.json|SKIP|vggt-1b"
   "facebook/VGGT-1B|860abec7937da0a4c03c41d3c269c366e82abdf9|model.safetensors|f164acf60724910d8fe1578bb499d800850c7bb0948db7555c413f9fbe60467e|vggt-1b"
   "Intel/zoedepth-nyu|52ae69caf7896c927909b3ceab4249c235e16dc1|config.json|SKIP|zoedepth-nyu"
@@ -76,6 +106,7 @@ failed=0
 
 for row in "${MODELS[@]}"; do
   IFS='|' read -r repo revision file want subdir <<< "$row"
+  wanted "$subdir" || continue
   target="$DEST/$subdir/$file"
   mkdir -p "$(dirname "$target")"
 

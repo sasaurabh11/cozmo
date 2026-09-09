@@ -26,3 +26,8 @@ calibration/
 # a fraction of a second, and pytest rebuilds them automatically. Committing
 # 472 KB of depth PNGs and MP4s would only let them drift from the generators.
 tests/fixtures/captures/
+
+# Raw capture archives handed to us (Stray Scanner zips). Extracted into
+# /captures/, which is already ignored; the archives themselves are hundreds of
+# megabytes and belong in the reproduction bundle, not in git history.
+/data/

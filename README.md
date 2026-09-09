@@ -19,11 +19,27 @@ openings to within one occupancy cell.
 ## Install and run in under 5 minutes
 
 ```bash
-python3 -m venv .venv && source .venv/bin/activate
-pip install -e ".[dev]"
-./scripts/fetch_weights.sh            # no-op today; the hook exists
-python tests/fixtures/synthesize.py   # build the capture fixtures (0.25 s)
+scripts/setup.sh && source .venv/bin/activate
+```
 
+That is the whole install: virtualenv, dependencies, the ray-traced capture
+fixtures, and a smoke reconstruction. Measured at **68 seconds from `git clone`
+to a scored gate table** on a clean machine with a cold pip cache. It upgrades
+pip first on purpose — a fresh venv from a system Python 3.9 ships pip 21.x,
+which predates PEP 660 and fails `pip install -e` outright.
+
+No model weights are needed for that path: the LiDAR tier is pure geometry. The
+photo and video tiers need VGGT and its own interpreter, and the damage detector
+needs Grounding DINO and SAM 2; both are opt-in so nobody waits on 6.9 GB to see
+a room reconstructed:
+
+```bash
+scripts/fetch_weights.sh --group photo       # VGGT + matcher    (~5.2 GB)
+scripts/fetch_weights.sh --group semantics   # detector + depth  (~1.7 GB)
+scripts/setup_recon_env.sh                   # .venv-recon (numpy<2, py>=3.10)
+```
+
+```bash
 # Reconstruct a room from a LiDAR capture, with a drawing
 cozmo run --input tests/fixtures/captures/synthetic_room --out out/room
 open out/room/plan.png

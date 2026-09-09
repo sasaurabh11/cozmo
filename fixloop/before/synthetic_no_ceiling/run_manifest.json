@@ -1,0 +1,298 @@
+{
+  "pipeline_version": "0.4.0-video-calibration",
+  "schema_version": "1.3.0",
+  "package_version": "0.1.0",
+  "git": {
+    "commit": "fa8465d009c19b372446051fa794f57a96dfd0ab",
+    "branch": "main",
+    "describe": "fa8465d",
+    "dirty": true
+  },
+  "command": "cozmo run --input tests/fixtures/captures/synthetic_no_ceiling --out fixloop/before/synthetic_no_ceiling --no-semantics --quiet",
+  "argv": [
+    "cozmo",
+    "run",
+    "--input",
+    "tests/fixtures/captures/synthetic_no_ceiling",
+    "--out",
+    "fixloop/before/synthetic_no_ceiling",
+    "--no-semantics",
+    "--quiet"
+  ],
+  "seed": {
+    "seed": 20260908,
+    "seeded": [
+      "random",
+      "numpy",
+      "open3d",
+      "torch"
+    ],
+    "unavailable": []
+  },
+  "options": {
+    "drift_correction": true,
+    "ignore_calibration": false
+  },
+  "input": {
+    "path": "/Users/saurabh/Documents/Cozmo/tests/fixtures/captures/synthetic_no_ceiling",
+    "sha256": "775cd9c2d402d95f220749ba4220b10eefd75346c268bfd72040ea7ec9d1b211",
+    "file_count": 36,
+    "total_bytes": 127199
+  },
+  "capture": {
+    "capture_id": "synthetic_no_ceiling",
+    "space_id": "synthetic_room",
+    "tier": "lidar",
+    "device": {
+      "model": "synthetic",
+      "os_version": null,
+      "has_lidar": true
+    },
+    "rooms": [
+      "test_room"
+    ],
+    "payload": {
+      "frame_count": 16,
+      "depth_frames": 16,
+      "confidence_frames": 16,
+      "depth_resolution": [
+        128,
+        96
+      ],
+      "rgb_resolution": [
+        960,
+        720
+      ],
+      "has_intrinsics": true,
+      "depth_intrinsics_fx": 92.0,
+      "min_confidence_used": 2,
+      "path_length_m": 2.05,
+      "loop_closure_gap_m": 0.137,
+      "fraction_above_camera_height": 1.0,
+      "ceiling_likely_captured": true,
+      "horizontal_planes_m": [
+        0.695,
+        0.715,
+        0.735,
+        0.755,
+        0.775,
+        0.795,
+        0.815,
+        0.835,
+        0.855,
+        0.875,
+        0.895,
+        0.915,
+        0.935,
+        0.955,
+        0.975,
+        0.995,
+        1.015,
+        1.035,
+        1.055,
+        1.075,
+        1.095,
+        1.115,
+        1.135,
+        1.155,
+        1.175,
+        1.195,
+        1.215,
+        1.235,
+        1.255,
+        1.275,
+        1.295,
+        1.315,
+        1.335,
+        1.355,
+        1.375,
+        1.395,
+        1.415,
+        1.435,
+        1.455,
+        1.475,
+        1.495,
+        1.515,
+        1.535,
+        1.555,
+        1.575,
+        1.595,
+        1.615,
+        1.635,
+        1.655,
+        1.675,
+        1.695,
+        1.715,
+        1.735,
+        1.755,
+        1.775,
+        1.795,
+        1.815,
+        1.835,
+        1.855,
+        1.875,
+        1.895,
+        1.915,
+        1.935,
+        1.955,
+        1.975,
+        1.995,
+        2.015,
+        2.035,
+        2.055,
+        2.075,
+        2.095,
+        2.115,
+        2.135
+      ],
+      "warnings": []
+    },
+    "warnings": []
+  },
+  "outputs": {
+    "plan.json": "c048504f6d3923579fcc2a1b5b7a3756bb7aa7ec9e1945a2a27c6726f5db3f23",
+    "plan.png": "73e19459b528c4987bfd6be6b4ddc9ba011aa2773bdf8c8aaab15acafabff0e7",
+    "plan.svg": "732550bf9220ddf011450f16193f0c68536ca8b83bb97f761e27ee88fddc304f"
+  },
+  "reconstruction": {
+    "fusion": {
+      "points": 36567,
+      "points_before_downsample": 157800,
+      "frames_used": 16,
+      "stride": 1,
+      "voxel_size_m": 0.03,
+      "min_confidence": 2,
+      "dropped_frames": 0,
+      "requested_stride": 10,
+      "extent_m": [
+        4.405,
+        2.499,
+        3.983
+      ],
+      "height_range_m": [
+        0.0,
+        2.499
+      ],
+      "camera_height_median_m": 1.4,
+      "fraction_above_camera": 0.3549
+    },
+    "floor_plane": {
+      "normal": [
+        0.0001,
+        1.0,
+        0.0002
+      ],
+      "height_m": 0.0012,
+      "inliers": 5680,
+      "inlier_ratio": 0.1553
+    },
+    "layout": {
+      "floor_area_m2": 10.078,
+      "perimeter_m": 12.7986,
+      "wall_count": 4,
+      "line_count": 4,
+      "manhattan_snap": true,
+      "rotation_deg": 22.943,
+      "wall_lengths_m": [
+        3.599,
+        2.8,
+        3.599,
+        2.8
+      ],
+      "manhattan_score": 0.9523,
+      "wall_band_points": 19843,
+      "vertical_points": 19841,
+      "cells_kept": 1,
+      "bounds_uv": [
+        -0.2,
+        -3.0,
+        3.803,
+        0.204
+      ],
+      "axis_fallback": []
+    },
+    "ceiling": {
+      "height_above_floor_m": 2.4949,
+      "ci_95_m": [
+        2.3949,
+        2.7949
+      ],
+      "method": "wall_extrapolation",
+      "support_points": 4,
+      "wall_top_spread_m": 0.0264,
+      "note": "No ceiling plane, but walls stop together at 2.44 m (spread 0.03 m), read as the wall/ceiling junction.",
+      "wall_top_consensus_m": 2.4449,
+      "highest_wall_point_m": 2.458,
+      "wall_tops_m": [
+        2.432,
+        2.432,
+        2.458,
+        2.458
+      ]
+    },
+    "wall_observation_fraction": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "semantics": {
+      "detector": "disabled"
+    },
+    "openings": [
+      {
+        "wall_index": 2,
+        "kind": "door",
+        "width_m": 0.85,
+        "height_m": 2.0,
+        "offset_along_wall_m": 1.1,
+        "sill_height_m": 0.0,
+        "confidence": 0.95,
+        "head_spread_m": 0.0,
+        "columns": 17
+      },
+      {
+        "wall_index": 3,
+        "kind": "window",
+        "width_m": 1.1,
+        "height_m": 1.2,
+        "offset_along_wall_m": 0.85,
+        "sill_height_m": 0.9,
+        "confidence": 0.95,
+        "sill_spread_m": 0.0,
+        "columns": 22
+      }
+    ],
+    "ablation_floor_area_m2": 13.4093,
+    "timings_s": {
+      "drift_s": 0.001,
+      "fuse_s": 0.012,
+      "floor_s": 0.001,
+      "layout_s": 0.024,
+      "ceiling_s": 0.001,
+      "openings_s": 0.007,
+      "ablation_s": 0.077
+    }
+  },
+  "reconstruction_settings": {
+    "stride": 10,
+    "voxel_size_m": 0.03,
+    "semantics": false,
+    "frame_stride": 60,
+    "max_frames": 40,
+    "weights_dir": null
+  },
+  "calibration": {
+    "loaded": false,
+    "path": "calibration/calibration.json",
+    "calibration_version": null,
+    "fitted_at": null
+  },
+  "environment": {
+    "python": "3.9.6",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "source_date_epoch": null
+  },
+  "started_at": "2026-09-09T17:48:31.910315+00:00",
+  "duration_s": 0.8153
+}

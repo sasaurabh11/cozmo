@@ -1,0 +1,423 @@
+{
+  "schema_version": "1.3.0",
+  "capture_id": "synthetic_no_ceiling",
+  "tier": "lidar",
+  "pipeline_version": "0.4.0-video-calibration",
+  "generated_at": "2026-09-09T17:48:32.554548Z",
+  "scale": {
+    "source": "lidar_depth",
+    "scale_factor": {
+      "value": 1.0,
+      "ci_95": [
+        0.995,
+        1.005
+      ],
+      "unit": "ratio"
+    },
+    "reference_description": "sensor-metric depth; no external scale reference used",
+    "notes": null
+  },
+  "drift_correction": {
+    "enabled": true,
+    "method": "pose_graph",
+    "loop_closures": 0,
+    "residual_closure_error": null,
+    "ablation_footprint_area": {
+      "value": 13.4093,
+      "ci_95": [
+        12.872928,
+        13.945672
+      ],
+      "unit": "m2"
+    },
+    "notes": "no loop closures found; graph optimised on sequential edges only Wall normals additionally give the room's own axes (22.9 deg off the pose frame)."
+  },
+  "property_totals": {
+    "room_count": 1,
+    "total_floor_area": {
+      "value": 10.078,
+      "ci_95": [
+        9.67488,
+        10.481119999999999
+      ],
+      "unit": "m2"
+    },
+    "footprint_area": {
+      "value": 10.078,
+      "ci_95": [
+        9.67488,
+        10.481119999999999
+      ],
+      "unit": "m2"
+    },
+    "total_wall_area": {
+      "value": 31.9313,
+      "ci_95": [
+        30.654048,
+        33.208552
+      ],
+      "unit": "m2"
+    },
+    "bounding_box_m": [
+      3.599,
+      2.8
+    ]
+  },
+  "rooms": [
+    {
+      "id": "test_room",
+      "name": "Test Room",
+      "pose": {
+        "x": 0.0,
+        "y": 0.0,
+        "theta_rad": 0.40042666347233674
+      },
+      "walls": [
+        {
+          "id": "test_room_w0",
+          "start": {
+            "x": 3.601,
+            "y": -2.7977
+          },
+          "end": {
+            "x": 0.0017,
+            "y": -2.7977
+          },
+          "length": {
+            "value": 3.5993,
+            "ci_95": [
+              3.5433,
+              3.6553
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.4949,
+            "ci_95": [
+              2.3949,
+              2.7949
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [],
+          "observation_note": "observed across 100% of its length, to 2.43 m above floor"
+        },
+        {
+          "id": "test_room_w1",
+          "start": {
+            "x": 0.0017,
+            "y": -2.7977
+          },
+          "end": {
+            "x": 0.0017,
+            "y": 0.0023
+          },
+          "length": {
+            "value": 2.8,
+            "ci_95": [
+              2.752,
+              2.848
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.4949,
+            "ci_95": [
+              2.3949,
+              2.7949
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [],
+          "observation_note": "observed across 100% of its length, to 2.43 m above floor"
+        },
+        {
+          "id": "test_room_w2",
+          "start": {
+            "x": 0.0017,
+            "y": 0.0023
+          },
+          "end": {
+            "x": 3.601,
+            "y": 0.0023
+          },
+          "length": {
+            "value": 3.5993,
+            "ci_95": [
+              3.5433,
+              3.6553
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.4949,
+            "ci_95": [
+              2.3949,
+              2.7949
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [
+            "test_room_w2_op0"
+          ],
+          "observation_note": "observed across 100% of its length, to 2.46 m above floor"
+        },
+        {
+          "id": "test_room_w3",
+          "start": {
+            "x": 3.601,
+            "y": 0.0023
+          },
+          "end": {
+            "x": 3.601,
+            "y": -2.7977
+          },
+          "length": {
+            "value": 2.8,
+            "ci_95": [
+              2.752,
+              2.848
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.4949,
+            "ci_95": [
+              2.3949,
+              2.7949
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [
+            "test_room_w3_op0"
+          ],
+          "observation_note": "observed across 100% of its length, to 2.46 m above floor"
+        }
+      ],
+      "openings": [
+        {
+          "id": "test_room_w2_op0",
+          "wall_id": "test_room_w2",
+          "type": "door",
+          "width": {
+            "value": 0.85,
+            "ci_95": [
+              0.7999999999999999,
+              0.9
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.0,
+            "ci_95": [
+              1.95,
+              2.05
+            ],
+            "unit": "m"
+          },
+          "offset_along_wall": {
+            "value": 1.1,
+            "ci_95": [
+              1.05,
+              1.1500000000000001
+            ],
+            "unit": "m"
+          },
+          "sill_height": null,
+          "connects_room_id": null,
+          "detection_confidence": 0.95,
+          "detection_sources": [
+            "geometry"
+          ],
+          "source_note": null
+        },
+        {
+          "id": "test_room_w3_op0",
+          "wall_id": "test_room_w3",
+          "type": "window",
+          "width": {
+            "value": 1.1,
+            "ci_95": [
+              1.05,
+              1.1500000000000001
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 1.2,
+            "ci_95": [
+              1.15,
+              1.25
+            ],
+            "unit": "m"
+          },
+          "offset_along_wall": {
+            "value": 0.85,
+            "ci_95": [
+              0.7999999999999999,
+              0.9
+            ],
+            "unit": "m"
+          },
+          "sill_height": {
+            "value": 0.9,
+            "ci_95": [
+              0.85,
+              0.9500000000000001
+            ],
+            "unit": "m"
+          },
+          "connects_room_id": null,
+          "detection_confidence": 0.95,
+          "detection_sources": [
+            "geometry"
+          ],
+          "source_note": null
+        }
+      ],
+      "surfaces": [
+        {
+          "id": "test_room_w0_surface",
+          "room_id": "test_room",
+          "kind": "wall",
+          "wall_id": "test_room_w0",
+          "area": {
+            "value": 8.9799,
+            "ci_95": [
+              8.620704,
+              9.339096000000001
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "test_room_w1_surface",
+          "room_id": "test_room",
+          "kind": "wall",
+          "wall_id": "test_room_w1",
+          "area": {
+            "value": 6.9857,
+            "ci_95": [
+              6.706271999999999,
+              7.265128
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "test_room_w2_surface",
+          "room_id": "test_room",
+          "kind": "wall",
+          "wall_id": "test_room_w2",
+          "area": {
+            "value": 8.9799,
+            "ci_95": [
+              8.620704,
+              9.339096000000001
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "test_room_w3_surface",
+          "room_id": "test_room",
+          "kind": "wall",
+          "wall_id": "test_room_w3",
+          "area": {
+            "value": 6.9857,
+            "ci_95": [
+              6.706271999999999,
+              7.265128
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "test_room_floor",
+          "room_id": "test_room",
+          "kind": "floor",
+          "wall_id": null,
+          "area": {
+            "value": 10.078,
+            "ci_95": [
+              9.67488,
+              10.481119999999999
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "test_room_ceiling",
+          "room_id": "test_room",
+          "kind": "ceiling",
+          "wall_id": null,
+          "area": {
+            "value": 10.078,
+            "ci_95": [
+              9.67488,
+              10.481119999999999
+            ],
+            "unit": "m2"
+          }
+        }
+      ],
+      "ceiling_height": {
+        "value": 2.4949,
+        "ci_95": [
+          2.3949,
+          2.7949
+        ],
+        "unit": "m"
+      },
+      "floor_area": {
+        "value": 10.078,
+        "ci_95": [
+          9.67488,
+          10.481119999999999
+        ],
+        "unit": "m2"
+      },
+      "perimeter": {
+        "value": 12.7986,
+        "ci_95": [
+          12.5906,
+          13.0066
+        ],
+        "unit": "m"
+      },
+      "source_frame_count": 16
+    }
+  ],
+  "adjacencies": [],
+  "damage": [],
+  "concealed_flags": [],
+  "scope": [],
+  "quality": {
+    "overall_confidence": 0.55,
+    "interval_method": "Asserted intervals: wall +-(2 cm + 1% of length), openings +-5 cm (one occupancy cell), areas +-4%, then scaled by this tier's fitted calibration factor (1.0 if uncalibrated). The ceiling interval is real -- it comes from the ceiling estimator -- and is calibrated the same way.",
+    "ceiling_method": "wall_extrapolation",
+    "semantics_available": false,
+    "calibration_note": "Uncalibrated: no calibration file found (run `cozmo calibrate` against a benchmark set with ground truth). Every interval factor defaults to 1.0 -- these are the pipeline's own asserted half-widths, unchecked.",
+    "degradations": [
+      "ceiling not measured (wall_extrapolation)"
+    ],
+    "warnings": [
+      "semantic detection disabled for this run; damage, concealed flags and scope are empty because nothing looked for them"
+    ],
+    "coverage": {
+      "fraction_above_camera": 0.3549,
+      "wall_band_points": 19843.0,
+      "mean_wall_observation": 1.0,
+      "walls_well_observed": 4.0
+    },
+    "video_sampling": null
+  }
+}
