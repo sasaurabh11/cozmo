@@ -11,12 +11,22 @@ windows, and a rendered plan come out.
 | `photo` | Real reconstruction: VGGT → per-view planes → scale recovery → openings → render. Single room, or multiple rooms stitched into one property (see [Multi-room stitching](#multi-room-stitching)) |
 | `video` | Real reconstruction, reusing the photo tier's own code: frames are sampled from the clip (fixed stride, a blur filter, capped at what the backbone handles well) and fed straight into the same VGGT → planes → scale → openings path. No separate video reconstruction pipeline — see [The video tier](#the-video-tier-more-views-same-code) |
 
-On a 1715-frame capture of a real room the whole pipeline runs in **2.9 s**.
 On the synthetic fixture, where the answer is known exactly, it recovers
 3.60 m and 2.80 m walls to **1 mm**, a 2.50 m ceiling to **9 mm**, and both
-openings to within one occupancy cell.
+openings to within one occupancy cell. A 1,715-frame real LiDAR capture takes
+**6.8 s**; the largest, 9,745 frames, takes 69 s. Photo and video are dominated
+by VGGT at roughly 40–50 s per room.
+
+Full numbers, all three tiers, regenerable in one command:
+[benchmark_report.md](benchmark_report.md). Requirement-by-requirement status:
+[compliance_matrix.md](compliance_matrix.md).
 
 ## Install and run in under 5 minutes
+
+**Prerequisites:** Python ≥3.9, `git`, `curl`, and ~1 GB of disk for the base
+install. macOS (Apple Silicon, tested) or Linux. No GPU required — the LiDAR
+tier is CPU geometry; the photo/video tiers use Apple MPS or CUDA when present
+and fall back to CPU. Add ~7 GB of disk if you fetch all model weights.
 
 ```bash
 scripts/setup.sh && source .venv/bin/activate
@@ -102,18 +112,25 @@ something real. With it **on**, wall normals are histogrammed to find the room's
 own axes and the layout is built on those. With it **off**, ARKit's world axes
 are used exactly as they came:
 
-| Capture | Correction on | Correction off |
-|---|---|---|
-| Synthetic room (truth 10.08 m²) | **10.08 m²** | 21.04 m² |
-| Real capture, room A | **8.05 m²** | 16.59 m² |
+| Capture | Correction on | Correction off | Loop closures | Method |
+|---|---|---|---|---|
+| Synthetic room (truth 10.08 m²) | **10.08 m²** | 13.41 m² | 0 | `pose_graph` |
+| `apartment_lidar` (1,715 frames) | **17.82 m²** | 16.70 m² | 5 | `loop_closure` |
+| `scan_with_ceiling` (9,745 frames) | **39.01 m²** | 42.71 m² | 12 | `loop_closure` |
+| `scan_floor_only` (5,251 frames) | **51.33 m²** | 62.24 m² | 12 | `loop_closure` |
 
-Rooms are not aligned to the capture's world frame — the real one sits 23° off,
-and the fixture is built 23° off for the same reason — so taking the pose frame
-as given roughly doubles the footprint. Each arm records the other's number in
+Rooms are not aligned to the capture's world frame — the real ones sit tens of
+degrees off, and the fixture is built 23° off for the same reason — so taking
+the pose frame as given inflates the footprint, by 33% on the fixture and 21%
+on the largest real scan. Each arm records the other's number in
 `drift_correction.ablation_footprint_area`, so one run gives you both.
 
-No loop closure: the sample walk ends 3.18 m from where it started, so there is
-no loop to close, and the plan says that rather than claiming a pose graph.
+Whether loop closure has anything to bind depends on the walk. `scan_floor_only`
+and `scan_with_ceiling` both return to within 0.4 m of their start and fire 12
+closures each; `apartment_lidar` ends 3.18 m away and finds only 5; the
+synthetic fixture is a single slow turn with no revisit at all, so it reports
+`pose_graph` (ran, found nothing to close) rather than claiming a closure it
+did not make.
 
 ### `cozmo run` writes
 
@@ -134,6 +151,34 @@ exactly the failure the repeatability gate exists to catch.
 
 Set `SOURCE_DATE_EPOCH` to make `plan.json` byte-identical across reruns; the
 test suite uses this to assert determinism.
+
+## Capture provenance and disclosure
+
+The brief specifies **iPhone 15 or newer** for the photo and video tiers and
+Pro-class LiDAR devices for the LiDAR tier, and allows public datasets only with
+disclosure. Every capture in `captures/` declares its own device in
+`capture.json`. Stated plainly, because some of them do not meet that bar:
+
+| Capture | Tier | Device | Brief-compliant? |
+|---|---|---|---|
+| `apartment_lidar` | lidar | iPhone (Pro-class, LiDAR) | ✅ |
+| `scan_with_ceiling` | lidar | iPhone (Pro-class, LiDAR) | ✅ |
+| `scan_floor_only` | lidar | iPhone (Pro-class, LiDAR) | ✅ |
+| `apartment_video` | video | iPhone (Pro-class, LiDAR) | ✅ same clip's RGB, used video-only |
+| `room_photos` | photo | iPhone 15 | ✅ |
+| `saurabh_room` | photo | **OnePlus Nord 2T** | ❌ Android, not iPhone 15+ |
+| `saurabh_room_photo` | photo | **OnePlus Nord 2T** | ❌ Android, not iPhone 15+ |
+| `saurabh_room_video` | video | **Mac Pro** | ❌ not a phone capture |
+| `demo_office` | photo | Kinect RGB, MSR 7-Scenes | ❌ public dataset — disclosed |
+| `demo_fourroom` | photo | Kinect RGB, MSR 7-Scenes | ❌ public dataset — disclosed |
+| `demo_bedroom` | photo | VGGT demo images | ❌ public sample — disclosed |
+
+The non-compliant captures are development fixtures: they exercise the code
+paths (multi-room stitching, video room segmentation, opening detection) and are
+useful for that, but **they are not valid evidence for the accuracy gates**, and
+no accuracy claim in this repository rests on them. The device string travels
+into every `run_manifest.json`, so any number can be traced to the hardware that
+produced it.
 
 ## Capture directories
 
@@ -346,10 +391,14 @@ confidence, optional per-frame local depth), so a fix-loop entry that reads
 cozmo run --input captures/room_photos --out out/room_photos
 ```
 
-Single room only -- multi-room stitching is the next phase. Openings reuse
+One folder is one room; several folders stitch into one property, see
+[Multi-room stitching](#multi-room-stitching). Openings reuse
 [geometry/openings.py](cozmo/geometry/openings.py) unchanged, called on the
 merged wall planes once they are in metres; nothing there was forked for this
-tier.
+tier. Where the reconstructed cloud is too sparse for that geometric detector
+to see a gap -- which is most real photo captures -- the semantic detector
+supplies openings instead, and each one records which source found it in
+`detection_sources`.
 
 **Honest status on the real capture.** `captures/room_photos` is 7 real stills
 pulled from the apartment video, chosen for sharpness (low odometry speed).
@@ -400,10 +449,17 @@ Every sampling decision is recorded, not just applied: `quality.video_sampling`
 in the plan carries the stride, threshold and cap alongside what actually
 happened -- frames decoded, how many survived the stride, how many survived
 the blur filter, how many were finally used -- so a thin or blurry walkthrough
-is visible in the output rather than silently degrading. Single room only,
-for the same reason the photo tier started single-room: one video file is one
-walkthrough of one room; stitching several video walkthroughs into one
-property is not attempted.
+is visible in the output rather than silently degrading.
+
+A walkthrough usually crosses doorways, so one clip is not one room. The
+sampled frames are split into per-room runs by appearance -- DINOv2
+descriptors of consecutive frames, cut where agreement drops, since crossing a
+doorway changes almost everything in view at once -- and each run is written
+into its own folder. At that point the walkthrough *is* a photo capture, and
+[`build_multi_room_photo_plan`](cozmo/pipeline/photo.py) does the rest
+unchanged: reconstruction, stitching, adjacency, overlap resolution. A walk
+that never leaves one room segments into one run and takes the single-room
+path. On a real 37 s clip this recovers 3 rooms with 2 adjacencies.
 
 ## The LiDAR reconstruction
 
@@ -778,10 +834,18 @@ scripts/fetch_weights.sh
 
 ## What is deliberately not here yet
 
-- **Damage/scope at the photo and video tiers.** `cozmo.semantics` is
-  tier-agnostic and could attach here, but wiring it in is not done yet -- the
-  photo and video tiers' Plans carry empty `damage`/`concealed_flags`/`scope`.
-  Only the LiDAR tier runs the semantic stage today.
+- **Damage/scope at the photo and video tiers.** Openings *are* detected at
+  those tiers (Grounding DINO, via
+  [semantics/photo_worker.py](cozmo/semantics/photo_worker.py)), but the rest
+  of the semantic stage is not wired in: their Plans carry empty
+  `damage`/`concealed_flags`/`scope`. Only the LiDAR tier produces damage
+  regions, concealed flags and scope today.
+- **Room segmentation at the LiDAR tier.** The LiDAR path emits exactly one
+  room per capture. A whole-flat walkthrough therefore becomes a single room
+  polygon covering an arbitrary part of the flat, which is why the brief's
+  "stitched plan from every tier" is met at photo and video but *not* at
+  LiDAR, and why two scans of one flat disagree by 27% on footprint. This is
+  the open root cause behind the worst gate in the benchmark.
 - **Exact ground truth for the photo/video tiers' own real-capture tests.** The
   synthetic LiDAR fixtures have exact wall lengths because they're ray-traced;
   VGGT needs real texture to reconstruct anything, so a real-capture check at
@@ -789,9 +853,6 @@ scripts/fetch_weights.sh
   measurement -- the acceptance criterion there is a well-formed, plausible
   reconstruction with intervals that behave correctly (widen on disagreement,
   bracket the estimate), not a verified sub-10% error against tape.
-- **Multi-room video.** One video file is one walkthrough of one room; unlike
-  the photo tier, several video walkthroughs are not stitched into one
-  property.
 - **A held-out calibration split.** `cozmo calibrate` fits and evaluates on the
   same benchmark set -- see [Calibration](#calibration) for why, and why every
   fitted factor is printed next to its sample count.

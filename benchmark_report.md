@@ -222,9 +222,9 @@ Wall-clock per capture, MacBook (Apple Silicon, MPS), from `benchmark_runs/timin
 | `saurabh_room_photo` | photo | 3 folders (10 stills) | 90.4 |
 | `demo_fourroom` | photo | 4 folders (21 stills) | 140.5 |
 | `apartment_video` | video | 1,715-frame clip | 107.2 |
-| `saurabh_room_video` | video | 1,105-frame clip | ~165 |
+| `saurabh_room_video` | video | 1,105-frame clip | **233.4** |
 
-**Whole benchmark: ~11 minutes for 11 captures.** The LiDAR tier is
+**Whole benchmark: 12.8 minutes for 11 captures.** The LiDAR tier is
 geometry-only and scales with frame count (2.5 s → 68.8 s over a 600× range).
 Photo and video are dominated by VGGT: roughly 40–50 s per room regardless of
 capture size, which is why multi-room captures scale linearly with room count.
@@ -266,7 +266,7 @@ second blocks one.
 
 | What | Command | Measured |
 |---|---|---|
-| Clean-machine setup | `scripts/setup.sh` | **68.4 s** from `git clone` to a scored gate table, cold pip cache, no weights needed |
+| Clean-machine setup | `scripts/setup.sh` | **58.1 s** from `git clone` to a working reconstruction, cold pip cache, no weights needed |
 | Whole benchmark | `bash scripts/run_benchmark.sh benchmark_runs` | ~11 min, 11 captures |
 | One capture | `cozmo run --input <dir> --out <dir>` | 2.5 s – 165 s by tier |
 | Determinism | run twice, `diff plan.json` | LiDAR: `plan.json` **and** `plan.png` byte-identical. Photo (real VGGT/MPS): identical, max wall difference **0.00e+00 m** |
