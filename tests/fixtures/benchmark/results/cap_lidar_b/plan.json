@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.2.0",
+  "schema_version": "1.3.0",
   "capture_id": "cap_lidar_b",
   "tier": "lidar",
   "pipeline_version": "0.1.0-fixture",
@@ -635,6 +635,7 @@
     "warnings": [
       "operator re-walked the living room; two passes merged"
     ],
-    "coverage": {}
+    "coverage": {},
+    "video_sampling": null
   }
 }

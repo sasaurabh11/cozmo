@@ -1,15 +1,15 @@
 # Cozmo AI — floor-plan reconstruction pipeline
 
-**LiDAR tier is real.** A Stray Scanner capture goes in; a dimensioned room
-polygon, a ceiling height that admits when it was not measured, detected doors
-and windows, and a rendered plan come out. Photo and video tiers are still
-stubs, and say so in their own output.
+**Every tier is real.** A capture goes in — LiDAR, a folder of unposed
+stills, or a handheld walkthrough video — and a dimensioned room polygon, a
+ceiling height that admits when it was not measured, detected doors and
+windows, and a rendered plan come out.
 
 | Tier | Status |
 |---|---|
 | `lidar` | Real reconstruction: fuse → floor plane → wall layout → ceiling → openings → render, then damage → concealed-damage rules → scope |
-| `photo` | Real reconstruction: VGGT → per-view planes → scale recovery → openings → render. Single room only |
-| `video` | Stub. Emits a hardcoded property with `STUB PIPELINE` in `quality.warnings` |
+| `photo` | Real reconstruction: VGGT → per-view planes → scale recovery → openings → render. Single room, or multiple rooms stitched into one property (see [Multi-room stitching](#multi-room-stitching)) |
+| `video` | Real reconstruction, reusing the photo tier's own code: frames are sampled from the clip (fixed stride, a blur filter, capped at what the backbone handles well) and fed straight into the same VGGT → planes → scale → openings path. No separate video reconstruction pipeline — see [The video tier](#the-video-tier-more-views-same-code) |
 
 On a 1715-frame capture of a real room the whole pipeline runs in **2.9 s**.
 On the synthetic fixture, where the answer is known exactly, it recovers
@@ -38,14 +38,16 @@ scores a real reconstruction against an exact answer: every LiDAR gate passes,
 worst wall error 0.1 cm. It validates the geometry and the sensor conventions —
 not real-world accuracy, since synthetic depth has no noise.
 
-For the stub tiers and a table with deliberate failures in it:
+For the photo tier, and a gate table with deliberate failures in it (the
+hand-authored fixtures under `tests/fixtures/benchmark/results/`, see
+[Fixtures](#fixtures)):
 
 ```bash
-cozmo run --input tests/fixtures/captures/demo_photo --out out/demo_photo
+cozmo run --input tests/fixtures/captures/demo_photo --out out/demo_photo --backbone stub
 cozmo benchmark \
     --results tests/fixtures/benchmark/results \
     --ground-truth tests/fixtures/benchmark/ground_truth.csv \
-    --out out/bench_stub
+    --out out/bench_fixtures
 ```
 
 With Docker instead:
@@ -58,13 +60,21 @@ docker run --rm -v "$PWD:/data" cozmo \
               -o /data/out/bench
 ```
 
-## The two commands
+## The three commands
 
 ```
 cozmo run       --input DIR --out DIR [--drift-correction on|off] [--seed N]
-                [--stride N] [--voxel-size M] [--verbose]
+                [--stride N] [--voxel-size M]                        # lidar
+                [--backbone vggt|stub] [--unsafe-scale-cues]         # photo/video
+                [--video-stride N] [--video-blur-threshold F] [--video-max-frames N]  # video
+                [--semantics/--no-semantics] [--frame-stride N] [--max-frames N]
+                [--ignore-calibration] [--verbose]
 cozmo benchmark --results DIR --ground-truth CSV --out DIR [--strict]
+cozmo calibrate --captures DIR --ground-truth CSV --out FILE [--backbone vggt|stub]
 ```
+
+`cozmo run --help` and `cozmo calibrate --help` list every flag; the ones above
+are the ones worth knowing about first.
 
 One command per capture. **Tier is never a flag** — it is read from
 `capture.json` inside the input directory, because the tier is a fact about the
@@ -350,6 +360,35 @@ suite uses -- `cozmo.recon.backbone.VGGTReconstructor` is exercised for real,
 separately, in `tests/test_recon.py`'s opt-in `TestVGGTBackbone` (needs
 weights + `.venv-recon` + `COZMO_TEST_RECON=1`).
 
+## The video tier: more views, same code
+
+A deliberate simplification, disclosed here and in the technical report
+rather than hidden: **there is no separate video reconstruction pipeline.**
+[`cozmo/io/video.py`](cozmo/io/video.py) decodes the walkthrough clip at a
+fixed stride (`--video-stride`, default 15 -- roughly one sampled frame every
+half second of a 30 fps walk), drops any sampled frame whose Laplacian
+variance falls below a blur floor (`--video-blur-threshold`, default 80 --
+motion blur and out-of-focus pans read low, sharp texture reads high), then
+keeps the sharpest survivors up to `--video-max-frames` (default 8, the
+reconstruction backbone's own 2-8 view contract). Those frames are written as
+an ordinary photo folder and handed straight to
+[`cozmo/pipeline/photo.py`](cozmo/pipeline/photo.py)'s existing
+`_reconstruct_room` — unmodified. More views, same code.
+
+```bash
+cozmo run --input captures/walkthrough --out out/walkthrough \
+    --video-stride 15 --video-blur-threshold 80 --video-max-frames 8
+```
+
+Every sampling decision is recorded, not just applied: `quality.video_sampling`
+in the plan carries the stride, threshold and cap alongside what actually
+happened -- frames decoded, how many survived the stride, how many survived
+the blur filter, how many were finally used -- so a thin or blurry walkthrough
+is visible in the output rather than silently degrading. Single room only,
+for the same reason the photo tier started single-room: one video file is one
+walkthrough of one room; stitching several video walkthroughs into one
+property is not attempted.
+
 ## The LiDAR reconstruction
 
 Five stages in [cozmo/geometry/](cozmo/geometry/), each usable on its own:
@@ -414,12 +453,65 @@ Every wall reports the fraction of its length that returned anything, because
 that the wall is solid. On the real capture five of ten walls fall below 60%,
 and the plan says so in `quality.degradations`.
 
-### Intervals at this tier are placeholders
+### Intervals: asserted first, then calibrated
 
 Wall ±(2 cm + 1% of length), openings ±5 cm (one occupancy cell), areas ±4%.
-These are asserted, not calibrated, and `quality.calibration_note` says so. The
-ceiling interval is the exception — it comes from the estimator and means
-something.
+These half-widths are reasoned from something structural -- occupancy-grid
+quantisation at this tier, view count and scale-cue disagreement at photo and
+video -- and that reasoning is never thrown away. What changes is that every
+one of them is now scaled by a per-tier, per-quantity factor fitted against
+ground truth (see [Calibration](#calibration)); the factor is 1.0, i.e. no
+change, until `cozmo calibrate` has actually run and produced a file. The
+ceiling interval is the one exception worth calling out on its own -- it comes
+from the ceiling estimator, not an asserted constant, and is calibrated the
+same way as everything else.
+
+## Calibration
+
+`cozmo calibrate` closes the loop between an asserted interval and a checked
+one:
+
+```bash
+cozmo calibrate --captures tests/fixtures/captures \
+    --ground-truth tests/fixtures/benchmark/ground_truth_synthetic.csv \
+    --out calibration/calibration.json
+```
+
+It runs the *real* pipeline (every calibration factor forced to 1.0 for this
+pass -- fitting against an already-calibrated prediction would just re-derive
+the previous factor) over every `capture.json`-rooted capture under
+`--captures`, pairs every measurement against ground truth using exactly the
+pairing `cozmo benchmark`'s own `interval_coverage` gate uses, and for each
+(tier, quantity kind) group fits the smallest half-width scale factor whose
+scaled interval covers ≥ 95% of that group's truth values. The factor floors
+at 1.0 -- calibration only ever widens an interval here; narrowing an
+already-generous placeholder on the handful of captures a benchmark this size
+can supply is exactly the "confident garbage on thin evidence" failure mode
+the project exists to catch, not commit.
+
+```
+TIER   QUANTITY        N  SCALE  COVERAGE  TRUSTED
+-----  --------------  -  -----  --------  -------
+lidar  wall_length     8  1.230  95.0%     yes
+photo  wall_length     3  4.100  100.0%    no
+```
+
+`N` and `TRUSTED` (≥ 3 calibration samples) sit right next to the factor so a
+fit backed by three captures is never mistaken for one backed by three
+hundred. The fitted file is versioned (`calibration_version`, `fitted_at`,
+which captures and ground truth produced it) and is loaded by the pipeline at
+runtime — from `calibration/calibration.json` by default, or wherever
+`COZMO_CALIBRATION_FILE` points — so a newly fitted file changes reported
+uncertainty on the next run without a code change. It is not committed (see
+`.gitignore`): a fit from a thin or synthetic benchmark set is not a number
+worth shipping, and every tier runs uncalibrated (factor 1.0, stated plainly
+in `quality.calibration_note`) when no file is present.
+
+`cozmo benchmark` reports the same achieved-coverage numbers the fit is
+checked against, broken out by tier and quantity kind, as
+`interval_coverage_by_kind` gate rows — so a benchmark run shows where
+calibration is and isn't earning its keep without needing to re-run
+`cozmo calibrate` first.
 
 ## Damage, concealed flags and scope
 
@@ -550,6 +642,7 @@ footprint_area.
 | `footprint` | LiDAR ±2%, video ±3%, photo ±8% |
 | `repeatability` | ≤ 1 cm or 0.5% per wall, between two captures of one room at one tier |
 | `interval_coverage` | ≥ 90% of 95% intervals contain the truth, mean half-width reported alongside |
+| `interval_coverage_by_kind` | Same threshold, broken out by tier and quantity kind (wall_length, opening_width, ceiling_height, floor_area, footprint_area) across every capture in the run — see [Calibration](#calibration) |
 
 Two rules the scorer will not bend:
 
@@ -562,6 +655,23 @@ Two rules the scorer will not bend:
 Repeats are found structurally — plans are grouped by `(tier, room_id)`, which
 is exactly "two captures of the same room at the same tier" — so no bookkeeping
 is needed to enable the repeatability and spread gates.
+
+### Device matrix
+
+Every `cozmo benchmark` run also prints a device matrix — tier × device class
+× measured accuracy per gate — generated from that run's own gate results and
+each capture's `run_manifest.json` (which is where device info actually lives;
+`plan.json` itself doesn't carry it), not written by hand:
+
+```
+TIER   DEVICE             GATE               N  PASS RATE  WORST VALUE
+-----  -----------------  -----------------  -  ---------  -----------
+lidar  synthetic (LiDAR)  wall_lengths       1  100%       1.0000
+```
+
+A `plan.json` scored without its sibling manifest (e.g. the hand-authored
+gate-table fixtures below) reports device class `unknown` rather than a
+guess. The table is also written into `results.json` under `device_matrix`.
 
 ### Assumptions, stated rather than buried
 
@@ -594,13 +704,16 @@ the code defining them. `pytest` rebuilds them automatically when they are
 missing or when either generator changes; run
 `python tests/fixtures/synthesize.py` to build them by hand for CLI use.
 
-Text fixtures — ground truth CSVs and the stub-tier `plan.json` files — stay
-committed: they are small, they diff, and they are meant to be read in review.
+Text fixtures — ground truth CSVs and the hand-authored `plan.json` files below
+— stay committed: they are small, they diff, and they are meant to be read in
+review.
 
-### Stub-tier plans
+### Hand-authored gate-table plans
 
 `tests/fixtures/benchmark/` holds a two-room ground truth and three synthetic
-plans, each built to land on a specific side of a specific gate:
+plans -- built directly, not run through the pipeline, so the scorer can be
+exercised against known-good and known-bad numbers without needing a capture
+at all. Each lands on a specific side of a specific gate:
 
 | Capture | Tier | What it demonstrates |
 |---|---|---|
@@ -627,40 +740,45 @@ both CLI commands end to end.
 ```
 cozmo/
   schema.py            output contract (pydantic v2)
-  cli.py               typer CLI: run, benchmark, version
-  seed.py              random / numpy / torch seeding, recorded per run
-  io/  stray.py        Stray Scanner loader (placeholder)
-       photo.py        per-room photo folders
-       capture.py      tier dispatch on capture.json
-  pipeline/run.py      single-capture orchestrator (stubbed reconstruction)
-  benchmark/score.py   ground truth in, gate table + results.json out
-tests/                 schema, scorer, pipeline, CLI + fixtures
+  calibration.py        loads/applies fitted interval factors at runtime
+  calibrate.py           `cozmo calibrate`: fits factors from (prediction, truth) pairs
+  cli.py                typer CLI: run, benchmark, calibrate, version
+  seed.py               random / numpy / torch seeding, recorded per run
+  io/  stray.py         Stray Scanner loader (verified, used as-is)
+       photo.py         per-room photo folders
+       video.py         video frame sampling (stride + blur filter + cap)
+       capture.py       tier dispatch on capture.json
+  geometry/             LiDAR: fuse, floor/ceiling planes, layout, openings, render
+  recon/                photo/video backbone (VGGT), scale recovery, per-view layout
+  stitch/               multi-room matching, pose graph, drift/loop-closure correction
+  semantics/            damage, concealed-damage rules, scope (tier-agnostic)
+  pipeline/run.py       single-capture orchestrator; dispatches on tier
+       photo.py         photo tier + shared single-room assembly (video reuses it)
+       video.py         video tier: sample frames, hand to the photo path
+  benchmark/score.py    ground truth in, gate table + device matrix + results.json out
+tests/                  schema, scorer, pipeline, geometry, recon, stitch, semantics, CLI + fixtures
 scripts/fetch_weights.sh
 ```
 
 ## What is deliberately not here yet
 
-- **Video reconstruction.** Still emits `build_stub_plan`; the seam is the same
-  one the photo tier just came out of.
-- **Multi-room photo stitching.** One room per photo folder today.
-- **Damage/scope at the photo tier.** `cozmo.semantics` is tier-agnostic and could
-  attach here, but wiring it in is not done yet -- the photo tier's Plan carries
-  empty `damage`/`concealed_flags`/`scope`.
-- **Exact ground truth for the photo tier's own real-capture test.** The
+- **Damage/scope at the photo and video tiers.** `cozmo.semantics` is
+  tier-agnostic and could attach here, but wiring it in is not done yet -- the
+  photo and video tiers' Plans carry empty `damage`/`concealed_flags`/`scope`.
+  Only the LiDAR tier runs the semantic stage today.
+- **Exact ground truth for the photo/video tiers' own real-capture tests.** The
   synthetic LiDAR fixtures have exact wall lengths because they're ray-traced;
-  VGGT needs real texture to reconstruct anything, so the photo-tier check runs
-  against real photos of the apartment capture with no independent laser
-  measurement -- the acceptance criterion here is a well-formed, plausible
+  VGGT needs real texture to reconstruct anything, so a real-capture check at
+  those tiers runs against real photos/video with no independent laser
+  measurement -- the acceptance criterion there is a well-formed, plausible
   reconstruction with intervals that behave correctly (widen on disagreement,
   bracket the estimate), not a verified sub-10% error against tape.
-- **Multi-room segmentation and stitching.** The LiDAR tier emits one room. On
-  the real capture it returns the region the operator actually walked, which is
-  one room of a larger apartment; adjacency and whole-property stitching are the
-  next stage.
-- **Loop closure and a pose graph.** The only drift handling today is the
-  Manhattan/plane-anchored correction described above, and the plan claims
-  exactly that and nothing more.
-- **Calibrated intervals.** See above — LiDAR intervals are asserted.
+- **Multi-room video.** One video file is one walkthrough of one room; unlike
+  the photo tier, several video walkthroughs are not stitched into one
+  property.
+- **A held-out calibration split.** `cozmo calibrate` fits and evaluates on the
+  same benchmark set -- see [Calibration](#calibration) for why, and why every
+  fitted factor is printed next to its sample count.
 - **Detector precision.** Open-vocabulary prompts are noisy: "cracked drywall"
   at a low threshold returns the wall. Damage is held to a higher score
   threshold than openings and masks covering more than 35% of a frame are

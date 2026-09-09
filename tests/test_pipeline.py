@@ -1,19 +1,20 @@
 """Pipeline orchestration: determinism, provenance, tier dispatch.
 
-The reconstruction is stubbed, so what is worth testing today is everything
-around it -- the parts that have to be true before any number can be believed.
+Every tier (photo, video, lidar) does real reconstruction now -- see
+test_video.py for the video tier specifically. What is worth testing here is
+everything around the reconstruction itself: the parts that have to be true
+before any number can be believed.
 """
 
 from __future__ import annotations
 
 import json
-from pathlib import Path
 
 import pytest
 
 from cozmo.io.capture import load_capture
 from cozmo.pipeline.run import (
-    MANIFEST_FILENAME, PLAN_FILENAME, build_stub_plan, hash_directory, run_capture,
+    MANIFEST_FILENAME, PLAN_FILENAME, hash_directory, run_capture,
 )
 
 # The photo tier now does real reconstruction (VGGT). Tests in this file that
@@ -104,21 +105,6 @@ class TestRunOutputs:
         result = run_capture(photo_capture, tmp_path / "out", **PHOTO_STUB_KW)
         assert "Uncalibrated" in result.plan.quality.calibration_note
         assert result.plan.quality.semantics_available is False
-
-    def test_stub_tier_plans_admit_they_are_stubs(self):
-        """The video tier is still the hardcoded stub; build_stub_plan is its
-        seam and is unit-tested directly here (video has no fixture capture
-        of its own yet)."""
-        from cozmo.io.capture import CaptureBundle, CaptureManifest
-        from cozmo.schema import Tier as _Tier
-
-        bundle = CaptureBundle(
-            root=Path("."),
-            manifest=CaptureManifest(capture_id="video_stub", tier=_Tier.VIDEO),
-            payload=None, warnings=[],
-        )
-        plan = build_stub_plan(bundle)
-        assert any("STUB PIPELINE" in w for w in plan.quality.warnings)
 
     def test_lidar_drift_flag_reaches_the_plan_and_the_ablation(self, lidar_capture, tmp_path):
         on = run_capture(lidar_capture, tmp_path / "on", drift_correction=True).plan

@@ -30,6 +30,7 @@ from shapely.affinity import affine_transform
 from shapely.ops import unary_union
 
 from .. import PIPELINE_VERSION, SCHEMA_VERSION
+from ..calibration import CalibrationSet, calibration_note_for, recalibrate_measurement, recalibrate_room
 from ..geometry.openings import detect_openings, wall_observation_fractions
 from ..io.capture import CaptureBundle
 from ..recon.backbone import ReconstructorUnavailable, get_reconstructor
@@ -266,6 +267,128 @@ def _reconstruct_room(
     )
 
 
+def _assemble_single_room_plan(
+    bundle: CaptureBundle,
+    result: RoomReconstruction,
+    tier: Tier,
+    generated_at: Optional[datetime],
+    backbone_name: str,
+    extra_warnings: Optional[List[str]] = None,
+    extra_degradations: Optional[List[str]] = None,
+    video_sampling: Optional[Dict[str, Any]] = None,
+    drift_note_prefix: str = "",
+    calibration: Optional[CalibrationSet] = None,
+) -> Tuple[Plan, Dict[str, Any]]:
+    """Build a single-room Plan from one room's reconstruction.
+
+    Shared by the photo tier (:func:`build_photo_plan`'s single-room branch)
+    and the video tier (:mod:`cozmo.pipeline.video`) -- a video capture is
+    nothing but more views of the same unposed-stills problem once frames
+    have been sampled from it (see cozmo/io/video.py), so everything from
+    reconstruction onward is identical; only the tier tag, a note about how
+    the views were obtained, and the calibration factors applied (calibration
+    is fit separately per tier) differ.
+    """
+    layout, scale, frames = result.layout, result.scale, result.frames
+    scale_estimate, room, detections = result.scale_estimate, result.room, result.detections
+    warnings_out = list(bundle.warnings) + result.warnings + list(extra_warnings or [])
+    degradations = list(result.degradations) + list(extra_degradations or [])
+    timings = result.timings
+
+    room = recalibrate_room(room, tier.value, calibration)
+
+    drift = DriftCorrection(
+        enabled=True, method=DriftMethod.PLANE_ANCHORED, loop_closures=0,
+        notes=(
+            f"{drift_note_prefix}Single-room reconstruction ({layout.layout_method}); no "
+            f"multi-room stitch, so no cross-room drift to correct. Per-wall confidence comes "
+            f"from view count and cross-view plane agreement instead of a pose graph residual."
+        ),
+    )
+
+    fired_cues = [c.name for c in scale_estimate.cues if c.fired]
+    plan = Plan(
+        schema_version=SCHEMA_VERSION, capture_id=bundle.capture_id, tier=tier,
+        pipeline_version=PIPELINE_VERSION, generated_at=generated_at or datetime.now(timezone.utc),
+        scale=ScaleInfo(
+            source=(
+                ScaleSource.STRUCTURAL_PRIOR if "door_height" in fired_cues or "ceiling_height" in fired_cues
+                else ScaleSource.REFERENCE_OBJECT
+            ),
+            scale_factor=Measurement(
+                value=round(scale, 5),
+                ci_95=(round(scale_estimate.ci_95[0], 5), round(scale_estimate.ci_95[1], 5)),
+                unit=Unit.RATIO,
+            ),
+            reference_description=(
+                f"{len(fired_cues)} cue(s) fired: {', '.join(fired_cues) if fired_cues else 'none'} "
+                f"(agreement {scale_estimate.agreement:.2f}, method {scale_estimate.method})"
+            ),
+        ),
+        drift_correction=drift,
+        property_totals=PropertyTotals(
+            room_count=1,
+            total_floor_area=recalibrate_measurement(
+                room.floor_area.model_copy(deep=True), tier.value, "floor_area", calibration
+            ),
+            footprint_area=recalibrate_measurement(
+                room.floor_area.model_copy(deep=True), tier.value, "footprint_area", calibration
+            ),
+            total_wall_area=Measurement.relative(
+                round(room.perimeter.value * room.ceiling_height.value, 4),
+                max(room.perimeter.relative_half_width or 0.08, 0.08), Unit.SQUARE_METERS
+            ),
+            bounding_box_m=(
+                round(float(layout.polygon.bounds[2] - layout.polygon.bounds[0]) * scale, 3),
+                round(float(layout.polygon.bounds[3] - layout.polygon.bounds[1]) * scale, 3),
+            ),
+        ),
+        rooms=[room], adjacencies=[], damage=[], concealed_flags=[], scope=[],
+        quality=QualityReport(
+            overall_confidence=round(min(0.75, 0.35 + 0.2 * len(fired_cues) + 0.15 * scale_estimate.agreement), 3),
+            interval_method=(
+                f"{tier.value.title()} tier: per-wall relative uncertainty from view count and "
+                f"cross-view plane agreement, combined in quadrature with the scale factor's own "
+                f"interval (cue disagreement), then scaled by this tier's fitted calibration "
+                f"factor (1.0 if uncalibrated). No sensor-noise error budget -- there is no depth "
+                f"sensor at this tier."
+            ),
+            calibration_note=calibration_note_for(tier.value, calibration),
+            ceiling_method=layout.layout_method,
+            semantics_available=False,
+            degradations=degradations,
+            warnings=warnings_out,
+            coverage={
+                "layout_method": 1.0 if layout.layout_method == "per_view_merge" else 0.0,
+                "scale_cues_fired": float(len(fired_cues)),
+                "scale_agreement": float(scale_estimate.agreement),
+            },
+            video_sampling=video_sampling,
+        ),
+    )
+
+    details = {
+        "layout_result": layout,
+        "scale_factor": scale,
+        "backbone": backbone_name,
+        "reconstruction_stats": result.reconstruction.stats,
+        "layout": layout.stats,
+        "layout_method": layout.layout_method,
+        "view_plane_counts": layout.view_plane_counts,
+        "scale": scale_estimate.as_dict(),
+        "frames": summarize_frames(frames),
+        "openings": [
+            {"wall_index": d.wall_index, "kind": d.kind, "width_m": round(d.width_m * scale, 3),
+             "confidence": d.confidence}
+            for d in detections
+        ],
+        "timings_s": timings,
+    }
+    if video_sampling is not None:
+        details["video_sampling"] = video_sampling
+    return plan, details
+
+
 def build_photo_plan(
     bundle: CaptureBundle,
     generated_at: Optional[datetime] = None,
@@ -273,6 +396,7 @@ def build_photo_plan(
     weights_dir: Optional[Path] = None,
     run_metric_depth_cue: bool = False,
     run_door_cue: bool = False,
+    calibration: Optional[CalibrationSet] = None,
 ) -> Tuple[Plan, Dict[str, Any]]:
     """Reconstruct one room from a folder of 2-8 unposed photos.
 
@@ -295,7 +419,7 @@ def build_photo_plan(
         return build_multi_room_photo_plan(
             bundle, generated_at=generated_at, backbone_name=backbone_name,
             weights_dir=weights_dir, run_metric_depth_cue=run_metric_depth_cue,
-            run_door_cue=run_door_cue,
+            run_door_cue=run_door_cue, calibration=calibration,
         )
 
     room_dir = room_folders[0]
@@ -305,96 +429,9 @@ def build_photo_plan(
         room_dir, room_id, backbone_name=backbone_name, weights_dir=weights_dir,
         run_metric_depth_cue=run_metric_depth_cue, run_door_cue=run_door_cue,
     )
-    layout, scale, frames = result.layout, result.scale, result.frames
-    scale_estimate, room, detections = result.scale_estimate, result.room, result.detections
-    warnings_out = list(bundle.warnings) + result.warnings
-    degradations = result.degradations
-    timings = result.timings
-
-    drift = DriftCorrection(
-        enabled=True, method=DriftMethod.PLANE_ANCHORED, loop_closures=0,
-        notes=(
-            f"Single-room photo reconstruction ({layout.layout_method}); no multi-room stitch, "
-            f"so no cross-room drift to correct. Per-wall confidence comes from view count and "
-            f"cross-view plane agreement instead of a pose graph residual."
-        ),
+    return _assemble_single_room_plan(
+        bundle, result, Tier.PHOTO, generated_at, backbone_name, calibration=calibration,
     )
-
-    fired_cues = [c.name for c in scale_estimate.cues if c.fired]
-    plan = Plan(
-        schema_version=SCHEMA_VERSION, capture_id=bundle.capture_id, tier=Tier.PHOTO,
-        pipeline_version=PIPELINE_VERSION, generated_at=generated_at or datetime.now(timezone.utc),
-        scale=ScaleInfo(
-            source=(
-                ScaleSource.STRUCTURAL_PRIOR if "door_height" in fired_cues or "ceiling_height" in fired_cues
-                else ScaleSource.REFERENCE_OBJECT
-            ),
-            scale_factor=Measurement(
-                value=round(scale, 5),
-                ci_95=(round(scale_estimate.ci_95[0], 5), round(scale_estimate.ci_95[1], 5)),
-                unit=Unit.RATIO,
-            ),
-            reference_description=(
-                f"{len(fired_cues)} cue(s) fired: {', '.join(fired_cues) if fired_cues else 'none'} "
-                f"(agreement {scale_estimate.agreement:.2f}, method {scale_estimate.method})"
-            ),
-        ),
-        drift_correction=drift,
-        property_totals=PropertyTotals(
-            room_count=1,
-            total_floor_area=room.floor_area.model_copy(deep=True),
-            footprint_area=room.floor_area.model_copy(deep=True),
-            total_wall_area=Measurement.relative(
-                round(room.perimeter.value * room.ceiling_height.value, 4),
-                max(room.perimeter.relative_half_width or 0.08, 0.08), Unit.SQUARE_METERS
-            ),
-            bounding_box_m=(
-                round(float(layout.polygon.bounds[2] - layout.polygon.bounds[0]) * scale, 3),
-                round(float(layout.polygon.bounds[3] - layout.polygon.bounds[1]) * scale, 3),
-            ),
-        ),
-        rooms=[room], adjacencies=[], damage=[], concealed_flags=[], scope=[],
-        quality=QualityReport(
-            overall_confidence=round(min(0.75, 0.35 + 0.2 * len(fired_cues) + 0.15 * scale_estimate.agreement), 3),
-            interval_method=(
-                "Photo tier: per-wall relative uncertainty from view count and cross-view plane "
-                "agreement, combined in quadrature with the scale factor's own interval (cue "
-                "disagreement). No sensor-noise error budget -- there is no depth sensor at this tier."
-            ),
-            calibration_note=(
-                "Uncalibrated. Widened deliberately by cue disagreement rather than narrowed by "
-                "averaging over it; not yet checked against benchmark ground truth."
-            ),
-            ceiling_method=layout.layout_method,
-            semantics_available=False,
-            degradations=degradations,
-            warnings=warnings_out,
-            coverage={
-                "layout_method": 1.0 if layout.layout_method == "per_view_merge" else 0.0,
-                "scale_cues_fired": float(len(fired_cues)),
-                "scale_agreement": float(scale_estimate.agreement),
-            },
-        ),
-    )
-
-    details = {
-        "layout_result": layout,
-        "scale_factor": scale,
-        "backbone": backbone_name,
-        "reconstruction_stats": result.reconstruction.stats,
-        "layout": layout.stats,
-        "layout_method": layout.layout_method,
-        "view_plane_counts": layout.view_plane_counts,
-        "scale": scale_estimate.as_dict(),
-        "frames": summarize_frames(frames),
-        "openings": [
-            {"wall_index": d.wall_index, "kind": d.kind, "width_m": round(d.width_m * scale, 3),
-             "confidence": d.confidence}
-            for d in detections
-        ],
-        "timings_s": timings,
-    }
-    return plan, details
 
 
 def _rotate2(vec: Tuple[float, float], yaw: float) -> Tuple[float, float]:
@@ -411,6 +448,7 @@ def build_multi_room_photo_plan(
     run_metric_depth_cue: bool = False,
     run_door_cue: bool = False,
     max_frames_per_pair: int = 4,
+    calibration: Optional[CalibrationSet] = None,
 ) -> Tuple[Plan, Dict[str, Any]]:
     """Reconstruct every room folder, then stitch them into one property.
 
@@ -523,10 +561,11 @@ def build_multi_room_photo_plan(
                 "start": Point2D(x=round(sx + x, 4), y=round(sy + y, 4)),
                 "end": Point2D(x=round(ex + x, 4), y=round(ey + y, 4)),
             }))
-        final_rooms.append(source_room.model_copy(update={
+        moved_room = source_room.model_copy(update={
             "walls": moved_walls,
             "pose": Pose2D(x=round(x, 4), y=round(y, 4), theta_rad=round(source_room.pose.theta_rad + yaw, 5)),
-        }))
+        })
+        final_rooms.append(recalibrate_room(moved_room, Tier.PHOTO.value, calibration))
 
     adjacencies = [
         Adjacency(
@@ -599,19 +638,29 @@ def build_multi_room_photo_plan(
         ),
         property_totals=PropertyTotals(
             room_count=len(final_rooms),
-            total_floor_area=Measurement.relative(round(total_floor_area, 4), footprint_rel, Unit.SQUARE_METERS),
-            footprint_area=Measurement.relative(round(footprint_area, 4), footprint_rel, Unit.SQUARE_METERS),
+            total_floor_area=recalibrate_measurement(
+                Measurement.relative(round(total_floor_area, 4), footprint_rel, Unit.SQUARE_METERS),
+                Tier.PHOTO.value, "floor_area", calibration,
+            ),
+            footprint_area=recalibrate_measurement(
+                Measurement.relative(round(footprint_area, 4), footprint_rel, Unit.SQUARE_METERS),
+                Tier.PHOTO.value, "footprint_area", calibration,
+            ),
         ),
         rooms=final_rooms, adjacencies=adjacencies, damage=[], concealed_flags=[], scope=[],
         quality=QualityReport(
             overall_confidence=round(min(0.7, 0.3 + 0.15 * len(stitch_result.edges_used)), 3),
             interval_method=(
                 "Multi-room photo tier: per-room intervals as in the single-room case, footprint "
-                "additionally carries each room's own scale uncertainty. Adjacency confidence comes "
-                "from match evidence (image inlier count, doorway width agreement), not calibration."
+                "additionally carries each room's own scale uncertainty, then this tier's fitted "
+                "calibration factor. Adjacency confidence comes from match evidence (image inlier "
+                "count, doorway width agreement), not calibration."
             ),
-            calibration_note="Uncalibrated. Stitching adds pose-graph and overlap-resolution error on top "
-                             "of each room's own uncalibrated reconstruction.",
+            calibration_note=(
+                calibration_note_for(Tier.PHOTO.value, calibration)
+                + " Stitching additionally adds pose-graph and overlap-resolution error on top of "
+                  "each room's own calibrated reconstruction, which calibration does not separately account for."
+            ),
             ceiling_method="multi_room_stitch",
             semantics_available=False,
             degradations=all_degradations,

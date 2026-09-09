@@ -9,6 +9,11 @@ build/
 out/
 runs/
 weights/
+# Fitted by `cozmo calibrate` against whatever benchmark captures and ground
+# truth happen to be on this machine -- a fit from a thin or synthetic set is
+# not a number worth committing, and the pipeline runs uncalibrated (factor
+# 1.0 everywhere) and says so when this file is absent.
+calibration/
 .DS_Store
 
 # Raw captures and run outputs live outside version control. The leading slash

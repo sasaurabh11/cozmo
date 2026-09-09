@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.2.0",
+  "schema_version": "1.3.0",
   "capture_id": "cap_lidar_a",
   "tier": "lidar",
   "pipeline_version": "0.1.0-fixture",
@@ -761,6 +761,7 @@
     "calibration_note": null,
     "degradations": [],
     "warnings": [],
-    "coverage": {}
+    "coverage": {},
+    "video_sampling": null
   }
 }

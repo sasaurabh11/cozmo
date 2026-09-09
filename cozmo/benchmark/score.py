@@ -558,12 +558,17 @@ def gate_adjacency_correctness(lp: LoadedPlan, gt: GroundTruth) -> GateResult:
     )
 
 
-def gate_interval_coverage(lp: LoadedPlan, gt: GroundTruth) -> GateResult:
-    """Calibration: do the 95% intervals actually contain the truth?
+def covered_measurements(lp: LoadedPlan, gt: GroundTruth) -> List[Dict[str, Any]]:
+    """Every measurement in `lp` with a matching ground-truth row: predicted
+    value, truth, half-width, whether the interval covers it, and which
+    quantity kind it is (wall_length | opening_width | ceiling_height |
+    floor_area | footprint_area).
 
-    Scored at every tier. Wide intervals pass this row cheaply, which is why the
-    mean half-width is reported alongside -- a pipeline that widens its way to
-    coverage is visible here rather than hidden.
+    This is the one definition of "which measurements get checked against
+    truth" -- used by :func:`gate_interval_coverage` and
+    :func:`gate_interval_coverage_by_kind` here, and reused as-is by
+    ``cozmo.calibrate`` to fit calibration factors against exactly the same
+    pairing the benchmark scores against.
     """
     checks: List[Dict[str, Any]] = []
 
@@ -595,6 +600,19 @@ def gate_interval_coverage(lp: LoadedPlan, gt: GroundTruth) -> GateResult:
     row = gt.lookup("property", "footprint_area")
     if row:
         add("footprint_area", "property", lp.plan.property_totals.footprint_area, row.value_m)
+    return checks
+
+
+def gate_interval_coverage(lp: LoadedPlan, gt: GroundTruth) -> GateResult:
+    """Calibration: do the 95% intervals actually contain the truth?
+
+    Scored at every tier. Wide intervals pass this row cheaply, which is why the
+    mean half-width is reported alongside -- a pipeline that widens its way to
+    coverage is visible here rather than hidden. See
+    :func:`gate_interval_coverage_by_kind` for the same question broken out by
+    quantity kind across the whole benchmark set.
+    """
+    checks = covered_measurements(lp, gt)
 
     if not checks:
         return GateResult(
@@ -717,6 +735,145 @@ def gate_ceiling_spread(plans: Sequence[LoadedPlan]) -> List[GateResult]:
     return results
 
 
+def gate_interval_coverage_by_kind(plans: Sequence[LoadedPlan], gt: GroundTruth) -> List[GateResult]:
+    """Achieved 95%-interval coverage, broken out by tier and quantity kind,
+    across every plan in the benchmark set.
+
+    ``gate_interval_coverage`` answers "does this one capture's intervals hold
+    up"; this answers "which kind of measurement, at which tier, is actually
+    calibrated" -- the number ``cozmo calibrate``'s own report is fit against,
+    surfaced here so a benchmark run shows it without needing calibrate.py.
+    """
+    groups: Dict[Tuple[str, str], List[Dict[str, Any]]] = {}
+    for lp in plans:
+        for check in covered_measurements(lp, gt):
+            groups.setdefault((lp.tier.value, check["kind"]), []).append(check)
+
+    if not groups:
+        return [GateResult(
+            gate="interval_coverage_by_kind", scope="-", tier="-", status=SKIP,
+            metric="nothing to check", threshold="-",
+            detail={"reason": "no measurement in any plan has matching ground truth"},
+        )]
+
+    results: List[GateResult] = []
+    for (tier, kind), checks in sorted(groups.items()):
+        covered = sum(1 for c in checks if c["covered"])
+        fraction = covered / len(checks)
+        mean_half_width = sum(c["half_width"] for c in checks) / len(checks)
+        results.append(GateResult(
+            gate="interval_coverage_by_kind", scope=f"{tier}:{kind}", tier=tier,
+            status=PASS if fraction >= INTERVAL_COVERAGE_MIN - EPS else FAIL,
+            metric=f"{covered}/{len(checks)} covered ({_pct(fraction)}), mean +-{mean_half_width:.4f}",
+            threshold=f">= {_pct(INTERVAL_COVERAGE_MIN)} of 95% intervals ({kind})",
+            value=round(fraction, 4),
+            detail={"n": len(checks), "mean_half_width": round(mean_half_width, 4)},
+        ))
+    return results
+
+
+# --------------------------------------------------------------------------
+# Device matrix: tier x device class x measured accuracy per gate
+# --------------------------------------------------------------------------
+
+RUN_MANIFEST_FILENAME = "run_manifest.json"
+
+# Per-capture gates whose `value` is a meaningful accuracy number for one
+# device. room_overlap and adjacency_correctness are structural (multi-room)
+# checks, not a per-device accuracy figure, so they are left out of the matrix.
+DEVICE_MATRIX_GATES = ("wall_lengths", "ceiling_height", "opening_widths", "footprint", "interval_coverage")
+
+# Whether a bigger `value` is better, per gate -- wall_lengths/opening_widths/
+# interval_coverage are pass fractions (bigger is better); ceiling_height's
+# value is an absolute error and footprint's is a relative error (smaller is
+# better). Used only to pick which end of the range to call "worst".
+GATE_HIGHER_IS_BETTER: Dict[str, bool] = {
+    "wall_lengths": True, "opening_widths": True, "interval_coverage": True,
+    "ceiling_height": False, "footprint": False,
+}
+
+
+@dataclass(frozen=True)
+class DeviceMatrixRow:
+    tier: str
+    device_class: str
+    gate: str
+    n_captures: int
+    pass_rate: Optional[float]
+    worst_value: Optional[float]
+
+    def to_json(self) -> Dict[str, Any]:
+        return asdict(self)
+
+
+def _device_class(plan_path: Path) -> str:
+    """Device class for the capture that produced `plan_path`, read from the
+    sibling run_manifest.json -- not asserted, and "unknown" when that
+    manifest is not sitting next to the plan being scored."""
+    manifest_path = Path(plan_path).parent / RUN_MANIFEST_FILENAME
+    if not manifest_path.is_file():
+        return "unknown"
+    try:
+        manifest = json.loads(manifest_path.read_text())
+    except (OSError, json.JSONDecodeError):
+        return "unknown"
+    device = manifest.get("capture", {}).get("device", {})
+    model = str(device.get("model") or "unknown")
+    return f"{model} (LiDAR)" if device.get("has_lidar") else model
+
+
+def build_device_matrix(gates: Sequence[GateResult], plans: Sequence[LoadedPlan]) -> List[DeviceMatrixRow]:
+    """One row per (tier, device class, gate), aggregated across every
+    capture the benchmark scored -- generated from this run's own gate
+    results and each capture's own run_manifest.json, not written by hand.
+    """
+    device_by_capture: Dict[str, str] = {lp.capture_id: _device_class(lp.path) for lp in plans}
+
+    groups: Dict[Tuple[str, str, str], List[GateResult]] = {}
+    for g in gates:
+        if g.gate not in DEVICE_MATRIX_GATES:
+            continue
+        device = device_by_capture.get(g.scope)
+        if device is None:   # scope is not a capture id for this gate; skip
+            continue
+        groups.setdefault((g.tier, device, g.gate), []).append(g)
+
+    rows: List[DeviceMatrixRow] = []
+    for (tier, device, gate), members in sorted(groups.items()):
+        scored = [g for g in members if g.status != SKIP and g.value is not None]
+        n = len(scored)
+        if n == 0:
+            rows.append(DeviceMatrixRow(tier, device, gate, 0, None, None))
+            continue
+        pass_rate = sum(1 for g in scored if g.status == PASS) / n
+        values = [g.value for g in scored]
+        worst = min(values) if GATE_HIGHER_IS_BETTER.get(gate, True) else max(values)
+        rows.append(DeviceMatrixRow(tier, device, gate, n, round(pass_rate, 4), round(worst, 4)))
+    return rows
+
+
+def render_device_matrix(rows: Sequence[DeviceMatrixRow]) -> str:
+    if not rows:
+        return "no per-capture gate results to build a device matrix from"
+    headers = ("TIER", "DEVICE", "GATE", "N", "PASS RATE", "WORST VALUE")
+    table_rows: List[Tuple[str, ...]] = [
+        (
+            r.tier, r.device_class, r.gate, str(r.n_captures),
+            f"{r.pass_rate * 100:.0f}%" if r.pass_rate is not None else "-",
+            f"{r.worst_value:.4f}" if r.worst_value is not None else "-",
+        )
+        for r in rows
+    ]
+    widths = [max(len(headers[i]), *(len(row[i]) for row in table_rows)) for i in range(len(headers))]
+
+    def line(cells: Iterable[str]) -> str:
+        return "  ".join(str(c).ljust(widths[i]) for i, c in enumerate(cells)).rstrip()
+
+    out = [line(headers), "  ".join("-" * w for w in widths)]
+    out.extend(line(r) for r in table_rows)
+    return "\n".join(out)
+
+
 # --------------------------------------------------------------------------
 # Report
 # --------------------------------------------------------------------------
@@ -728,6 +885,7 @@ class Report:
     plans: List[Dict[str, Any]]
     ground_truth: Dict[str, Any]
     generated_at: str
+    device_matrix_rows: List[DeviceMatrixRow] = field(default_factory=list)
 
     @property
     def counts(self) -> Dict[str, int]:
@@ -749,6 +907,7 @@ class Report:
             "plans": self.plans,
             "summary": self.counts,
             "gates": [g.to_json() for g in self.gates],
+            "device_matrix": [r.to_json() for r in self.device_matrix_rows],
         }
 
 
@@ -776,9 +935,11 @@ def score_results(results_dir: Path, ground_truth_csv: Path) -> Report:
         gates.append(gate_adjacency_correctness(lp, gt))
     gates.extend(gate_repeatability(plans))
     gates.extend(gate_ceiling_spread(plans))
+    gates.extend(gate_interval_coverage_by_kind(plans, gt))
 
     return Report(
         gates=gates,
+        device_matrix_rows=build_device_matrix(gates, plans),
         plans=[
             {
                 "capture_id": lp.capture_id,

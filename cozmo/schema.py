@@ -392,6 +392,11 @@ class QualityReport(StrictModel):
     degradations: List[str] = Field(default_factory=list)
     warnings: List[str] = Field(default_factory=list)
     coverage: Dict[str, float] = Field(default_factory=dict)
+    # Video tier only: the sampling parameters and outcome (stride, blur
+    # threshold, frame cap, how many frames survived each step). A video
+    # capture's plan has to say how its views were chosen, the same way a
+    # photo capture's plan says which EXIF focal length it used.
+    video_sampling: Optional[Dict[str, Any]] = None
 
 
 class Plan(StrictModel):

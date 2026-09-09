@@ -366,7 +366,7 @@ class TestFullReport:
         assert {g.gate for g in report.gates} == {
             "wall_lengths", "ceiling_height", "opening_widths", "footprint",
             "interval_coverage", "repeatability", "ceiling_spread",
-            "room_overlap", "adjacency_correctness",
+            "room_overlap", "adjacency_correctness", "interval_coverage_by_kind",
         }
 
     def test_known_fixture_verdicts(self, results_dir, ground_truth_csv):

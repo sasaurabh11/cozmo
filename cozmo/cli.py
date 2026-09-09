@@ -21,8 +21,9 @@ from typing import Optional
 import typer
 
 from . import PIPELINE_VERSION, SCHEMA_VERSION, __version__
-from .benchmark.score import render_table, score_results, write_results
+from .benchmark.score import render_device_matrix, render_table, score_results, write_results
 from .geometry.fuse import DEFAULT_STRIDE, DEFAULT_VOXEL_M
+from .io.video import DEFAULT_BLUR_THRESHOLD, DEFAULT_MAX_FRAMES as VIDEO_DEFAULT_MAX_FRAMES, DEFAULT_STRIDE_FRAMES
 from .pipeline.run import run_capture
 from .semantics.stage import DEFAULT_FRAME_STRIDE, DEFAULT_MAX_FRAMES
 from .pipeline.photo import DEFAULT_BACKBONE
@@ -98,6 +99,23 @@ def run(
              "process. Off by default -- they load torch here, which already has open3d "
              "loaded for the LiDAR path, and the two cannot share a process (see README).",
     ),
+    video_stride: int = typer.Option(
+        DEFAULT_STRIDE_FRAMES, "--video-stride", min=1,
+        help="Video tier: sample every Nth decoded frame before the blur filter.",
+    ),
+    video_blur_threshold: float = typer.Option(
+        DEFAULT_BLUR_THRESHOLD, "--video-blur-threshold", min=0.0,
+        help="Video tier: drop sampled frames below this Laplacian variance (motion blur).",
+    ),
+    video_max_frames: int = typer.Option(
+        VIDEO_DEFAULT_MAX_FRAMES, "--video-max-frames", min=2,
+        help="Video tier: cap on frames handed to the reconstruction backbone (its own 2-8 view contract).",
+    ),
+    ignore_calibration: bool = typer.Option(
+        False, "--ignore-calibration",
+        help="Force every interval calibration factor to 1.0 (the pipeline's raw asserted "
+             "half-widths). Used by `cozmo calibrate` itself; not for normal runs.",
+    ),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Log each reconstruction stage."),
     quiet: bool = typer.Option(False, "--quiet", "-q", help="Suppress the summary."),
 ) -> None:
@@ -121,6 +139,10 @@ def run(
             max_frames=max_frames,
             backbone_name=backbone,
             unsafe_scale_cues=unsafe_scale_cues,
+            video_stride=video_stride,
+            video_blur_threshold=video_blur_threshold,
+            video_max_frames=video_max_frames,
+            ignore_calibration=ignore_calibration,
         )
     except (FileNotFoundError, NotADirectoryError, ValueError) as exc:
         _err(f"run failed: {exc}")
@@ -196,11 +218,65 @@ def benchmark(
         raise typer.Exit(code=2)
 
     typer.echo(render_table(report))
+    typer.echo("\nDevice matrix (generated from this run's captures, not written by hand):")
+    typer.echo(render_device_matrix(report.device_matrix_rows))
     path = write_results(report, out_dir)
     typer.echo(f"\nresults      {path}")
 
     if strict and report.failed:
         raise typer.Exit(code=1)
+
+
+@app.command()
+def calibrate(
+    captures_dir: Path = typer.Option(
+        ..., "--captures", "-c",
+        help="Directory searched recursively for capture.json-rooted captures.",
+        exists=True, file_okay=False, readable=True,
+    ),
+    ground_truth: Path = typer.Option(
+        ..., "--ground-truth", "-g",
+        help="Ground-truth CSV: room,element,element_id,dimension,value_m,method,notes",
+        exists=True, dir_okay=False, readable=True,
+    ),
+    out_path: Path = typer.Option(
+        Path("calibration/calibration.json"), "--out", "-o",
+        help="Where the fitted calibration file is written.",
+    ),
+    backbone: str = typer.Option(
+        DEFAULT_BACKBONE, "--backbone",
+        help="Photo/video tier reconstruction backbone to run while collecting samples.",
+    ),
+    weights_dir: Optional[Path] = typer.Option(None, "--weights-dir"),
+    seed: int = typer.Option(DEFAULT_SEED, "--seed"),
+    verbose: bool = typer.Option(False, "--verbose", "-v"),
+) -> None:
+    """Fit interval calibration factors against ground truth.
+
+    Runs the real pipeline over every capture under --captures (each with its
+    own tier, read from its own capture.json, same as `cozmo run`), pairs
+    every measurement against ground truth, and writes the fitted per-tier,
+    per-quantity half-width factors to --out. Point the pipeline at the
+    result with COZMO_CALIBRATION_FILE, or leave it at the default
+    calibration/calibration.json.
+    """
+    logging.basicConfig(
+        level=logging.INFO if verbose else logging.WARNING,
+        format="%(levelname)-7s %(name)s: %(message)s",
+    )
+    from .calibrate import coverage_report, run_calibration
+
+    try:
+        written, factors = run_calibration(
+            captures_dir, ground_truth, out_path,
+            backbone_name=backbone, weights_dir=weights_dir, seed=seed,
+        )
+    except (FileNotFoundError, ValueError) as exc:
+        _err(f"calibrate failed: {exc}")
+        raise typer.Exit(code=2)
+
+    typer.echo(coverage_report(factors))
+    typer.echo(f"\ncalibration  {written}")
 
 
 @app.command()

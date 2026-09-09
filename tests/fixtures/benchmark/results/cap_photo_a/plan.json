@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.2.0",
+  "schema_version": "1.3.0",
   "capture_id": "cap_photo_a",
   "tier": "photo",
   "pipeline_version": "0.1.0-fixture",
@@ -635,6 +635,7 @@
     "warnings": [
       "scale recovered from a door-height prior; intervals below are the pipeline's own claim and the calibration row shows they are too tight"
     ],
-    "coverage": {}
+    "coverage": {},
+    "video_sampling": null
   }
 }
