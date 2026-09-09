@@ -472,6 +472,14 @@ def build_lidar_plan(
             f"walls {poorly_seen} observed across less than 60% of their length; "
             f"absence of openings in them is not evidence they are solid"
         )
+    axis_fallback = layout.stats.get("axis_fallback") or []
+    if axis_fallback:
+        axis_names = ", ".join("u" if a == 0 else "v" for a in axis_fallback)
+        degradations.append(
+            f"too few walls detected across the room's {axis_names} axis; that boundary is "
+            f"padded from where the data happens to stop, not a measured wall -- treat this "
+            f"room's size and the walls on that axis as unverified, not just wide"
+        )
 
     if not drift_correction:
         drift_method = DriftMethod.NONE_POSES_AS_IS
@@ -569,15 +577,20 @@ def build_lidar_plan(
         "ceiling": ceiling.summary(),
         "wall_observation_fraction": [round(f, 3) for f in observation],
         "semantics": semantic.details if semantic else {"detector": "disabled"},
+        # The plan's own openings come from opening_source (detector-confirmed
+        # openings included, not just geometry's), so the drawing has to be
+        # built from the same list -- rendering from `detections` alone drew
+        # an empty plan.png whenever every opening came from the semantic
+        # cross-check (a doorway geometry's sparse occupancy grid missed).
         "openings": [
             {
                 "wall_index": d.wall_index, "kind": d.kind,
                 "width_m": round(d.width_m, 3), "height_m": round(d.height_m, 3),
                 "offset_along_wall_m": round(d.offset_along_wall_m, 3),
                 "sill_height_m": round(d.sill_height_m, 3), "confidence": d.confidence,
-                **d.stats,
+                **getattr(d, "stats", {}),
             }
-            for d in detections
+            for d in opening_source
         ],
         "ablation_floor_area_m2": round(ablation_area, 4) if ablation_area is not None else None,
         "timings_s": timings,

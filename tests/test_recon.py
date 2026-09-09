@@ -22,12 +22,15 @@ from cozmo.recon.frames import (
     _focal_px_from_exif,
     load_photo_folder,
 )
+from cozmo.geometry.layout import FloorFrame
 from cozmo.recon.layout import (
     ASSUMED_CAMERA_DOWN,
     ViewPlane,
+    WALL_MIN_RANGE_OVER_FLOOR,
     _cluster_wall_planes,
     _merge_floor_or_ceiling,
     _view_floor_ceiling_wall,
+    _wall_line_from_cluster,
 )
 from cozmo.recon.scale import ScaleCue, ceiling_height_cue, recover_scale
 
@@ -274,6 +277,105 @@ class TestWallClustering:
         b = ViewPlane(frame_index=1, kind="wall", normal_world=n1, point_world=n1 * 4.0, inliers=100)
         clusters = _cluster_wall_planes([a, b])
         assert len(clusters) == 2
+
+
+class TestFurnitureIsNotAWall:
+    """A room's own bounding wall is never closer to you than the floor at
+    your own feet; a flat vertical surface that is (a wardrobe door, a
+    headboard) must not be reported as a wall candidate -- found on a real
+    capture, where a wardrobe standing away from the true wall had *more*
+    inlier points than the true wall itself, since VGGT's per-pixel
+    confidence favours near content."""
+
+    def test_a_close_flat_surface_is_dropped_but_the_real_wall_survives(self):
+        rng = np.random.default_rng(0)
+        n = 4000
+        down = ASSUMED_CAMERA_DOWN  # [0, 1, 0]: local +y is down
+
+        # Floor: below the camera by 1.2 (camera at local origin).
+        floor_pts = np.stack(
+            [rng.uniform(-2, 2, n), np.full(n, 1.2), rng.uniform(0.3, 4, n)], axis=1
+        )
+        # The room's real wall, straight ahead and well past the floor's own
+        # distance from the camera.
+        wall_pts = np.stack(
+            [rng.uniform(-2, 2, n), rng.uniform(-1.2, 1.2, n), np.full(n, 3.0)], axis=1
+        )
+        # A wardrobe door: flat, vertical, facing sideways (so it lands in a
+        # different angle-cluster than the real wall) -- but close, well
+        # inside the floor's own distance from the camera.
+        furniture_pts = np.stack(
+            [np.full(n, 0.35), rng.uniform(-1.2, 1.2, n), rng.uniform(0.3, 1.5, n)], axis=1
+        )
+        points = np.concatenate([floor_pts, wall_pts, furniture_pts]).astype(np.float32)
+
+        planes = _view_floor_ceiling_wall(
+            points, np.ones(len(points)), np.eye(3), np.zeros(3), frame_index=0
+        )
+        walls = [p for p in planes if p.kind == "wall"]
+
+        assert len(walls) == 1
+        assert abs(walls[0].offset) == pytest.approx(3.0, abs=0.2)
+
+
+class TestWallLineFromCluster:
+    @staticmethod
+    def _frame() -> FloorFrame:
+        return FloorFrame(
+            origin=np.zeros(3), up=np.array([0.0, 1.0, 0.0]),
+            e1=np.array([1.0, 0.0, 0.0]), e2=np.array([0.0, 0.0, 1.0]), rotation_rad=0.0,
+        )
+
+    def test_edge_side_comes_from_the_clusters_own_camera_not_a_global_median(self):
+        """Two walls whose own per-view estimates are both biased toward the
+        same side of the room's global median -- because the cameras that saw
+        them both happened to stand off-centre on that side -- must still
+        snap to opposite edges. Deciding by comparing each wall's coordinate
+        to a *global* median instead of to its *own* camera sent both to the
+        same edge and silently inflated the room on the other side: found on
+        a real capture (demo_bedroom), where every wall ended up snapped to
+        the same edge and one axis fell back to the raw data extent.
+        """
+        frame = self._frame()
+        rng = np.random.default_rng(0)
+        floor_uv = np.column_stack(
+            [rng.uniform(-2.0, 2.0, 5000), rng.uniform(-1.0, 1.0, 5000)]
+        )
+
+        # Both cameras stood right-of-centre (u ~ 0.5-0.6); both walls' own
+        # naive estimates are biased toward those cameras and land positive,
+        # on the *same* side of the room's true (symmetric, median ~ 0)
+        # centre -- exactly the failure mode a global-median comparison misses.
+        west = ViewPlane(
+            frame_index=0, kind="wall", normal_world=np.array([1.0, 0.0, 0.0]),
+            point_world=np.array([0.1, 0.0, 0.0]), inliers=100,
+            extent_world=(np.array([0.1, 0.0, -1.0]), np.array([0.1, 0.0, 1.0])),
+        )
+        east = ViewPlane(
+            frame_index=1, kind="wall", normal_world=np.array([1.0, 0.0, 0.0]),
+            point_world=np.array([0.9, 0.0, 0.0]), inliers=100,
+            extent_world=(np.array([0.9, 0.0, -1.0]), np.array([0.9, 0.0, 1.0])),
+        )
+        camera_uv_by_frame = {0: np.array([0.5, 0.0]), 1: np.array([0.6, 0.0])}
+
+        west_line, _ = _wall_line_from_cluster([west], frame, floor_uv, camera_uv_by_frame)
+        east_line, _ = _wall_line_from_cluster([east], frame, floor_uv, camera_uv_by_frame)
+
+        assert west_line.coord < 0   # snapped to the room's low edge
+        assert east_line.coord > 0   # snapped to the room's high edge
+        assert west_line.coord != east_line.coord
+
+    def test_no_floor_evidence_falls_back_to_the_naive_offset(self):
+        """Without enough pooled floor points to trust, the per-view estimate
+        is used as-is rather than snapped to nothing."""
+        frame = self._frame()
+        plane = ViewPlane(
+            frame_index=0, kind="wall", normal_world=np.array([1.0, 0.0, 0.0]),
+            point_world=np.array([0.3, 0.0, 0.0]), inliers=100,
+            extent_world=(np.array([0.3, 0.0, -1.0]), np.array([0.3, 0.0, 1.0])),
+        )
+        line, _ = _wall_line_from_cluster([plane], frame, None, None)
+        assert line.coord == pytest.approx(0.3)
 
 
 class TestFloorCeilingMerge:

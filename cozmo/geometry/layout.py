@@ -312,27 +312,69 @@ def _interior_mask(
     return mask, (u0, v0)
 
 
+def densest_edge(
+    values: np.ndarray, toward_high: bool,
+    bin_m: float = 0.05, min_bin_fraction: float = 0.5,
+) -> float:
+    """The outer edge of ``values``' densely-supported extent, in one direction.
+
+    A histogram walk-in from the extreme rather than a min/max or a percentile:
+    those trust one stray far point -- VGGT depth noise, a glimpse through an
+    open doorway into the next room -- exactly as much as a genuinely dense
+    surface. Bins are walked inward from the end until one holds its fair share
+    of an even spread (``min_bin_fraction`` x 1/bin count), and that bin's outer
+    boundary is the edge.
+
+    Shared: the photo tier snaps each wall to this edge of the pooled floor
+    evidence (cozmo.recon.layout), and the arrangement falls back to it when no
+    fitted wall line bounds an axis (see :func:`_cells_from_lines`).
+    """
+    if len(values) == 0:
+        return 0.0
+    lo, hi = float(np.min(values)), float(np.max(values))
+    if hi <= lo:
+        return hi if toward_high else lo
+    n_bins = max(1, int(np.ceil((hi - lo) / bin_m)))
+    counts, edges = np.histogram(values, bins=n_bins, range=(lo, hi))
+    threshold = min_bin_fraction * (len(values) / n_bins)
+    order = range(len(counts) - 1, -1, -1) if toward_high else range(len(counts))
+    for i in order:
+        if counts[i] >= threshold:
+            return float(edges[i + 1] if toward_high else edges[i])
+    return hi if toward_high else lo
+
+
 def _cells_from_lines(
-    lines: Sequence[WallLine], bounds: Tuple[float, float, float, float]
-) -> Tuple[List[float], List[float]]:
+    lines: Sequence[WallLine], bounds: Tuple[float, float, float, float],
+    fallback_bounds: Optional[Tuple[float, float, float, float]] = None,
+) -> Tuple[List[float], List[float], List[int]]:
     """Cut lines for the arrangement, one axis at a time.
 
-    Only fitted wall lines are used. Falling back to the data extent would let
-    the room's outer edge sit wherever the point cloud happened to stop, which
-    on the synthetic fixture stretched a 3.60 m wall to 3.89 m: the extra came
-    from cells between the real wall and the edge of the data, not from the room.
-    The extent is used only on an axis with too few lines to bound anything.
+    Only fitted wall lines are used. Falling back to the raw data extent would
+    let the room's outer edge sit wherever the point cloud happened to stop,
+    which on the synthetic fixture stretched a 3.60 m wall to 3.89 m: the extra
+    came from cells between the real wall and the edge of the data, not from the
+    room. ``fallback_bounds`` (from :func:`densest_edge` over the floor
+    evidence) is therefore preferred on an axis with too few lines to bound
+    anything -- an edge where observed floor actually ends, rather than a margin
+    padded around the furthest stray point. Which axes needed it is returned
+    too, so the wall(s) it produces can be reported as a guess rather than
+    silently priced the same as a measurement.
     """
     u0, v0, u1, v1 = bounds
+    fu0, fv0, fu1, fv1 = fallback_bounds if fallback_bounds is not None else bounds
     us = sorted({l.coord for l in lines if l.axis == 0 and u0 <= l.coord <= u1})
     vs = sorted({l.coord for l in lines if l.axis == 1 and v0 <= l.coord <= v1})
+    fallback_axes: List[int] = []
     if len(us) < 2:
-        log.warning("only %d wall line(s) across u; falling back to the data extent", len(us))
-        us = sorted({u0, u1, *us})
+        log.warning("only %d wall line(s) across u; bounding it by floor evidence", len(us))
+        us = sorted({fu0, fu1, *us})
+        fallback_axes.append(0)
     if len(vs) < 2:
-        log.warning("only %d wall line(s) across v; falling back to the data extent", len(vs))
-        vs = sorted({v0, v1, *vs})
-    return us, vs
+        log.warning("only %d wall line(s) across v; bounding it by floor evidence", len(vs))
+        vs = sorted({fv0, fv1, *vs})
+        fallback_axes.append(1)
+    return us, vs, fallback_axes
 
 
 def _merge_collinear(ring: Sequence[Tuple[float, float]]) -> List[Tuple[float, float]]:
@@ -562,7 +604,15 @@ def assemble_polygon(
     )
     mask, (u0, v0) = _interior_mask(floor_uv, trajectory_uv, bounds)
 
-    us, vs = _cells_from_lines(lines, bounds)
+    # Where the observed floor actually ends, for any axis no fitted wall line
+    # bounds -- an evidence-based edge instead of a margin padded around the
+    # furthest stray point.
+    evidence_bounds = (
+        (densest_edge(floor_uv[:, 0], False), densest_edge(floor_uv[:, 1], False),
+         densest_edge(floor_uv[:, 0], True), densest_edge(floor_uv[:, 1], True))
+        if len(floor_uv) else bounds
+    )
+    us, vs, fallback_axes = _cells_from_lines(lines, bounds, evidence_bounds)
     kept = []
     for i in range(len(us) - 1):
         for j in range(len(vs) - 1):
@@ -599,5 +649,8 @@ def assemble_polygon(
     polygon = Polygon(cleaned.exterior).simplify(POLYGON_SIMPLIFY_M)
 
     walls = _walls_from_polygon(polygon, lines)
-    stats = {"cells_kept": len(kept), "bounds_uv": [round(b, 3) for b in bounds]}
+    stats = {
+        "cells_kept": len(kept), "bounds_uv": [round(b, 3) for b in bounds],
+        "axis_fallback": fallback_axes,
+    }
     return polygon, walls, stats

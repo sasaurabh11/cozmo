@@ -228,7 +228,15 @@ def _optimize_pose_graph(
     x0 = pack(initial_xyz, initial_yaw)
     if n <= 1 or not edges:
         return initial_xyz, initial_yaw
-    result = least_squares(residuals, x0, method="lm", max_nfev=2000)
+    # Levenberg-Marquardt needs at least as many residuals as unknowns: four
+    # per edge against four per free node, i.e. it only applies when the graph
+    # has an edge for every node it has to place. A partly-connected property
+    # -- four rooms off a walkthrough where only some pairs matched -- is
+    # under-determined, and scipy raises rather than solving it. Trust-region
+    # reflective handles that shape, leaving the unconstrained directions where
+    # they started, which is the honest answer for a room nothing tied down.
+    method = "lm" if 4 * len(edges) >= 4 * (n - 1) else "trf"
+    result = least_squares(residuals, x0, method=method, max_nfev=2000)
     return unpack(result.x)
 
 

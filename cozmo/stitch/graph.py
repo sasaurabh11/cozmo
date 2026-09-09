@@ -69,6 +69,12 @@ class RoomForStitch:
     # keypoint matches to 3D.
     frame_points: Dict[int, np.ndarray]
     frame_K: Dict[int, np.ndarray]
+    # Camera-to-world pose for each frame. ``frame_points`` stay camera-local
+    # because keypoint reprojection needs that convention; the points are
+    # transformed into the room floor frame only after the nearest match is
+    # selected.
+    frame_poses: Dict[int, Tuple[np.ndarray, np.ndarray]] = field(default_factory=dict)
+    metric_scale: float = 1.0
     openings: Dict[str, Tuple[int, float]] = field(default_factory=dict)
 
 
@@ -149,6 +155,16 @@ def _lift_matches_to_floor_frame(
         p3_b = _nearest_point_3d(points_b, K_b, (m.u_b, m.v_b))
         if p3_a is None or p3_b is None:
             continue
+        pose_a = room_a.frame_poses.get(m.frame_index_a)
+        pose_b = room_b.frame_poses.get(m.frame_index_b)
+        if pose_a is not None:
+            R_a, t_a = pose_a
+            p3_a = p3_a @ np.asarray(R_a, dtype=float).T + np.asarray(t_a, dtype=float)
+        if pose_b is not None:
+            R_b, t_b = pose_b
+            p3_b = p3_b @ np.asarray(R_b, dtype=float).T + np.asarray(t_b, dtype=float)
+        p3_a = p3_a * float(room_a.metric_scale)
+        p3_b = p3_b * float(room_b.metric_scale)
         pts_a.append(room_a.frame.project(p3_a[None, :])[0])
         pts_b.append(room_b.frame.project(p3_b[None, :])[0])
         weights.append(m.score)
@@ -343,9 +359,36 @@ def _resolve_overlaps(
         direction = np.array([ca.x - cb.x, ca.y - cb.y])
         norm = np.linalg.norm(direction)
         direction = direction / norm if norm > 1e-6 else np.array([1.0, 0.0])
-        dx, dy = direction * OVERLAP_PUSH_STEP_M
+
+        # A fixed 5 cm nudge is fine for a tiny numerical touch, but a bad
+        # room-to-room transform can overlap by several metres. Find the
+        # smallest translation along the separating axis that removes this
+        # pair's overlap, then apply a small clearance. This also keeps the
+        # result deterministic and makes the iteration count meaningful.
+        base = current[mover]
+        target = current[other]
+
+        def trial(distance: float) -> Polygon:
+            return affine_transform(base, [1, 0, 0, 1,
+                                           float(direction[0] * distance),
+                                           float(direction[1] * distance)])
+
+        low, high = 0.0, OVERLAP_PUSH_STEP_M
+        while trial(high).intersection(target).area > OVERLAP_AREA_TOLERANCE_M2 and high < 100.0:
+            high *= 2.0
+        if high >= 100.0 and trial(high).intersection(target).area > OVERLAP_AREA_TOLERANCE_M2:
+            return shifts, False, iteration + 1
+        for _ in range(32):
+            middle = (low + high) / 2.0
+            if trial(middle).intersection(target).area <= OVERLAP_AREA_TOLERANCE_M2:
+                high = middle
+            else:
+                low = middle
+
+        distance = high + 0.02
+        dx, dy = direction * distance
         sx, sy = shifts[mover]
-        shifts[mover] = (sx + dx, sy + dy)
+        shifts[mover] = (sx + float(dx), sy + float(dy))
         current[mover] = affine_transform(polygons[mover], [1, 0, 0, 1, sx + dx, sy + dy])
 
     return shifts, False, OVERLAP_MAX_ITERATIONS

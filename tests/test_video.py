@@ -32,10 +32,17 @@ def _write_video(
     blurred_indices: Optional[Sequence[int]] = None,
     fps: float = 15.0,
     seed: int = 0,
+    blur_ramp: bool = False,
 ) -> None:
     """A short synthetic clip with real texture (random rectangles), so
     Laplacian variance is meaningfully nonzero and distinguishes sharp frames
-    from the ones in `blurred_indices`, which get a heavy Gaussian blur."""
+    from the ones in `blurred_indices`, which get a heavy Gaussian blur.
+
+    ``blur_ramp`` instead softens progressively from start to end -- the
+    sharpness profile of a real handheld walk, steadiest before the operator
+    starts moving. Every frame stays well above a low blur threshold, so what
+    it exercises is the *cap*, not the blur filter.
+    """
     blurred = set(blurred_indices or ())
     rng = np.random.default_rng(seed)
     writer = cv2.VideoWriter(str(path), cv2.VideoWriter_fourcc(*"mp4v"), fps, FRAME_SIZE)
@@ -49,6 +56,10 @@ def _write_video(
                 cv2.rectangle(image, (x0, y0), (x1, y1), color, -1)
             if i in blurred:
                 image = cv2.GaussianBlur(image, (31, 31), 20)
+            elif blur_ramp and i > 0:
+                # Sharpest at the start, softening steadily to the end.
+                sigma = 0.05 + 2.0 * (i / max(1, n_frames - 1))
+                image = cv2.GaussianBlur(image, (7, 7), sigma)
             writer.write(image)
     finally:
         writer.release()
@@ -96,6 +107,32 @@ class TestSampleFrames:
         _write_video(video, n_frames=10, blurred_indices=range(10))
         with pytest.raises(ValueError, match="survived"):
             sample_frames(video, tmp_path / "frames", stride_frames=1, blur_threshold=80.0)
+
+    def test_the_cap_spans_the_whole_clip_not_just_its_sharpest_stretch(self, tmp_path):
+        """A walkthrough is sharpest where the operator stood still, which is
+        almost never spread evenly across the walk. Capping by global sharpness
+        therefore collapsed the whole selection onto one stretch: on a real
+        37 s walk through three rooms it took all 8 frames from the first 11
+        seconds and discarded the other two rooms, so the reconstruction had
+        only one room to find. The cap has to sample the clip, not its
+        steadiest moment.
+        """
+        video = tmp_path / "walk.mp4"
+        # Sharpness falls steadily from start to end, as on a real walk.
+        _write_video(video, n_frames=120, blur_ramp=True)
+        result = sample_frames(
+            video, tmp_path / "frames", stride_frames=3, blur_threshold=1.0, max_frames=6
+        )
+        kept = sorted(int(p.stem.split("_")[-1]) for p in result.frame_paths)
+        assert result.capped
+        # Frames from the back half of the clip must survive the cap: taking
+        # the globally sharpest six here keeps only the opening.
+        assert max(kept) > 60, f"cap kept only the sharp opening stretch: {kept}"
+        assert min(kept) < 60, f"cap kept only the tail: {kept}"
+        # And they should be spread rather than bunched: with six frames over
+        # 120, no gap should swallow more than half the clip.
+        gaps = [b - a for a, b in zip(kept, kept[1:])]
+        assert max(gaps) < 60, f"cap left a hole across the walk: {kept}"
 
     def test_summary_reports_the_parameters_used(self, tmp_path):
         video = tmp_path / "walk.mp4"

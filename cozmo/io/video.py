@@ -21,7 +21,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Sequence, Tuple
 
 import cv2
 import numpy as np
@@ -35,18 +35,44 @@ log = logging.getLogger("cozmo.io.video")
 # near-duplicate frames.
 DEFAULT_STRIDE_FRAMES = 15
 
-# Laplacian variance below this on a sharp 8-bit frame reads as motion blur or
-# an out-of-focus pan, not texture-free wall. Chosen empirically against
-# clearly-blurred vs. clearly-sharp handheld phone stills; a capture that
-# trips this threshold on nearly everything says so in the sampling summary
-# rather than silently degrading.
-DEFAULT_BLUR_THRESHOLD = 80.0
+# Laplacian variance below this reads as motion blur or an out-of-focus pan,
+# not texture-free wall. Measured against a real 1920x1440 H.264 iPhone
+# walkthrough clip (captures/apartment_lidar's own rgb.mp4): sampled frames
+# there ranged 1.9-34 (median 6.7, p90 14.1), an order of magnitude below what
+# the same test found for uncompressed JPEG stills. Heavy video compression
+# smooths exactly the high-frequency detail this metric looks for, so a
+# still-photo threshold silently rejects every video frame -- 15.0 sits above
+# that clip's median (keeps the sharper half) and below its sharp tail.
+# A capture whose frames sit oddly relative to this raises a clear error
+# naming the counts involved, rather than silently reconstructing from noise.
+DEFAULT_BLUR_THRESHOLD = 15.0
 
 # The reconstruction backbone's own contract is 2-8 views per room (see
-# cozmo/pipeline/photo.py); 8 is the top of that band.
+# cozmo/pipeline/photo.py); 8 is the top of that band. This is a cap PER ROOM,
+# not per video: a walkthrough that crosses three rooms needs three rooms'
+# worth of frames sampled before it can be split into them.
 DEFAULT_MAX_FRAMES = 8
 
 MIN_FRAMES_REQUIRED = 2
+
+# How many rooms one walkthrough is assumed to be able to cross, and therefore
+# how large a pool is sampled before segmentation (DEFAULT_MAX_FRAMES x this).
+# Only the frames of the rooms actually found are reconstructed, so a
+# single-room video costs nothing extra beyond embedding the larger pool.
+VIDEO_MAX_ROOMS = 6
+
+# Consecutive sampled frames whose DINOv2 descriptors agree at least this well
+# are the same room; a drop below it is a room boundary. A walkthrough crossing
+# a doorway changes almost everything in frame at once, which is exactly what a
+# semantic descriptor is good at spotting -- far more reliable than a colour
+# histogram, which a lamp being switched on can move as much as a doorway does.
+ROOM_CUT_SIMILARITY = 0.55
+
+# A room needs at least MIN_FRAMES_REQUIRED frames to reconstruct at all, so a
+# shorter run of frames than this is a glimpse through a doorway (or a turn in
+# a corridor), not a room worth claiming. Merged into the neighbour it most
+# resembles instead of becoming a room of its own.
+MIN_FRAMES_PER_ROOM = 2
 
 
 @dataclass(frozen=True)
@@ -137,14 +163,27 @@ def sample_frames(
 
     capped = False
     if len(candidates) > max_frames:
-        # Keep the sharpest max_frames, then restore chronological order. A
-        # reconstruction backbone wants views spread across the walkthrough,
-        # not just its N sharpest instants bunched together in time -- but a
-        # cap has to select by *some* signal, and sharpness is the one
-        # already computed for the blur filter. When quality is roughly
-        # uniform across the walk this is just an even subsample.
-        candidates = sorted(candidates, key=lambda c: c[2], reverse=True)[:max_frames]
-        candidates.sort(key=lambda c: c[0])
+        # Sharpest-per-time-bucket, NOT globally sharpest. Sharpness is not
+        # uniform across a walkthrough: an operator is steadiest before they
+        # start moving and blurriest while actually walking, so taking the
+        # globally sharpest N collapses the whole selection onto whichever
+        # stretch the camera was most stationary. On a real 37 s, 1105-frame
+        # walk through three rooms that picked 8 frames from the first 11
+        # seconds and discarded the other two rooms entirely -- the
+        # reconstruction then had only one room to find, which is exactly the
+        # "a multi-room video only ever produces one room" symptom.
+        #
+        # Splitting the clip into max_frames equal spans and taking each
+        # span's sharpest survivor keeps the blur filter's benefit while
+        # guaranteeing the whole walk is represented.
+        first, last = candidates[0][0], candidates[-1][0]
+        span = max(1, last - first + 1)
+        buckets: Dict[int, Tuple[int, np.ndarray, float]] = {}
+        for candidate in candidates:
+            bucket = min(max_frames - 1, int((candidate[0] - first) * max_frames / span))
+            if bucket not in buckets or candidate[2] > buckets[bucket][2]:
+                buckets[bucket] = candidate
+        candidates = [buckets[b] for b in sorted(buckets)]
         capped = True
 
     if len(candidates) < MIN_FRAMES_REQUIRED:
@@ -180,3 +219,68 @@ def sample_frames(
         sharpness_scores=sharpness_scores,
         capped=capped,
     )
+
+
+def segment_frames_into_rooms(
+    embeddings: Sequence[Sequence[float]],
+    cut_similarity: float = ROOM_CUT_SIMILARITY,
+    min_frames_per_room: int = MIN_FRAMES_PER_ROOM,
+) -> List[List[int]]:
+    """Split a walkthrough's frames into per-room runs, by appearance.
+
+    ``embeddings`` are one descriptor per sampled frame, in capture order.
+    Returns lists of frame positions -- one list per room found, in order.
+
+    A walkthrough is a sequence, not a set: the frames of one room are
+    contiguous in time, and crossing a doorway swaps out nearly everything in
+    view at once. So the cut is made where *consecutive* descriptors stop
+    agreeing, rather than by clustering frames globally (which happily puts
+    two visits to the same room in one group and then cannot say which of the
+    two the geometry belongs to).
+
+    Runs shorter than ``min_frames_per_room`` cannot be reconstructed and are
+    not rooms; each is merged into whichever neighbouring run it resembles
+    more, so a glimpse through a doorway joins the room it was glimpsed from
+    instead of becoming a room with one photo of somebody else's bathroom.
+    """
+    vectors = [np.asarray(e, dtype=float) for e in embeddings]
+    if not vectors:
+        return []
+    if len(vectors) == 1:
+        return [[0]]
+
+    unit = [v / max(float(np.linalg.norm(v)), 1e-9) for v in vectors]
+    similarity = [float(np.dot(unit[i], unit[i + 1])) for i in range(len(unit) - 1)]
+
+    runs: List[List[int]] = [[0]]
+    for position, agreement in enumerate(similarity, start=1):
+        if agreement < cut_similarity:
+            runs.append([position])
+        else:
+            runs[-1].append(position)
+
+    # Merge runs too short to reconstruct into their more similar neighbour.
+    merged = True
+    while merged and len(runs) > 1:
+        merged = False
+        for index, run in enumerate(runs):
+            if len(run) >= min_frames_per_room:
+                continue
+            before = runs[index - 1] if index > 0 else None
+            after = runs[index + 1] if index + 1 < len(runs) else None
+            if before is not None and after is not None:
+                to_before = float(np.dot(unit[run[0]], unit[before[-1]]))
+                to_after = float(np.dot(unit[run[-1]], unit[after[0]]))
+                target = index - 1 if to_before >= to_after else index + 1
+            else:
+                target = index - 1 if before is not None else index + 1
+            runs[target] = sorted(runs[target] + run)
+            runs.pop(index)
+            merged = True
+            break
+
+    log.info(
+        "walkthrough split into %d room(s) by appearance: %s (consecutive similarity %s)",
+        len(runs), [len(r) for r in runs], [round(s, 2) for s in similarity],
+    )
+    return runs

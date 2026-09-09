@@ -52,6 +52,7 @@ from ..geometry.layout import (
     WallLine,
     WallSegment,
     assemble_polygon,
+    densest_edge,
     dominant_rotation,
     estimate_normals,
     extract_layout,
@@ -77,6 +78,34 @@ MIN_POINTS_PER_VIEW_PLANE = 40
 
 WALL_NORMAL_CLUSTER_COS = 0.90    # cos(~25 deg): same wall direction across views
 WALL_OFFSET_CLUSTER_M = 0.35      # same wall position across views
+
+# A "wall" candidate closer to the camera than the floor point near your own
+# feet cannot be the room's own bounding wall -- it is furniture. Found by
+# testing against a real room with a wardrobe standing away from the true
+# wall: the wardrobe's flat door is exactly as vertical-normal as a real wall
+# and, because VGGT's per-pixel confidence favours near content, often has
+# *more* inlier points than the true wall does, so nothing upstream of this
+# check tells them apart. Requiring a wall to be meaningfully farther than the
+# floor directly in front of you holds for any room bigger than you are tall,
+# which is every room this tier is meant to run on.
+WALL_MIN_RANGE_OVER_FLOOR = 1.2
+
+# A wall's position is snapped to the outer edge of the pooled floor evidence
+# (see _wall_line_from_cluster and _densest_edge) rather than trusted from one
+# frame's own offset estimate. A raw percentile trusts a single far stray
+# point (VGGT depth noise, or a glimpse through a doorway into another room)
+# exactly as much as a genuinely dense wall -- found on demo_fourroom's
+# office_b/c, 3-4 photos of a cluttered real scene where the pooled cloud is a
+# scatter, not a clean ring, and a percentile alone routinely snapped a wall
+# metres past anything real. ROOM_EDGE_BIN_M / ROOM_EDGE_MIN_BIN_FRACTION walk
+# in from the extreme until they find a histogram bin that actually holds a
+# working fraction of an even spread's share (1 / bin count along that axis),
+# not merely a bin that holds *something*. ROOM_EDGE_MIN_FLOOR_POINTS guards
+# against doing any of this off a pool too small to trust at all (falls back
+# to the per-view estimate).
+ROOM_EDGE_BIN_M = 0.05
+ROOM_EDGE_MIN_BIN_FRACTION = 0.5
+ROOM_EDGE_MIN_FLOOR_POINTS = 200
 
 # Below this many frames, a global RANSAC has too little to work with; above
 # it, per-view fitting is unnecessary and the LiDAR path's own global fitter
@@ -119,6 +148,7 @@ def _view_floor_ceiling_wall(
         return []
 
     planes: List[ViewPlane] = []
+    floor_local: Optional[float] = None   # this frame's own floor distance, if found
 
     floor_mask = height >= hi - FLOOR_BAND_FRACTION * span
     if floor_mask.sum() >= MIN_POINTS_PER_VIEW_PLANE:
@@ -170,6 +200,18 @@ def _view_floor_ceiling_wall(
         mean_normal /= norm
         with quiet_fp():
             offset_local = float(np.median(cluster_points @ mean_normal))
+
+        if floor_local is not None and abs(offset_local) <= WALL_MIN_RANGE_OVER_FLOOR * abs(floor_local):
+            # Closer than (or barely past) the floor at your own feet: a
+            # room's own bounding wall cannot be, so this is furniture (a
+            # wardrobe door, a headboard, ...) wearing a wall-shaped normal,
+            # not a wall -- see WALL_MIN_RANGE_OVER_FLOOR above.
+            log.debug(
+                "frame %d: dropping a wall candidate at %.3f units (floor is %.3f units away) "
+                "-- too close to be this room's own wall", frame_index, abs(offset_local), abs(floor_local),
+            )
+            continue
+
         point_local = offset_local * mean_normal
 
         with quiet_fp():
@@ -230,10 +272,43 @@ def _merge_floor_or_ceiling(planes: Sequence[ViewPlane]) -> Optional[Plane]:
     return Plane(normal=normal, d=-offset, inliers=int(weights.sum()), total=int(weights.sum()))
 
 
+def _densest_edge(axis_vals: np.ndarray, toward_high: bool) -> float:
+    """This tier's wall-snapping edge -- see ROOM_EDGE_BIN_M above for why it is
+    a histogram walk-in rather than a raw percentile. One implementation,
+    shared with the arrangement's own axis fallback."""
+    return densest_edge(
+        axis_vals, toward_high,
+        bin_m=ROOM_EDGE_BIN_M, min_bin_fraction=ROOM_EDGE_MIN_BIN_FRACTION,
+    )
+
+
 def _wall_line_from_cluster(
-    cluster: Sequence[ViewPlane], frame: FloorFrame,
+    cluster: Sequence[ViewPlane], frame: FloorFrame, floor_uv: Optional[np.ndarray] = None,
+    camera_uv_by_frame: Optional[Dict[int, np.ndarray]] = None,
 ) -> Optional[Tuple[WallLine, Dict[str, Any]]]:
-    """A merged world-frame wall plane -> a WallLine in the room's floor frame."""
+    """A merged world-frame wall plane -> a WallLine in the room's floor frame.
+
+    The cluster's own position estimate is a per-view plane offset -- reliable
+    for *which side of the room this wall is on* but not for *how far away it
+    is*: VGGT's per-frame points are densest and most confident close to the
+    camera, so a wall plane fit from one photo's own points tends to land
+    short of the wall's true position, especially from the room's middle
+    (see WALL_MIN_RANGE_OVER_FLOOR above for the furniture case this shares a
+    cause with). ``floor_uv``, when given, is every frame's floor-height
+    points pooled together -- far denser and, critically, not biased toward
+    any one camera -- so the wall is snapped outward to the real edge of that
+    pooled floor evidence along its own axis.
+
+    Which edge (the axis's low or high side) is decided from the cluster's
+    *own camera position(s)*, not from comparing its (biased) coordinate to
+    a room-wide median: with several walls all biased toward the same
+    centrally-placed cameras, more than one can land on the same side of a
+    global median, which snaps them all to the same edge and silently
+    inflates the room in the other direction. "Farther from this cluster's
+    own camera(s), in the direction it already looks" has no such failure
+    mode -- it only breaks if a camera saw straight through this wall, which
+    a wall detection already rules out.
+    """
     weights = np.array([p.inliers for p in cluster], dtype=float)
     normal = np.average([p.normal_world for p in cluster], axis=0, weights=weights)
     normal = normal / np.linalg.norm(normal)
@@ -246,6 +321,17 @@ def _wall_line_from_cluster(
     point_on_plane = normal * offset
     uv = frame.project(point_on_plane[None, :])[0]
     coord = uv[axis]
+
+    if floor_uv is not None and len(floor_uv) >= ROOM_EDGE_MIN_FLOOR_POINTS:
+        camera_axis_val = None
+        if camera_uv_by_frame is not None:
+            paired = [(camera_uv_by_frame[p.frame_index][axis], p.inliers) for p in cluster
+                      if p.frame_index in camera_uv_by_frame]
+            if paired:
+                cam_vals, cam_weights = zip(*paired)
+                camera_axis_val = float(np.average(cam_vals, weights=cam_weights))
+        reference = camera_axis_val if camera_axis_val is not None else float(np.median(floor_uv[:, axis]))
+        coord = _densest_edge(floor_uv[:, axis], toward_high=coord >= reference)
 
     extents = []
     for plane in cluster:
@@ -320,12 +406,12 @@ def extract_layout_photo(
     floor_plane = _merge_floor_or_ceiling(floors)
     ceiling_plane = _merge_floor_or_ceiling(ceilings)
 
+    # ASSUMED_CAMERA_DOWN is +Y in each VGGT camera frame.  The merged floor
+    # normal therefore points toward increasing camera-down height; its
+    # negation is the room's true up axis.  Do not force this onto world +Y:
+    # VGGT's world frame is camera-derived, and flipping it makes every point
+    # above the floor (including door/window rays) appear below the floor.
     up = -floor_plane.normal / np.linalg.norm(floor_plane.normal)
-    # ASSUMED_CAMERA_DOWN maps to world "down" per-frame via that frame's own
-    # pose; floor_plane.normal already points toward lower height (see
-    # _view_floor_ceiling_wall), so "up" is its negation.
-    if float(np.dot(up, [0, 1, 0])) < 0:
-        up = -up
 
     wall_clusters = _cluster_wall_planes(per_view)
     seed_axis = np.array([1.0, 0.0, 0.0])
@@ -353,18 +439,9 @@ def extract_layout_photo(
     origin = floor_plane.normal * (-floor_plane.d / float(np.dot(floor_plane.normal, floor_plane.normal)))
     frame = FloorFrame(origin=origin, up=up, e1=e1, e2=e2, rotation_rad=float(rotation))
 
-    lines: List[WallLine] = []
-    view_details: Dict[int, Dict[str, Any]] = {}
-    for i, cluster in enumerate(wall_clusters):
-        built = _wall_line_from_cluster(cluster, frame)
-        if built is None:
-            continue
-        line, detail = built
-        lines.append(line)
-        view_details[len(lines) - 1] = detail
-    if not lines:
-        raise ValueError("no wall cluster produced a usable line; too few views or too little overlap")
-
+    # Every frame's own points, pooled -- computed before the wall lines so
+    # _wall_line_from_cluster can snap each wall out to this pooled evidence's
+    # own outer edge instead of trusting a single (near-biased) per-view offset.
     all_world_points = np.concatenate([
         reconstruction.frame_points_local[p.frame_index] @ p.R.T + p.t
         for p in reconstruction.poses if p.frame_index in reconstruction.frame_points_local
@@ -377,6 +454,19 @@ def extract_layout_photo(
     heights_above_floor = all_height - floor_height
     floor_uv = frame.project(all_world_points[np.abs(heights_above_floor) <= 0.15])
     trajectory_uv = frame.project(np.array([p.t for p in reconstruction.poses]))
+    camera_uv_by_frame = {p.frame_index: trajectory_uv[i] for i, p in enumerate(reconstruction.poses)}
+
+    lines: List[WallLine] = []
+    view_details: Dict[int, Dict[str, Any]] = {}
+    for i, cluster in enumerate(wall_clusters):
+        built = _wall_line_from_cluster(cluster, frame, floor_uv, camera_uv_by_frame)
+        if built is None:
+            continue
+        line, detail = built
+        lines.append(line)
+        view_details[len(lines) - 1] = detail
+    if not lines:
+        raise ValueError("no wall cluster produced a usable line; too few views or too little overlap")
 
     polygon, walls, assembly_stats = assemble_polygon(lines, all_uv, floor_uv, trajectory_uv, margin=0.5)
 

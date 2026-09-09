@@ -27,6 +27,25 @@ def main(argv: List[str]) -> int:
     response_path = Path(argv[2])
 
     try:
+        matcher_weights = request.get("weights_dir")
+
+        # Mode 2: one DINOv2 descriptor per frame, for segmenting a video
+        # walkthrough into rooms (cozmo.io.video.segment_frames_into_rooms).
+        # It shares this process because it wants the same model the matcher
+        # already loads here, for the same reason it cannot run in the parent.
+        if "embed_frames" in request:
+            matcher = RoomMatcher(weights_dir=matcher_weights)
+            embeddings = [
+                matcher.embed_room(
+                    RoomFrames(room_id=f"f{i}", frame_paths=[path], frame_indices=[i]),
+                    max_frames=1,
+                ).tolist()
+                for i, path in enumerate(request["embed_frames"])
+            ]
+            payload: Dict[str, Any] = {"ok": True, "embeddings": embeddings}
+            response_path.write_text(json.dumps(payload))
+            return 0
+
         rooms = [
             RoomFrames(
                 room_id=r["room_id"], frame_paths=r["frame_paths"],
@@ -34,9 +53,9 @@ def main(argv: List[str]) -> int:
             )
             for r in request["rooms"]
         ]
-        matcher = RoomMatcher(weights_dir=request.get("weights_dir"))
+        matcher = RoomMatcher(weights_dir=matcher_weights)
         matches = matcher.match_rooms(rooms)
-        payload: Dict[str, Any] = {"ok": True, "matches": [m.as_dict() for m in matches]}
+        payload = {"ok": True, "matches": [m.as_dict() for m in matches]}
     except MatcherUnavailable as exc:
         payload = {"ok": False, "unavailable": True, "error": str(exc)}
     except Exception as exc:  # noqa: BLE001 - the parent needs the reason, not just failure
