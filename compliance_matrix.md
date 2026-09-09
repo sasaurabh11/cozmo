@@ -19,9 +19,9 @@ Generated against commit `HEAD`, benchmark run `benchmark_runs/` (11 captures,
 |---|---|---|---|---|
 | 1.1 | Choose a capture route: own iOS app **or** stock capture protocol | — | — | **not met** — neither a TestFlight/dev build nor a written one-page protocol exists. The pipeline ingests Stray Scanner output, but nothing tells a non-engineer what to install or how to walk. This is the 5% "capture route quality" row and it is currently unearned. |
 | 1.2 | Route 2: name the off-the-shelf tool | `cozmo/io/stray.py` | Loader targets **Stray Scanner** format (depth uint16 mm @ 256×192, camera-frame z, quaternion poses) | **partial** — the tool is implied by the loader and documented in `README.md`, but not named in a protocol page with install/walk/hand-off instructions. |
-| 1.3 | Tier 1 — **Photos**, 2–8 stills per room, no depth/poses, one folder per room | `cozmo/pipeline/photo.py`, `cozmo/recon/` | `cozmo run` on `captures/saurabh_room` → `benchmark_runs/saurabh_room/plan.json` | **met** — runs end to end. Accuracy is weak and honestly reported (±60% intervals). |
+| 1.3 | Tier 1 — **Photos**, 2–8 stills per room, no depth/poses, one folder per room | `cozmo/pipeline/photo.py`, `cozmo/recon/` | `cozmo run` on `captures/saurabh_room` → `benchmark_runs/saurabh_room/plan.json` | **partial** — runs end to end and accuracy is honestly reported (±60% intervals), but the photo captures it was exercised on are an Android phone and public datasets; the one iPhone 15 capture (`room_photos`) has no ground truth. |
 | 1.4 | Photo folders must produce the **same stitched whole-property plan** | `cozmo/pipeline/photo.py::build_multi_room_photo_plan`, `cozmo/stitch/` | `benchmark_runs/saurabh_room_photo/plan.json` — 3 rooms, 2 adjacencies, one plan | **met** — per-room folders stitch into one property with adjacency. |
-| 1.5 | Tier 2 — **Video**, handheld walkthrough clip | `cozmo/pipeline/video.py`, `cozmo/io/video.py` | `benchmark_runs/saurabh_room_video/plan.json` — 3 rooms from one clip | **met** — samples frames, segments the walk into rooms by DINOv2 appearance, reuses the photo path. |
+| 1.5 | Tier 2 — **Video**, handheld walkthrough clip | `cozmo/pipeline/video.py`, `cozmo/io/video.py` | `benchmark_runs/saurabh_room_video/plan.json` — 3 rooms from one clip | **partial** — samples frames, segments the walk into rooms by DINOv2 appearance, reuses the photo path. Exercised on a Mac-recorded clip and an iPhone Pro clip, not an iPhone 15 handheld walkthrough. |
 | 1.6 | Tier 3 — **LiDAR**, depth + poses + intrinsics | `cozmo/pipeline/run.py::build_lidar_plan`, `cozmo/geometry/` | `benchmark_runs/scan_with_ceiling/plan.json` — 39.01 m², 12 walls, ceiling measured 3.07 m | **met** — the strongest tier; exact on ray-traced truth (worst wall error 0.1 cm). |
 | 1.7 | All three tiers mandatory, same output contract from each | `cozmo/schema.py` | All 11 plans validate against one pydantic schema | **met** — verified by `Plan.from_json` on every run in `benchmark_runs/`. |
 | 1.8 | Intervals widen honestly as sensor data thins | `cozmo/pipeline/photo.py`, `cozmo/calibration.py` | LiDAR footprint ±4.0%, photo/video ±60.2% | **met** — a 15× widening from LiDAR to photo, visible in every plan. |
@@ -67,19 +67,19 @@ Generated against commit `HEAD`, benchmark run `benchmark_runs/` (11 captures,
 
 | # | Requirement | File path | Artifact | Status |
 |---|---|---|---|---|
-| 4.1 | One-page fix declaration: worst gate + failing number | `fixloop/` (before run present) | Worst gate identified: **repeatability, 718.4 cm vs a ≤1 cm gate** | **partial** — the analysis is done and evidenced; the declaration page is not yet written (owner: Saurabh). |
+| 4.1 | One-page fix declaration: worst gate + failing number | `fixloop/declaration.md` | **`ceiling_spread`, 62.9 cm vs a ≤1 cm gate**, committed (`62aff1d`) before the fix commit (`4be839e`) so the order is auditable | **met** |
 | 4.2 | Root-cause hypothesis with evidence | `benchmark_report.md` § Repeatability | Ratio distribution across the repeat pair: 0.037–6.457, σ 1.72 > mean 1.37 → rules out scale, noise and pose | **partial** — root cause established from the data; awaiting confirmation before the fix is implemented. |
-| 4.3 | Predicted post-fix number | — | — | **not met** — owner: Saurabh. |
-| 4.4 | Ship the fix | — | — | **not met** — deliberately not started; scope is pending confirmation of the declared cause. |
-| 4.5 | Before run, after run, both regenerable by us | `fixloop/before/`, `scripts/run_benchmark.sh` | Before run exists; regenerable with one command | **partial** — before ✅, after ❌. |
-| 4.6 | Readable diff | `fixloop/diff.md` | — | **not met** |
+| 4.3 | Predicted post-fix number | `fixloop/declaration.md` § 3 | Predicted ≈35 cm and an explicit prediction that the gate would still fail; actual **34.5 cm**, still failing. All 7 predicted quantities landed | **met** |
+| 4.4 | Ship the fix | `cozmo/geometry/planes.py::estimate_ceiling` | Commit `4be839e` — one branch, two lines of behaviour; `ceiling_spread` 62.9 → 34.5 cm on the genuine pair | **met** |
+| 4.5 | Before run, after run, both regenerable by us | `fixloop/before/`, `fixloop/after/`, `scripts/run_benchmark.sh` | Both runs, same 11 captures, one command each; tags `fixloop-before` / `fixloop-after` | **met** |
+| 4.6 | Readable diff | `fixloop/diff.md` | Code diff, prediction-vs-outcome table, and the whole-benchmark diff: **exactly 1 gate row changed** of 94 | **met** |
 
 ## Part 5 — Process evidence
 
 | # | Requirement | File path | Artifact | Status |
 |---|---|---|---|---|
-| 5.1 | Commit as you work; history must be auditable | `.git/` | 14 commits, 2026-09-08 → 2026-09-09 | **partial** — not a single-commit dump, so it does not score zero; but the history is two days wide with large commits, which reads as compressed. |
-| 5.2 | Not a repo that materialises in one or two commits | `.git/` | 14 commits across the build order (schema → io → pipeline → LiDAR → photo → stitch → video) | **met** — commit order follows the actual build order. |
+| 5.1 | Commit as you work; history must be auditable | `.git/` | 15 commits, 2026-09-08 → 2026-09-10 | **partial** — not a single-commit dump, so it does not score zero; but the history is two days wide with large commits, which reads as compressed. |
+| 5.2 | Not a repo that materialises in one or two commits | `.git/` | 15 commits across the build order (schema → io → pipeline → LiDAR → photo → stitch → video) | **met** — commit order follows the actual build order. |
 | 5.3 | AI tooling allowed; every decision defended live | — | — | **owner: Saurabh** — see the defence list at the end of the technical-report outline. |
 
 ## Deliverables
@@ -88,10 +88,10 @@ Generated against commit `HEAD`, benchmark run `benchmark_runs/` (11 captures,
 |---|---|---|---|---|
 | D1 | **Compliance matrix** | `compliance_matrix.md` | this file | **met** |
 | D2 | **Capture route** (build or protocol) + device matrix | `cozmo/benchmark/score.py::build_device_matrix` | device matrix generated; no capture route | **partial** — device matrix ✅ (generated, not hand-written), capture route ❌. |
-| D3 | **Repo**, README to a fresh capture in <15 min, one command per capture | `README.md`, `scripts/setup.sh` | **Measured: 68.4 s** from `git clone` to a scored gate table on a clean machine, cold pip cache | **met** — see § Reproduction below. |
+| D3 | **Repo**, README to a fresh capture in <15 min, one command per capture | `README.md`, `scripts/setup.sh` | **Measured: 58.1 s** from `git clone` to a working reconstruction on a clean machine, cold pip cache | **met** — see § Reproduction below. |
 | D4 | **Reproduction bundle**: regenerate every reported number from raw inputs | `scripts/run_benchmark.sh` | `bash scripts/run_benchmark.sh` → all 11 captures + `timing.csv` + `results.json` | **met** for the pipeline's own numbers; **partial** overall, since raw captures (998 MB) are distributed outside git. |
 | D5 | **Benchmark report**: gates at 3 tiers, repeatability, head-to-head, timing | `benchmark_report.md` | this run | **partial** — gates/repeatability/timing/coverage ✅, head-to-head ❌. |
-| D6 | **Fix loop bundle** | `fixloop/` | before run only | **partial** |
+| D6 | **Fix loop bundle** | `fixloop/` | `declaration.md`, `before/`, `after/`, `diff.md`, both tagged | **met** |
 | D7 | **Technical report**, max 6 pages | — | — | **not met** — owner: Saurabh; outline supplied. |
 | D8 | **Raw benchmark data**: sensor logs, ground truth, app exports | `captures/` (998 MB, 11 captures), `tests/fixtures/benchmark/*.csv` | sensor logs ✅, synthetic GT ✅ | **partial** — no laser/tape ground truth, no app exports. |
 
@@ -107,12 +107,12 @@ Generated against commit `HEAD`, benchmark run `benchmark_runs/` (11 captures,
 
 | # | Requirement | File path | Artifact | Status |
 |---|---|---|---|---|
-| C1 | Handheld consumer capture only | `captures/` | iPhone Pro LiDAR, OnePlus Nord 2T stills, phone video | **met** |
-| C2 | Any pretrained model/dataset/API **with disclosure** | `README.md`, `scripts/fetch_weights.sh` | 7 models named with HF repo + pinned commit revision | **met** |
+| C1 | Handheld consumer capture only | `captures/`, README § Capture provenance | 5 of 11 captures are handheld phone captures (3 LiDAR iPhone Pro, 1 iPhone 15 photo, 1 phone video). 3 are public datasets (MSR 7-Scenes Kinect, VGGT sample); 3 more are handheld but on an Android phone / a Mac, not the iPhone 15+ the brief specifies | **partial** — every capture declares its device, and the README names which are non-compliant and why. No accuracy claim rests on the non-compliant ones. |
+| C2 | Any pretrained model/dataset/API **with disclosure** | `README.md`, `scripts/fetch_weights.sh`, `captures/*/capture.json` | 7 models named with HF repo + pinned commit revision; the 3 public-dataset captures carry an explicit DISCLOSURE note in their `capture.json` and in the README's provenance table | **met** |
 | C3 | **Everything runs without calling your infrastructure** | `cozmo/` | `grep` for `requests\|urllib\|http://\|https://\|boto3\|api_key` across the package → **no runtime network calls**; all models load `local_files_only=True` | **met** — verifiable by grep; the only network access is `curl` inside the weight-fetch script. |
 | C4 | Weights and large binaries fetched by script or volume | `scripts/fetch_weights.sh` | 7 models, `--group` selective fetch, `--check` verification | **met** |
 | C5 | Weights hash-verified | `scripts/fetch_weights.sh` | **7/7 `model.safetensors` pinned by sha256** + HF commit revision in every URL; `--check` → "all weights present and verified" (26 files) | **met** — config/tokenizer JSONs are pinned by revision only, not sha256. |
-| C6 | No large binaries committed | `.gitignore` | Largest object in the **entire git history** is a 55.6 KB source file; `/captures/`, `/data/`, `weights/`, `out/` all ignored | **met** — verified with `git rev-list --objects --all`. |
+| C6 | No large binaries committed | `.gitignore` | Largest object in the **entire git history** is a 332 KB JPEG (the failure-mode evidence figure); largest source file 56 KB. `/captures/` (997 MB), `/data/`, `weights/` (6.9 GB), `out/` all ignored | **met** — verified with `git rev-list --objects --all`. |
 | C7 | Seeds set | `cozmo/seed.py` | `{"seed": 20260908, "seeded": ["random","numpy","open3d","torch"]}` recorded in every manifest | **met** — includes open3d's own global RNG, which otherwise makes RANSAC non-reproducible. |
 | C8 | Deterministic replay | `cozmo/pipeline/run.py` (`SOURCE_DATE_EPOCH`) | LiDAR: `plan.json` **and** `plan.png` byte-identical across two runs. Photo tier (real VGGT on MPS): `plan.json` identical, max wall diff **0.00e+00 m** | **met** — verified by diff, both tiers. |
 | C9 | Mirrors, glass, wet-look surfaces and low light covered | `known_failure_modes.md`, `docs/evidence/confidence_failure_modes.jpg` | Confidence-channel evidence from the real captures | **met** — with a measured, non-obvious finding: low light barely affects LiDAR depth (r = −0.08…−0.12) because the sensor is active; it degrades the passive tiers instead. |
@@ -123,12 +123,18 @@ Generated against commit `HEAD`, benchmark run `benchmark_runs/` (11 captures,
 
 | Status | Rows |
 |---|---|
-| **met** | 33 |
-| **partial** | 22 |
-| **not met** | 11 |
+| **met** | 37 |
+| **partial** | 21 |
+| **not met** | 9 |
 
-The eleven **not met** rows concentrate in four places, in descending score weight:
-the **fix loop** (25%, analysis done, fix not shipped), the **head-to-head**
-(10%, nothing started), the **capture route** (5%, nothing written), and the
-**benchmark set's ground truth** (no laser/tape measurements), which is what
-turns 45 gate rows into SKIP and blocks the 15% verified-accuracy row.
+The **fix loop (25%) is now complete**: declared, shipped, before/after both
+regenerable and tagged, one gate row changed of 94. `ceiling_spread` improved
+62.9 cm → 34.5 cm and still fails the 1 cm gate, with that shortfall predicted
+in the declaration and its cause evidenced (one of the two repeat captures
+contains no ceiling information at all).
+
+The 9 remaining **not met** rows concentrate in three places, in descending
+score weight: the **head-to-head** (10%, nothing started), the **capture route**
+(5%, nothing written), and the **benchmark set's ground truth** (no laser/tape
+measurements), which is what turns 45 gate rows into SKIP and blocks the 15%
+verified-accuracy row.
