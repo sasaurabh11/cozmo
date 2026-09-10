@@ -1,8 +1,8 @@
 # Cozmo AI — Technical Report
 
 Floor-plan reconstruction and damage-scope pipeline, three input tiers.
-12,173 lines across 45 modules · 202 tests (+27 opt-in against real model
-weights) · one command per capture.
+12,244 lines across 46 modules · 206 tests (202 run by default, 4 opt-in against
+real model weights) · one command per capture.
 
 Companion documents: [compliance_matrix.md](compliance_matrix.md) ·
 [benchmark_report.md](benchmark_report.md) ·
@@ -287,7 +287,7 @@ fits the data equally, and the midpoint minimises worst-case error.
 | `ceiling_spread` | ≈35 cm | **34.5 cm** |
 | gate result | **still FAIL** | **still FAIL** |
 | Synthetic fixtures | unchanged | unchanged |
-| Tests | 202 pass | 202 pass |
+| Tests | all pass | all pass |
 
 All seven predictions landed, including the prediction that the gate would not
 pass. Across the whole benchmark, **exactly 1 of 94 gate rows changed.**

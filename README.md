@@ -159,8 +159,8 @@ bash scripts/run_benchmark.sh benchmark_runs
 Run the tests:
 
 ```bash
-pytest                       # 202 tests, ~75 s
-COZMO_TEST_RECON=1 pytest    # + 27 more against real model weights
+pytest                                              # 202 tests, ~75 s
+COZMO_TEST_RECON=1 COZMO_TEST_DETECTOR=1 pytest     # + 4 more, needs weights
 ```
 
 ---

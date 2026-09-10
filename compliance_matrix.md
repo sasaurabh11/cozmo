@@ -88,7 +88,7 @@ Generated against commit `HEAD`, benchmark run `benchmark_runs/` (11 captures,
 |---|---|---|---|---|
 | D1 | **Compliance matrix** | `compliance_matrix.md` | this file | **met** |
 | D2 | **Capture route** (build or protocol) + device matrix | `cozmo/benchmark/score.py::build_device_matrix` | device matrix generated; no capture route | **partial** — device matrix ✅ (generated, not hand-written), capture route ❌. |
-| D3 | **Repo**, README to a fresh capture in <15 min, one command per capture | `README.md`, `scripts/setup.sh` | **Measured: 58.1 s** from `git clone` to a working reconstruction on a clean machine, cold pip cache | **met** — see § Reproduction below. |
+| D3 | **Repo**, README to a fresh capture in <15 min, one command per capture | `README.md`, `scripts/setup.sh` | **Measured: 120 s** from `git clone` to a working reconstruction on a clean machine, cold pip cache | **met** — see § Reproduction below. |
 | D4 | **Reproduction bundle**: regenerate every reported number from raw inputs | `scripts/run_benchmark.sh` | `bash scripts/run_benchmark.sh` → all 11 captures + `timing.csv` + `results.json` | **met** for the pipeline's own numbers; **partial** overall, since raw captures (998 MB) are distributed outside git. |
 | D5 | **Benchmark report**: gates at 3 tiers, repeatability, head-to-head, timing | `benchmark_report.md` | this run | **partial** — gates/repeatability/timing/coverage ✅, head-to-head ❌. |
 | D6 | **Fix loop bundle** | `fixloop/` | `declaration.md`, `before/`, `after/`, `diff.md`, both tagged | **met** |
@@ -121,11 +121,13 @@ Generated against commit `HEAD`, benchmark run `benchmark_runs/` (11 captures,
 
 ## Summary
 
+64 requirement rows, plus row 5.3 which is an owner action rather than a status.
+
 | Status | Rows |
 |---|---|
-| **met** | 37 |
-| **partial** | 21 |
-| **not met** | 9 |
+| **met** | 36 |
+| **partial** | 19 |
+| **not met** | 8 |
 
 The **fix loop (25%) is now complete**: declared, shipped, before/after both
 regenerable and tagged, one gate row changed of 94. `ceiling_spread` improved
@@ -133,7 +135,7 @@ regenerable and tagged, one gate row changed of 94. `ceiling_spread` improved
 in the declaration and its cause evidenced (one of the two repeat captures
 contains no ceiling information at all).
 
-The 9 remaining **not met** rows concentrate in three places, in descending
+The 8 remaining **not met** rows concentrate in three places, in descending
 score weight: the **head-to-head** (10%, nothing started), the **capture route**
 (5%, nothing written), and the **benchmark set's ground truth** (no laser/tape
 measurements), which is what turns 45 gate rows into SKIP and blocks the 15%
