@@ -37,6 +37,13 @@ from cozmo.recon.scale import ScaleCue, ceiling_height_cue, recover_scale
 VGGT_WEIGHTS = Path("weights/vggt-1b/model.safetensors")
 RECON_PYTHON = Path(os.environ.get("COZMO_RECON_PYTHON", ".venv-recon/bin/python"))
 RUN_BACKBONE_TESTS = os.environ.get("COZMO_TEST_RECON") == "1"
+# /captures/ is gitignored -- real captures are hundreds of MB and are not
+# committed -- so this photo capture exists only on machines that made one. It
+# has to be part of the skip condition, not just the weights: without it,
+# COZMO_TEST_RECON=1 on a fresh clone fails these two tests on a missing
+# directory, which reads as "the backbone is broken" rather than "no capture
+# here". Point COZMO_PHOTO_CAPTURE at your own photo-tier capture to run them.
+PHOTO_CAPTURE = Path(os.environ.get("COZMO_PHOTO_CAPTURE", "captures/room_photos"))
 
 
 # --------------------------------------------------------------------------
@@ -397,15 +404,22 @@ class TestFloorCeilingMerge:
 
 
 @pytest.mark.skipif(
-    not (VGGT_WEIGHTS.is_file() and RECON_PYTHON.is_file() and RUN_BACKBONE_TESTS),
-    reason="needs weights, .venv-recon (scripts/setup_recon_env.sh) and COZMO_TEST_RECON=1",
+    not (
+        VGGT_WEIGHTS.is_file()
+        and RECON_PYTHON.is_file()
+        and RUN_BACKBONE_TESTS
+        and (PHOTO_CAPTURE / "capture.json").is_file()
+    ),
+    reason="needs weights, .venv-recon (scripts/setup_recon_env.sh), "
+           "COZMO_TEST_RECON=1 and a photo capture at $COZMO_PHOTO_CAPTURE",
 )
 class TestVGGTBackbone:
     def test_reconstructs_a_real_photo_folder(self):
         from cozmo.recon.backbone import get_reconstructor
         from cozmo.recon.frames import load_photo_folder
 
-        frames = load_photo_folder(Path("captures/room_photos/rooms/living_room"))
+        rooms = sorted(p for p in (PHOTO_CAPTURE / "rooms").iterdir() if p.is_dir())
+        frames = load_photo_folder(rooms[0])
         reconstructor = get_reconstructor("vggt")
         result = reconstructor.reconstruct(frames)
         assert len(result.points) > 0
@@ -415,9 +429,7 @@ class TestVGGTBackbone:
     def test_photo_tier_end_to_end_via_cli(self, tmp_path):
         from cozmo.pipeline.run import run_capture
 
-        result = run_capture(
-            Path("captures/room_photos"), tmp_path, semantics=False,
-        )
+        result = run_capture(PHOTO_CAPTURE, tmp_path, semantics=False)
         room = result.plan.rooms[0]
         assert len(room.walls) >= 3
         for wall in room.walls:

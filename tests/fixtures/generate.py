@@ -19,11 +19,13 @@ one is explainable:
 
 from __future__ import annotations
 
-import base64
 import json
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Tuple
+
+import cv2
+import numpy as np
 
 from cozmo.schema import (
     Adjacency, ConcealedFlag, DamageClass, DamageRegion, DriftCorrection, DriftMethod,
@@ -318,21 +320,55 @@ def write_plans() -> List[Path]:
 # Capture fixtures for `cozmo run`
 # --------------------------------------------------------------------------
 
-# 1x1 JPEG, so the photo fixture contains real images rather than renamed text.
-TINY_JPEG = base64.b64decode(
-    "/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0"
-    "aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/wAALCAABAAEBAREA/8QAFAABAAAAAA"
-    "AAAAAAAAAAAAAACf/EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8AKp//2Q=="
-)
+PLACEHOLDER_SIZE_PX = 64
+
+
+def placeholder_jpeg(seed: int) -> bytes:
+    """A placeholder photo frame: 64x64, band-limited noise, distinct per seed.
+
+    Two properties matter, and both are load-bearing.
+
+    64x64 rather than 1x1, because transformers infers an image's channel axis
+    from its shape: for a square image with side <= 4 px, (H, W, C) and
+    (C, H, W) are the same shape, so a 1x1 RGB frame arrives as (1, 1, 3), is
+    read as one channel of 1x3, and every model fed this fixture silently runs
+    on a transposed image while printing a warning on each call. The call sites
+    now pass input_data_format explicitly, so this is belt and braces -- but a
+    1 px "photo" is not a photo, and it should not take a transformers
+    implementation detail to notice that.
+
+    Band-limited noise rather than a shared gradient, because the two room
+    folders must have nothing in common: test_pipeline asserts the photo tier
+    finds no adjacency between them. LightGlue happily produces spurious
+    matches between small synthetic images that share any structure at all --
+    measured 16 cross-room matches for a shared gradient-plus-block design and
+    30 for nearest-neighbour-upscaled blocks, both well over the 6-match
+    threshold. Smooth per-seed noise measures 2, because there is genuinely
+    nothing to match. Keep that margin in mind before restyling these.
+    """
+    size = PLACEHOLDER_SIZE_PX
+    rng = np.random.default_rng(4000 + seed)
+    coarse = rng.random((size // 8, size // 8, 3)).astype(np.float32)
+    image = cv2.resize(coarse, (size, size), interpolation=cv2.INTER_CUBIC)
+    image = cv2.GaussianBlur((np.clip(image, 0, 1) * 255).astype(np.uint8), (5, 5), 0)
+    ok, buffer = cv2.imencode(
+        ".jpg", image[:, :, ::-1],  # cv2 encodes BGR
+        [int(cv2.IMWRITE_JPEG_QUALITY), 88],
+    )
+    if not ok:
+        raise RuntimeError("could not encode the placeholder JPEG")
+    return buffer.tobytes()
 
 
 def write_photo_capture() -> Path:
     root = CAPTURES / "demo_photo"
+    seed = 0
     for room, count in (("living_room", 4), ("bedroom", 3)):
         folder = root / "rooms" / room
         folder.mkdir(parents=True, exist_ok=True)
         for index in range(count):
-            (folder / f"IMG_{index:04d}.jpg").write_bytes(TINY_JPEG)
+            (folder / f"IMG_{index:04d}.jpg").write_bytes(placeholder_jpeg(seed))
+            seed += 1
     (root / "capture.json").write_text(json.dumps({
         "capture_id": "demo_photo",
         "tier": "photo",

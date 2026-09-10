@@ -197,7 +197,15 @@ class RoomMatcher:
         vectors = []
         for path in room.frame_paths[:max_frames]:
             image = self._load(path)
-            inputs = self.dinov2_proc(images=image, return_tensors="pt").to(self.device)
+            # input_data_format is explicit, not defensive. transformers infers
+            # the channel axis from the shape, and for a square image whose side
+            # is <= 4 px -- (1, 1, 3), (3, 3, 3) -- (H, W, C) and (C, H, W) are
+            # indistinguishable, so it guesses channels_first, warns, and then
+            # normalises a 1-channel 1x3 image. cv2.imread always returns
+            # (H, W, C), so saying so removes the guess.
+            inputs = self.dinov2_proc(
+                images=image, return_tensors="pt", input_data_format="channels_last"
+            ).to(self.device)
             with torch.no_grad():
                 out = self.dinov2(**inputs)
             vectors.append(out.pooler_output[0].cpu().numpy())
@@ -216,7 +224,10 @@ class RoomMatcher:
         torch = self._torch
         image_a, image_b = self._load(path_a), self._load(path_b)
 
-        inputs = self.lg_proc(images=[[image_a, image_b]], return_tensors="pt").to(self.device)
+        inputs = self.lg_proc(
+            images=[[image_a, image_b]], return_tensors="pt",
+            input_data_format="channels_last",
+        ).to(self.device)
         with torch.no_grad():
             outputs = self.lg_model(**inputs)
 

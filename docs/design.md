@@ -11,34 +11,6 @@ Companion documents: [technical_report.md](../technical_report.md) ·
 
 ---
 
-## Capture provenance and disclosure
-
-The brief specifies **iPhone 15 or newer** for the photo and video tiers and
-Pro-class LiDAR devices for the LiDAR tier, and allows public datasets only with
-disclosure. Every capture in `captures/` declares its own device in
-`capture.json`. Stated plainly, because some of them do not meet that bar:
-
-| Capture | Tier | Device | Brief-compliant? |
-|---|---|---|---|
-| `apartment_lidar` | lidar | iPhone (Pro-class, LiDAR) | ✅ |
-| `scan_with_ceiling` | lidar | iPhone (Pro-class, LiDAR) | ✅ |
-| `scan_floor_only` | lidar | iPhone (Pro-class, LiDAR) | ✅ |
-| `apartment_video` | video | iPhone (Pro-class, LiDAR) | ✅ same clip's RGB, used video-only |
-| `room_photos` | photo | iPhone 15 | ✅ |
-| `saurabh_room` | photo | **OnePlus Nord 2T** | ❌ Android, not iPhone 15+ |
-| `saurabh_room_photo` | photo | **OnePlus Nord 2T** | ❌ Android, not iPhone 15+ |
-| `saurabh_room_video` | video | **Mac Pro** | ❌ not a phone capture |
-| `demo_office` | photo | Kinect RGB, MSR 7-Scenes | ❌ public dataset — disclosed |
-| `demo_fourroom` | photo | Kinect RGB, MSR 7-Scenes | ❌ public dataset — disclosed |
-| `demo_bedroom` | photo | VGGT demo images | ❌ public sample — disclosed |
-
-The non-compliant captures are development fixtures: they exercise the code
-paths (multi-room stitching, video room segmentation, opening detection) and are
-useful for that, but **they are not valid evidence for the accuracy gates**, and
-no accuracy claim in this repository rests on them. The device string travels
-into every `run_manifest.json`, so any number can be traced to the hardware that
-produced it.
-
 ## Capture directories
 
 Every capture carries a `capture.json`:

@@ -182,7 +182,10 @@ class OpenVocabularyDetector:
         # Grounding DINO wants one lowercase phrase per prompt, period-separated.
         text = ". ".join(p.lower() for p in prompts) + "."
 
-        inputs = self.processor(images=image, text=text, return_tensors="pt").to(self.device)
+        inputs = self.processor(
+            images=image, text=text, return_tensors="pt",
+            input_data_format="channels_last",  # (H, W, 3), per the docstring
+        ).to(self.device)
         with torch.no_grad():
             outputs = self.model(**inputs)
 

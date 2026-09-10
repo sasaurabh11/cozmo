@@ -12,15 +12,46 @@ import logging
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
-import matplotlib
-
-matplotlib.use("Agg")
-
-import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.lines import Line2D
 
 log = logging.getLogger("cozmo.geometry.render")
+
+# matplotlib is imported inside render_plan(), not here. Importing it at module
+# scope made every command pay for it: cli -> pipeline.run -> this module, so
+# `cozmo version`, `cozmo benchmark` and `cozmo calibrate` -- none of which draw
+# anything -- each loaded a plotting library they never call. Measured with
+# `python -X importtime`: matplotlib.pyplot costs ~160 ms of the CLI's startup,
+# now zero for the commands that do not draw. (It is not the whole story:
+# open3d, pulled in by cozmo.geometry.fuse via cli.py, still costs ~900 ms, so
+# `cozmo version` remains ~1.2 s. Different import, same shape of problem.)
+#
+# The startup time is the smaller half. On a machine whose home directory is not
+# writable, matplotlib cannot cache its font list, so it rebuilt the cache and
+# printed warnings on every single invocation -- which is what made this show up
+# as a bug report rather than as a slow command.
+
+
+def _pyplot():
+    """Import matplotlib on first use and pin the headless backend.
+
+    `use("Agg")` must happen before pyplot is imported, and MPLCONFIGDIR is set
+    defensively first: matplotlib falls back to a fresh temp directory when the
+    default cache path is unwritable, which means rebuilding the font cache on
+    every run. Pointing it at one stable temp directory makes that a one-off.
+    """
+    import os
+    import tempfile
+
+    os.environ.setdefault(
+        "MPLCONFIGDIR", str(Path(tempfile.gettempdir()) / "cozmo-matplotlib")
+    )
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from matplotlib.lines import Line2D
+
+    return plt, Line2D
 
 WALL_LINEWIDTH = 3.0
 OPENING_LINEWIDTH = 1.2
@@ -58,6 +89,8 @@ def render_plan(
     unconnected rooms' wall lists filled as one ring draws a phantom floor
     joining them.
     """
+    plt, Line2D = _pyplot()
+
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 

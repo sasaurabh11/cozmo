@@ -62,7 +62,10 @@ def estimate_metric_depth(image: np.ndarray, weights_dir: Optional[Path] = None)
     _load(weights_dir)
     import torch
 
-    inputs = _processor(images=image, return_tensors="pt").to(_device)
+    inputs = _processor(
+        images=image, return_tensors="pt",
+        input_data_format="channels_last",  # (H, W, 3), per the docstring
+    ).to(_device)
     with torch.no_grad():
         outputs = _model(**inputs)
 

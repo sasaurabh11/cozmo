@@ -11,7 +11,7 @@ One command per capture. The tier is read from the capture, never passed as a fl
 
 ## 1. Install
 
-**You need:** Python ≥3.9, `git`, `curl`, ~1 GB disk. macOS or Linux. No GPU required.
+**You need:** Python 3.9–3.12, `git`, `curl`, ~1 GB disk. macOS or Linux. No GPU required.
 
 ```bash
 git clone <repo> cozmo && cd cozmo
@@ -19,9 +19,13 @@ scripts/setup.sh
 source .venv/bin/activate
 ```
 
-That's it — **about 60 seconds**. The script creates the virtualenv, installs
-dependencies, builds the test fixtures, and runs a smoke reconstruction to prove
-it worked.
+That's it — **about 2 minutes** on a fresh clone. The script picks a supported
+interpreter, creates the virtualenv, installs dependencies, builds the test
+fixtures, and runs a smoke reconstruction to prove it worked.
+
+> Needs **CPython 3.9–3.12**. `open3d` publishes no wheel for 3.13+, so if your
+> `python3` is newer the script finds an older one for you, or tells you to
+> `brew install python@3.12`. Force one with `PYTHON=/path/to/python3.12 scripts/setup.sh`.
 
 Check it:
 

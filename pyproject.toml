@@ -7,7 +7,7 @@ name = "cozmo"
 version = "0.1.0"
 description = "Floor-plan reconstruction and damage-scope pipeline (skeleton)"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.9,<3.13"   # open3d publishes no wheel for 3.13+
 license = { text = "Proprietary" }
 authors = [{ name = "Saurabh", email = "saurabh@zuvees.ae" }]
 dependencies = [
