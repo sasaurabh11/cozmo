@@ -17,8 +17,8 @@ Generated against commit `HEAD`, benchmark run `benchmark_runs/` (11 captures,
 
 | # | Requirement | File path | Artifact | Status |
 |---|---|---|---|---|
-| 1.1 | Choose a capture route: own iOS app **or** stock capture protocol | — | — | **not met** — neither a TestFlight/dev build nor a written one-page protocol exists. The pipeline ingests Stray Scanner output, but nothing tells a non-engineer what to install or how to walk. This is the 5% "capture route quality" row and it is currently unearned. |
-| 1.2 | Route 2: name the off-the-shelf tool | `cozmo/io/stray.py` | Loader targets **Stray Scanner** format (depth uint16 mm @ 256×192, camera-frame z, quaternion poses) | **partial** — the tool is implied by the loader and documented in `README.md`, but not named in a protocol page with install/walk/hand-off instructions. |
+| 1.1 | Choose a capture route: own iOS app **or** stock capture protocol | `capture_protocol.md` | One-page Route 2 protocol: named tool, per-tier walk instructions, folder layout, hand-off | **met** — Route 2 taken. Every instruction is verified against the ingest code, and a capture built by following the page literally runs end to end. No iOS build is shipped; Route 2 is explicitly equally legitimate in the brief. |
+| 1.2 | Route 2: name the off-the-shelf tool | `capture_protocol.md`, `cozmo/io/stray.py` | **Stray Scanner** (App Store, free) named with the exact export it produces; native Camera app for photo/video | **met** — tool named, install-to-hand-off written for a non-engineer, with the three failure modes that actually broke real captures called out (no upward sweep, no parallax between photos, EXIF stripped by messaging apps). |
 | 1.3 | Tier 1 — **Photos**, 2–8 stills per room, no depth/poses, one folder per room | `cozmo/pipeline/photo.py`, `cozmo/recon/` | `cozmo run` on `captures/saurabh_room` → `benchmark_runs/saurabh_room/plan.json` | **partial** — runs end to end and accuracy is honestly reported (±60% intervals), but the photo captures it was exercised on are an Android phone and public datasets; the one iPhone 15 capture (`room_photos`) has no ground truth. |
 | 1.4 | Photo folders must produce the **same stitched whole-property plan** | `cozmo/pipeline/photo.py::build_multi_room_photo_plan`, `cozmo/stitch/` | `benchmark_runs/saurabh_room_photo/plan.json` — 3 rooms, 2 adjacencies, one plan | **met** — per-room folders stitch into one property with adjacency. |
 | 1.5 | Tier 2 — **Video**, handheld walkthrough clip | `cozmo/pipeline/video.py`, `cozmo/io/video.py` | `benchmark_runs/saurabh_room_video/plan.json` — 3 rooms from one clip | **partial** — samples frames, segments the walk into rooms by DINOv2 appearance, reuses the photo path. Exercised on a Mac-recorded clip and an iPhone Pro clip, not an iPhone 15 handheld walkthrough. |
@@ -87,7 +87,7 @@ Generated against commit `HEAD`, benchmark run `benchmark_runs/` (11 captures,
 | # | Requirement | File path | Artifact | Status |
 |---|---|---|---|---|
 | D1 | **Compliance matrix** | `compliance_matrix.md` | this file | **met** |
-| D2 | **Capture route** (build or protocol) + device matrix | `cozmo/benchmark/score.py::build_device_matrix` | device matrix generated; no capture route | **partial** — device matrix ✅ (generated, not hand-written), capture route ❌. |
+| D2 | **Capture route** (build or protocol) + device matrix | `capture_protocol.md`, `cozmo/benchmark/score.py::build_device_matrix` | One-page protocol + 35-row generated device matrix | **met** — both halves present. The device matrix is generated from each run's own gate results and manifests, not hand-written; most of its accuracy cells read *unverified* because only the synthetic fixtures carry ground truth. |
 | D3 | **Repo**, README to a fresh capture in <15 min, one command per capture | `README.md`, `scripts/setup.sh` | **Measured: 120 s** from `git clone` to a working reconstruction on a clean machine, cold pip cache | **met** — see § Reproduction below. |
 | D4 | **Reproduction bundle**: regenerate every reported number from raw inputs | `scripts/run_benchmark.sh` | `bash scripts/run_benchmark.sh` → all 11 captures + `timing.csv` + `results.json` | **met** for the pipeline's own numbers; **partial** overall, since raw captures (998 MB) are distributed outside git. |
 | D5 | **Benchmark report**: gates at 3 tiers, repeatability, head-to-head, timing | `benchmark_report.md` | this run | **partial** — gates/repeatability/timing/coverage ✅, head-to-head ❌. |
@@ -125,9 +125,9 @@ Generated against commit `HEAD`, benchmark run `benchmark_runs/` (11 captures,
 
 | Status | Rows |
 |---|---|
-| **met** | 36 |
-| **partial** | 19 |
-| **not met** | 8 |
+| **met** | 39 |
+| **partial** | 17 |
+| **not met** | 7 |
 
 The **fix loop (25%) is now complete**: declared, shipped, before/after both
 regenerable and tagged, one gate row changed of 94. `ceiling_spread` improved
@@ -135,8 +135,9 @@ regenerable and tagged, one gate row changed of 94. `ceiling_spread` improved
 in the declaration and its cause evidenced (one of the two repeat captures
 contains no ceiling information at all).
 
-The 8 remaining **not met** rows concentrate in three places, in descending
-score weight: the **head-to-head** (10%, nothing started), the **capture route**
-(5%, nothing written), and the **benchmark set's ground truth** (no laser/tape
-measurements), which is what turns 45 gate rows into SKIP and blocks the 15%
-verified-accuracy row.
+The 7 remaining **not met** rows concentrate in two places, in descending score
+weight: the **head-to-head** (10%, nothing started) and the **benchmark set's
+ground truth** (no laser or tape measurements), which is what turns 45 gate rows
+into SKIP and blocks the 15% verified-accuracy row. Both share one root cause —
+no real room has been physically measured — so a single afternoon with a laser
+measurer unblocks the larger share of what remains.

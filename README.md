@@ -169,6 +169,7 @@ COZMO_TEST_RECON=1 COZMO_TEST_DETECTOR=1 pytest     # + 4 more, needs weights
 
 | Document | Contents |
 |---|---|
+| **[capture_protocol.md](capture_protocol.md)** | The one-page capture protocol — which app, how to walk, how to hand the files over |
 | **[docs/design.md](docs/design.md)** | How each tier works and why — per-view planes, scale recovery, stitching, the rule engine, capture provenance |
 | **[technical_report.md](technical_report.md)** | Architecture, error budget, calibration, drift, fix loop, failure modes |
 | **[benchmark_report.md](benchmark_report.md)** | Gates at all three tiers, repeatability, timing |
