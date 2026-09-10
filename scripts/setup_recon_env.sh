@@ -22,19 +22,24 @@ if ! command -v "$PYTHON" >/dev/null 2>&1; then
   exit 1
 fi
 
+# Pinned to a commit, not to `main`: an unpinned upstream means the backbone
+# can change under a rerun, and "regenerate every reported number" stops being
+# true. Override with COZMO_VGGT_SRC=/path/to/checkout to use your own copy.
+VGGT_COMMIT="${COZMO_VGGT_COMMIT:-a288dd0f14786c93483e45524328726ab7b1b4ce}"
+
 VGGT_SRC="${COZMO_VGGT_SRC:-}"
 if [[ -z "$VGGT_SRC" ]]; then
   VGGT_SRC="$(mktemp -d)/vggt"
-  echo "fetching vggt source into $VGGT_SRC"
-  curl -sL "https://codeload.github.com/facebookresearch/vggt/zip/refs/heads/main" -o "$VGGT_SRC.zip"
+  echo "fetching vggt source @ ${VGGT_COMMIT:0:12} into $VGGT_SRC"
+  curl -sL "https://codeload.github.com/facebookresearch/vggt/zip/$VGGT_COMMIT" -o "$VGGT_SRC.zip"
   unzip -q "$VGGT_SRC.zip" -d "$(dirname "$VGGT_SRC")"
-  mv "$(dirname "$VGGT_SRC")/vggt-main" "$VGGT_SRC"
+  mv "$(dirname "$VGGT_SRC")/vggt-$VGGT_COMMIT" "$VGGT_SRC"
 fi
 
 "$PYTHON" -m venv .venv-recon
 .venv-recon/bin/pip install -q --upgrade pip
 .venv-recon/bin/pip install -q torch torchvision 'numpy<2' einops safetensors \
-    scipy shapely opencv-python-headless Pillow huggingface_hub -e "$VGGT_SRC"
+    scipy shapely opencv-python-headless Pillow huggingface_hub "$VGGT_SRC"
 
 echo
 echo "done. .venv-recon/bin/python is used automatically by VGGTReconstructor,"
