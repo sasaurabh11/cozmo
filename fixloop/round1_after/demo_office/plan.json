@@ -1,0 +1,375 @@
+{
+  "schema_version": "1.3.0",
+  "capture_id": "demo_office_7scenes",
+  "tier": "photo",
+  "pipeline_version": "0.4.0-video-calibration",
+  "generated_at": "2025-09-01T12:00:00Z",
+  "scale": {
+    "source": "structural_prior",
+    "scale_factor": {
+      "value": 3.40404,
+      "ci_95": [
+        2.38283,
+        4.42525
+      ],
+      "unit": "ratio"
+    },
+    "reference_description": "1 cue(s) fired: ceiling_height (agreement 0.30, method single_cue)",
+    "notes": null
+  },
+  "drift_correction": {
+    "enabled": true,
+    "method": "plane_anchored",
+    "loop_closures": 0,
+    "residual_closure_error": null,
+    "ablation_footprint_area": null,
+    "notes": "Single-room reconstruction (per_view_merge); no multi-room stitch, so no cross-room drift to correct. Per-wall confidence comes from view count and cross-view plane agreement instead of a pose graph residual."
+  },
+  "property_totals": {
+    "room_count": 1,
+    "total_floor_area": {
+      "value": 17.1719,
+      "ci_95": [
+        6.855889114282155,
+        27.487910885717845
+      ],
+      "unit": "m2"
+    },
+    "footprint_area": {
+      "value": 17.1719,
+      "ci_95": [
+        6.855889114282155,
+        27.487910885717845
+      ],
+      "unit": "m2"
+    },
+    "total_wall_area": {
+      "value": 45.4521,
+      "ci_95": [
+        30.207002201982263,
+        60.69719779801774
+      ],
+      "unit": "m2"
+    },
+    "bounding_box_m": [
+      6.782,
+      2.532
+    ]
+  },
+  "rooms": [
+    {
+      "id": "office",
+      "name": "Office",
+      "pose": {
+        "x": 0.0,
+        "y": 0.0,
+        "theta_rad": 0.21630357214444443
+      },
+      "walls": [
+        {
+          "id": "office_w0",
+          "start": {
+            "x": 4.8692,
+            "y": 1.4828
+          },
+          "end": {
+            "x": -1.9128,
+            "y": 1.4828
+          },
+          "length": {
+            "value": 6.782,
+            "ci_95": [
+              4.5073,
+              9.0567
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.44,
+            "ci_95": [
+              1.6216,
+              3.2584
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [],
+          "observation_note": "4 view(s), cross-view agreement 0.00, observed across 0% of its length"
+        },
+        {
+          "id": "office_w1",
+          "start": {
+            "x": -1.9128,
+            "y": 1.4828
+          },
+          "end": {
+            "x": -1.9128,
+            "y": 4.0148
+          },
+          "length": {
+            "value": 2.532,
+            "ci_95": [
+              1.6827,
+              3.3813
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.44,
+            "ci_95": [
+              1.6216,
+              3.2584
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [
+            "office_w1_op0"
+          ],
+          "observation_note": "1 view(s), cross-view agreement 1.00, observed across 0% of its length"
+        },
+        {
+          "id": "office_w2",
+          "start": {
+            "x": -1.9128,
+            "y": 4.0148
+          },
+          "end": {
+            "x": 4.8692,
+            "y": 4.0148
+          },
+          "length": {
+            "value": 6.782,
+            "ci_95": [
+              4.5073,
+              9.0567
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.44,
+            "ci_95": [
+              1.6216,
+              3.2584
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [],
+          "observation_note": "1 view(s), cross-view agreement 1.00, observed across 0% of its length"
+        },
+        {
+          "id": "office_w3",
+          "start": {
+            "x": 4.8692,
+            "y": 4.0148
+          },
+          "end": {
+            "x": 4.8692,
+            "y": 1.4828
+          },
+          "length": {
+            "value": 2.532,
+            "ci_95": [
+              1.6827,
+              3.3813
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.44,
+            "ci_95": [
+              1.6216,
+              3.2584
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [],
+          "observation_note": "1 view(s), cross-view agreement 1.00, observed across 0% of its length"
+        }
+      ],
+      "openings": [
+        {
+          "id": "office_w1_op0",
+          "wall_id": "office_w1",
+          "type": "window",
+          "width": {
+            "value": 0.8764,
+            "ci_95": [
+              0.5386,
+              1.2142
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 0.5353,
+            "ci_95": [
+              0.1975,
+              0.8731
+            ],
+            "unit": "m"
+          },
+          "offset_along_wall": {
+            "value": 1.6769,
+            "ci_95": [
+              1.3391000000000002,
+              2.0147
+            ],
+            "unit": "m"
+          },
+          "sill_height": {
+            "value": 1.412,
+            "ci_95": [
+              1.0741999999999998,
+              1.7498
+            ],
+            "unit": "m"
+          },
+          "connects_room_id": null,
+          "detection_confidence": 0.312,
+          "detection_sources": [
+            "semantic"
+          ],
+          "source_note": "detector only; geometry did not find a hole here, so the extent comes from the projected mask and is looser than a measured one"
+        }
+      ],
+      "surfaces": [
+        {
+          "id": "office_w0_surface",
+          "room_id": "office",
+          "kind": "wall",
+          "wall_id": "office_w0",
+          "area": {
+            "value": 16.548,
+            "ci_95": [
+              10.99763206625002,
+              22.098367933749977
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "office_w1_surface",
+          "room_id": "office",
+          "kind": "wall",
+          "wall_id": "office_w1",
+          "area": {
+            "value": 6.1781,
+            "ci_95": [
+              4.105902264231282,
+              8.250297735768719
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "office_w2_surface",
+          "room_id": "office",
+          "kind": "wall",
+          "wall_id": "office_w2",
+          "area": {
+            "value": 16.548,
+            "ci_95": [
+              10.99763206625002,
+              22.098367933749977
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "office_w3_surface",
+          "room_id": "office",
+          "kind": "wall",
+          "wall_id": "office_w3",
+          "area": {
+            "value": 6.1781,
+            "ci_95": [
+              4.105902264231282,
+              8.250297735768719
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "office_floor",
+          "room_id": "office",
+          "kind": "floor",
+          "wall_id": null,
+          "area": {
+            "value": 17.1719,
+            "ci_95": [
+              6.855889114282155,
+              27.487910885717845
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "office_ceiling",
+          "room_id": "office",
+          "kind": "ceiling",
+          "wall_id": null,
+          "area": {
+            "value": 17.1719,
+            "ci_95": [
+              6.855889114282155,
+              27.487910885717845
+            ],
+            "unit": "m2"
+          }
+        }
+      ],
+      "ceiling_height": {
+        "value": 2.44,
+        "ci_95": [
+          1.708,
+          3.1719999999999997
+        ],
+        "unit": "m"
+      },
+      "floor_area": {
+        "value": 17.1719,
+        "ci_95": [
+          6.855889114282155,
+          27.487910885717845
+        ],
+        "unit": "m2"
+      },
+      "perimeter": {
+        "value": 18.6279,
+        "ci_95": [
+          12.379912398289747,
+          24.875887601710254
+        ],
+        "unit": "m"
+      },
+      "source_frame_count": 7
+    }
+  ],
+  "adjacencies": [],
+  "damage": [],
+  "concealed_flags": [],
+  "scope": [],
+  "quality": {
+    "overall_confidence": 0.595,
+    "interval_method": "Photo tier: per-wall relative uncertainty from view count and cross-view plane agreement, combined in quadrature with the scale factor's own interval (cue disagreement), then scaled by this tier's fitted calibration factor (1.0 if uncalibrated). No sensor-noise error budget -- there is no depth sensor at this tier.",
+    "ceiling_method": "per_view_merge",
+    "semantics_available": true,
+    "calibration_note": "Uncalibrated: no calibration file found (run `cozmo calibrate` against a benchmark set with ground truth). Every interval factor defaults to 1.0 -- these are the pipeline's own asserted half-widths, unchecked.",
+    "degradations": [
+      "scale cues disagree (agreement 0.30); the scale interval is widened accordingly, not narrowed by averaging over it"
+    ],
+    "warnings": [],
+    "coverage": {
+      "layout_method": 1.0,
+      "scale_cues_fired": 1.0,
+      "scale_agreement": 0.3
+    },
+    "video_sampling": null
+  }
+}

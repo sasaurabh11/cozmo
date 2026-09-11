@@ -1,0 +1,627 @@
+{
+  "pipeline_version": "0.4.0-video-calibration",
+  "schema_version": "1.3.0",
+  "package_version": "0.1.0",
+  "git": {
+    "commit": "4991fac6ffa2c3cbd0a56c87f777d809504f011f",
+    "branch": "main",
+    "describe": "4991fac-dirty",
+    "dirty": true
+  },
+  "command": "cozmo run --input captures/apartment_video --out fixloop/round1_after/apartment_video --quiet --backbone vggt --no-semantics",
+  "argv": [
+    "cozmo",
+    "run",
+    "--input",
+    "captures/apartment_video",
+    "--out",
+    "fixloop/round1_after/apartment_video",
+    "--quiet",
+    "--backbone",
+    "vggt",
+    "--no-semantics"
+  ],
+  "seed": {
+    "seed": 20260908,
+    "seeded": [
+      "random",
+      "numpy",
+      "open3d",
+      "torch"
+    ],
+    "unavailable": []
+  },
+  "options": {
+    "drift_correction": true,
+    "ignore_calibration": false
+  },
+  "input": {
+    "path": "/Users/saurabh/Documents/Cozmo/captures/apartment_video",
+    "sha256": "565d882a2423254f4089d0bab7f63e17daa15cd6a8c932d492c3dfe7fcc974ee",
+    "file_count": 2,
+    "total_bytes": 43717071
+  },
+  "capture": {
+    "capture_id": "apartment_video_01",
+    "space_id": "apartment_room_a",
+    "tier": "video",
+    "device": {
+      "model": "iPhone (Pro-class, LiDAR)",
+      "os_version": null,
+      "has_lidar": true
+    },
+    "rooms": [
+      "room_a"
+    ],
+    "payload": {
+      "video": "rgb.mp4",
+      "size_bytes": 43716638
+    },
+    "warnings": []
+  },
+  "outputs": {
+    "plan.json": "6ce758df1f6a61e58668e5231b012526c816352229ee5dfd4b38e08a679a04f4",
+    "plan.png": "ec805ef667f6285718601475f4c1e30676a6f3380fa040e459f246fd705cb8f6",
+    "plan.svg": "10e1a6985dfe2cccbfb0d452f562f646cb7b4b46645ff75324adf263cf372ca9"
+  },
+  "reconstruction": {
+    "backbone": "vggt",
+    "rooms": {
+      "room_2": {
+        "layout_method": "per_view_merge",
+        "scale": {
+          "scale_factor": 4.29572,
+          "ci_95": [
+            3.007,
+            5.58443
+          ],
+          "agreement": 0.3,
+          "method": "single_cue",
+          "cues": [
+            {
+              "name": "metric_depth",
+              "fired": false,
+              "scale_factor": null,
+              "relative_sd": null,
+              "reason": "disabled for this run",
+              "detail": {}
+            },
+            {
+              "name": "door_height",
+              "fired": false,
+              "scale_factor": null,
+              "relative_sd": null,
+              "reason": "disabled for this run",
+              "detail": {}
+            },
+            {
+              "name": "ceiling_height",
+              "fired": true,
+              "scale_factor": 4.29572,
+              "relative_sd": 0.123,
+              "reason": "floor-to-ceiling span 0.568 (scale-free) against a 2.44 m +- 0.3 m prior",
+              "detail": {
+                "span_scalefree": 0.568
+              }
+            }
+          ]
+        },
+        "timings_s": {
+          "load_frames_s": 0.018,
+          "reconstruct_s": 13.72,
+          "layout_s": 0.255,
+          "scale_s": 0.0,
+          "opening_detector_s": 6.408,
+          "openings_s": 6.42
+        }
+      },
+      "room_3": {
+        "layout_method": "per_view_merge",
+        "scale": {
+          "scale_factor": 3.74042,
+          "ci_95": [
+            2.61829,
+            4.86254
+          ],
+          "agreement": 0.3,
+          "method": "single_cue",
+          "cues": [
+            {
+              "name": "metric_depth",
+              "fired": false,
+              "scale_factor": null,
+              "relative_sd": null,
+              "reason": "disabled for this run",
+              "detail": {}
+            },
+            {
+              "name": "door_height",
+              "fired": false,
+              "scale_factor": null,
+              "relative_sd": null,
+              "reason": "disabled for this run",
+              "detail": {}
+            },
+            {
+              "name": "ceiling_height",
+              "fired": true,
+              "scale_factor": 3.74042,
+              "relative_sd": 0.123,
+              "reason": "floor-to-ceiling span 0.652 (scale-free) against a 2.44 m +- 0.3 m prior",
+              "detail": {
+                "span_scalefree": 0.6523
+              }
+            }
+          ]
+        },
+        "timings_s": {
+          "load_frames_s": 0.012,
+          "reconstruct_s": 12.949,
+          "layout_s": 0.165,
+          "scale_s": 0.0,
+          "opening_detector_s": 5.533,
+          "openings_s": 5.54
+        }
+      },
+      "room_4": {
+        "layout_method": "per_view_merge",
+        "scale": {
+          "scale_factor": 7.78772,
+          "ci_95": [
+            5.4514,
+            10.12403
+          ],
+          "agreement": 0.3,
+          "method": "single_cue",
+          "cues": [
+            {
+              "name": "metric_depth",
+              "fired": false,
+              "scale_factor": null,
+              "relative_sd": null,
+              "reason": "disabled for this run",
+              "detail": {}
+            },
+            {
+              "name": "door_height",
+              "fired": false,
+              "scale_factor": null,
+              "relative_sd": null,
+              "reason": "disabled for this run",
+              "detail": {}
+            },
+            {
+              "name": "ceiling_height",
+              "fired": true,
+              "scale_factor": 7.78772,
+              "relative_sd": 0.123,
+              "reason": "floor-to-ceiling span 0.313 (scale-free) against a 2.44 m +- 0.3 m prior",
+              "detail": {
+                "span_scalefree": 0.3133
+              }
+            }
+          ]
+        },
+        "timings_s": {
+          "load_frames_s": 0.019,
+          "reconstruct_s": 14.348,
+          "layout_s": 0.258,
+          "scale_s": 0.0,
+          "opening_detector_s": 6.358,
+          "openings_s": 6.369
+        }
+      }
+    },
+    "skipped_rooms": [
+      {
+        "room_id": "room_1",
+        "reason": "ValueError: no cell of the wall arrangement is supported by interior evidence"
+      }
+    ],
+    "capture_groups": {
+      "room_4": [
+        "room_2",
+        "room_4"
+      ],
+      "room_3": [
+        "room_3"
+      ]
+    },
+    "representative_for": {
+      "room_2": "room_4",
+      "room_4": "room_4",
+      "room_3": "room_3"
+    },
+    "inferred_connections": [
+      {
+        "room_a": "room_3",
+        "room_b": "room_4",
+        "source": "capture_order_inferred"
+      }
+    ],
+    "matches": [
+      {
+        "room_a": "room_2",
+        "room_b": "room_3",
+        "dinov2_similarity": 0.5056,
+        "keypoint_match_count": 5,
+        "keypoint_matches": [
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 0,
+            "u_a": 189.0,
+            "v_a": 138.0,
+            "u_b": 288.0,
+            "v_b": 444.0,
+            "score": 0.4332
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 0,
+            "u_a": 1044.0,
+            "v_a": 348.0,
+            "u_b": 1368.0,
+            "v_b": 330.0,
+            "score": 0.3814
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 0,
+            "u_a": 744.0,
+            "v_a": 453.0,
+            "u_b": 1101.0,
+            "v_b": 576.0,
+            "score": 0.3471
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 0,
+            "u_a": 1479.0,
+            "v_a": 516.0,
+            "u_b": 1179.0,
+            "v_b": 27.0,
+            "score": 0.3706
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 0,
+            "u_a": 1128.0,
+            "v_a": 774.0,
+            "u_b": 1890.0,
+            "v_b": 360.0,
+            "score": 0.3944
+          }
+        ],
+        "doorway_matches": [],
+        "best_frame_pair": [
+          1,
+          0
+        ]
+      },
+      {
+        "room_a": "room_2",
+        "room_b": "room_4",
+        "dinov2_similarity": 0.5556,
+        "keypoint_match_count": 22,
+        "keypoint_matches": [
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 2,
+            "u_a": 1845.0,
+            "v_a": 810.0,
+            "u_b": 717.0,
+            "v_b": 27.0,
+            "score": 0.9972
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 2,
+            "u_a": 1791.0,
+            "v_a": 837.0,
+            "u_b": 693.0,
+            "v_b": 33.0,
+            "score": 0.829
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 2,
+            "u_a": 1725.0,
+            "v_a": 873.0,
+            "u_b": 672.0,
+            "v_b": 42.0,
+            "score": 0.9855
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 2,
+            "u_a": 1854.0,
+            "v_a": 924.0,
+            "u_b": 711.0,
+            "v_b": 81.0,
+            "score": 0.3573
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 2,
+            "u_a": 1404.0,
+            "v_a": 933.0,
+            "u_b": 573.0,
+            "v_b": 24.0,
+            "score": 0.9791
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 2,
+            "u_a": 1611.0,
+            "v_a": 933.0,
+            "u_b": 636.0,
+            "v_b": 54.0,
+            "score": 0.7566
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 2,
+            "u_a": 1803.0,
+            "v_a": 933.0,
+            "u_b": 687.0,
+            "v_b": 81.0,
+            "score": 0.6106
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 2,
+            "u_a": 1560.0,
+            "v_a": 957.0,
+            "u_b": 621.0,
+            "v_b": 57.0,
+            "score": 0.5799
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 2,
+            "u_a": 1515.0,
+            "v_a": 980.0,
+            "u_b": 600.0,
+            "v_b": 69.0,
+            "score": 0.9953
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 2,
+            "u_a": 1257.0,
+            "v_a": 1014.0,
+            "u_b": 507.0,
+            "v_b": 48.0,
+            "score": 0.9862
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 2,
+            "u_a": 1422.0,
+            "v_a": 1020.0,
+            "u_b": 564.0,
+            "v_b": 78.0,
+            "score": 0.9986
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 2,
+            "u_a": 1200.0,
+            "v_a": 1023.0,
+            "u_b": 465.0,
+            "v_b": 42.0,
+            "score": 0.9961
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 2,
+            "u_a": 1365.0,
+            "v_a": 1056.0,
+            "u_b": 543.0,
+            "v_b": 93.0,
+            "score": 0.5782
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 2,
+            "u_a": 1374.0,
+            "v_a": 1092.0,
+            "u_b": 534.0,
+            "v_b": 111.0,
+            "score": 0.9667
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 2,
+            "u_a": 1737.0,
+            "v_a": 1260.0,
+            "u_b": 633.0,
+            "v_b": 233.0,
+            "score": 0.8259
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 2,
+            "u_a": 1437.0,
+            "v_a": 1275.0,
+            "u_b": 537.0,
+            "v_b": 225.0,
+            "score": 0.9026
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 2,
+            "u_a": 1281.0,
+            "v_a": 1326.0,
+            "u_b": 462.0,
+            "v_b": 237.0,
+            "score": 0.8363
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 2,
+            "u_a": 1152.0,
+            "v_a": 1332.0,
+            "u_b": 384.0,
+            "v_b": 212.0,
+            "score": 0.8162
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 2,
+            "u_a": 1215.0,
+            "v_a": 1347.0,
+            "u_b": 414.0,
+            "v_b": 233.0,
+            "score": 0.7673
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 2,
+            "u_a": 1503.0,
+            "v_a": 1368.0,
+            "u_b": 549.0,
+            "v_b": 285.0,
+            "score": 0.3469
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 2,
+            "u_a": 1806.0,
+            "v_a": 1398.0,
+            "u_b": 633.0,
+            "v_b": 321.0,
+            "score": 0.6912
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 2,
+            "u_a": 1734.0,
+            "v_a": 1410.0,
+            "u_b": 600.0,
+            "v_b": 321.0,
+            "score": 0.5974
+          }
+        ],
+        "doorway_matches": [],
+        "best_frame_pair": [
+          1,
+          2
+        ]
+      },
+      {
+        "room_a": "room_3",
+        "room_b": "room_4",
+        "dinov2_similarity": 0.3431,
+        "keypoint_match_count": 0,
+        "keypoint_matches": [],
+        "doorway_matches": [],
+        "best_frame_pair": null
+      }
+    ],
+    "edges_used": [],
+    "edges_rejected": [
+      [
+        "room_2",
+        "room_3",
+        "only 5 keypoint match(es), no doorway match"
+      ],
+      [
+        "room_2",
+        "room_4",
+        "only 22 keypoint match(es), no doorway match"
+      ],
+      [
+        "room_3",
+        "room_4",
+        "dinov2 similarity 0.34, no doorway match"
+      ]
+    ],
+    "manhattan_rotation_deg": -0.0,
+    "overlap_resolved": true,
+    "timings_s": {
+      "room_1_s": 14.652,
+      "room_2_s": 20.419,
+      "room_3_s": 18.666,
+      "room_4_s": 20.998,
+      "match_s": 5.902,
+      "graph_s": 0.178,
+      "video_sample_s": 2.671,
+      "video_embed_s": 2.524
+    },
+    "multi_room_plan": true,
+    "per_room_reconstructions": {
+      "room_2": "RoomReconstruction(room_id='room_2', room=Room(id='room_2', name='Room 2', pose=Pose2D(x=0.0, y=0.0, theta_rad=-0.46921960068682006), walls=[Wall(id='room_2_w0', start=Point2D(x=0.185, y=2.1062), end=Point2D(x=-3.6539, y=2.1062), length=Measurement(value=3.8389, ci_95=(2.6653000000000002, 5.0125), unit=<Unit.METERS: 'm'>), height=Measurement(value=2.44, ci_95=(1.694, 3.186), unit=<Unit.METERS: 'm'>), thickness=None, is_exterior=None, opening_ids=['room_2_w0_op0'], observation_note='2 view(s), cross-view agreement 0.91, observed across 0% of its length'), Wall(id='room_2_w1', start=Point2D(x=-3.6539, y=2.1062), end=Point2D(x=-3.6539, y=4.7115), length=Measurement(value=2.6053, ci_95=(1.7315, 3.4791000000000003), unit=<Unit.METERS: 'm'>), height=Measurement(value=2.44, ci_95=(1.6216, 3.2584), unit=<Unit.METERS: 'm'>), thickness=None, is_exterior=None, opening_ids=[], observation_note='1 view(s), cross-view agreement 1.00, observed across 0% of its length'), Wall(id='room_2_w2', start=Point2D(x=-3.6539, y=4.7115), end=Point2D(x=0.185, y=4.7115), length=Measurement(value=3.8389, ci_95=(2.5513000000000003, 5.1265), unit=<Unit.METERS: 'm'>), height=Measurement(value=2.44, ci_95=(1.6216, 3.2584), unit=<Unit.METERS: 'm'>), thickness=None, is_exterior=None, opening_ids=[], observation_note='1 view(s), cross-view agreement 0.50, observed across 0% of its length'), Wall(id='room_2_w3', start=Point2D(x=0.185, y=4.7115), end=Point2D(x=0.185, y=2.1062), length=Measurement(value=2.6053, ci_95=(1.7315, 3.4791000000000003), unit=<Unit.METERS: 'm'>), height=Measurement(value=2.44, ci_95=(1.6216, 3.2584), unit=<Unit.METERS: 'm'>), thickness=None, is_exterior=None, opening_ids=[], observation_note='1 view(s), cross-view agreement 0.50, observed across 0% of its length')], openings=[Opening(id='room_2_w0_op0', wall_id='room_2_w0', type=<OpeningType.WINDOW: 'window'>, width=Measurement(value=2.1681, ci_95=(1.3969, 2.9393), unit=<Unit.METERS: 'm'>), height=Measurement(value=0.9015, ci_95=(0.13029999999999997, 1.6726999999999999), unit=<Unit.METERS: 'm'>), offset_along_wall=Measurement(value=1.1705, ci_95=(0.3993000000000001, 1.9417), unit=<Unit.METERS: 'm'>), sill_height=Measurement(value=-0.0403, ci_95=(-0.8115, 0.7309), unit=<Unit.METERS: 'm'>), connects_room_id=None, detection_confidence=0.418, detection_sources=['semantic'], source_note='detector only; geometry did not find a hole here, so the extent comes from the projected mask and is looser than a measured one')], surfaces=[Surface(id='room_2_w0_surface', room_id='room_2', kind=<SurfaceKind.WALL: 'wall'>, wall_id='room_2_w0', area=Measurement(value=9.3669, ci_95=(6.503182524165071, 12.230617475834928), unit=<Unit.SQUARE_METERS: 'm2'>)), Surface(id='room_2_w1_surface', room_id='room_2', kind=<SurfaceKind.WALL: 'wall'>, wall_id='room_2_w1', area=Measurement(value=6.3569, ci_95=(4.2247309210747375, 8.489069078925263), unit=<Unit.SQUARE_METERS: 'm2'>)), Surface(id='room_2_w2_surface', room_id='room_2', kind=<SurfaceKind.WALL: 'wall'>, wall_id='room_2_w2', area=Measurement(value=9.3669, ci_95=(6.225146229233582, 12.508653770766417), unit=<Unit.SQUARE_METERS: 'm2'>)), Surface(id='room_2_w3_surface', room_id='room_2', kind=<SurfaceKind.WALL: 'wall'>, wall_id='room_2_w3', area=Measurement(value=6.3569, ci_95=(4.2247309210747375, 8.489069078925263), unit=<Unit.SQUARE_METERS: 'm2'>)), Surface(id='room_2_floor', room_id='room_2', kind=<SurfaceKind.FLOOR: 'floor'>, wall_id=None, area=Measurement(value=10.0014, ci_95=(3.9930636323051933, 16.009736367694806), unit=<Unit.SQUARE_METERS: 'm2'>)), Surface(id='room_2_ceiling', room_id='room_2', kind=<SurfaceKind.CEILING: 'ceiling'>, wall_id=None, area=Measurement(value=10.0014, ci_95=(3.9930636323051933, 16.009736367694806), unit=<Unit.SQUARE_METERS: 'm2'>))], ceiling_height=Measurement(value=2.44, ci_95=(1.708, 3.1719999999999997), unit=<Unit.METERS: 'm'>), floor_area=Measurement(value=10.0014, ci_95=(3.9930636323051933, 16.009736367694806), unit=<Unit.SQUARE_METERS: 'm2'>), perimeter=Measurement(value=12.8883, ci_95=(8.565432762838416, 17.211167237161582), unit=<Unit.METERS: 'm'>), source_frame_count=3), layout=PhotoLayoutResult(frame=FloorFrame(origin=array([ 0.00928733,  0.28764951, -0.02390271]), up=array([-0.03215943, -0.99604978,  0.0827684 ]), e1=array([ 0.8914601 , -0.06603161, -0.44826188]), e2=array([0.45195647, 0.05936888, 0.89006218]), rotation_rad=-0.46921960068682006), polygon=<POLYGON ((0.043 0.49, -0.851 0.49, -0.851 1.097, 0.043 1.097, 0.043 0.49))>, walls=[WallSegment(start=(0.04305781355386051, 0.49029708396920413), end=(-0.8505936537467471, 0.49029708396920413), length_m=0.8936514673006076, normal=(-0.0, -1.0), top_height_m=None, support_points=155107), WallSegment(start=(-0.8505936537467471, 0.49029708396920413), end=(-0.8505936537467471, 1.0967818109601493), length_m=0.6064847269909451, normal=(-1.0, 0.0), top_height_m=None, support_points=121704), WallSegment(start=(-0.8505936537467471, 1.0967818109601493), end=(0.04305781355386051, 1.0967818109601493), length_m=0.8936514673006076, normal=(-0.0, 1.0), top_height_m=0.0, support_points=0), WallSegment(start=(0.04305781355386051, 1.0967818109601493), end=(0.04305781355386051, 0.49029708396920413), length_m=0.6064847269909451, normal=(1.0, 0.0), top_height_m=None, support_points=0)], lines=[WallLine(axis=1, coord=1.0967818109601495, extent=(np.float64(-0.920901055939761), np.float64(0.038695280440613655)), inliers=155107, top_height_m=0.0), WallLine(axis=1, coord=1.0967818109601495, extent=(np.float64(-0.9322821115378913), np.float64(0.0010948767250082425)), inliers=121704, top_height_m=0.0)], floor_area_m2=0.5419859661708666, perimeter_m=3.0002723885831055, manhattan_snap=True, rotation_deg=-26.88430278416857, stats={'manhattan_score': 0.2015, 'view_details': {0: {'views': [0, 1], 'view_count': 2, 'agreement': 0.911}, 1: {'views': [2], 'view_count': 1, 'agreement': 1.0}}, 'cells_kept': 1, 'bounds_uv': [-1.432, -0.056, 0.571, 1.669], 'axis_fallback': [0, 1]}, layout_method='per_view_merge', view_plane_counts={'floor_views': 3, 'ceiling_views': 3, 'wall_clusters': 2, 'wall_lines': 2}, floor_to_ceiling_span=0.5680073499414847, wall_confidence={0: 0.911, 1: 1.0, 2: 0.5, 3: 0.5}), reconstruction=ReconstructionResult(points=array([[ 0.17681098, -0.39956522,  0.89980006],\n       [ 0.17881095, -0.3996135 ,  0.9000101 ],\n       [ 0.18082035, -0.39966142,  0.9002285 ],\n       ...,\n       [-0.2568611 ,  0.5291705 ,  0.7415147 ],\n       [-0.25527596,  0.5293634 ,  0.74210656],\n       [-0.25370657,  0.5295731 ,  0.74271023]], dtype=float32), point_confidence=array([0.3675051 , 0.3719853 , 0.3745797 , ..., 0.39732242, 0.39510015,\n       0.3933586 ], dtype=float32), point_frame_index=array([0, 0, 0, ..., 2, 2, 2], dtype=int32), poses=[FramePose(frame_index=0, R=array([[ 9.99999881e-01,  4.46864928e-04,  5.37094456e-05],\n       [-4.46858816e-04,  9.99999881e-01, -1.13983100e-04],\n       [-5.37603773e-05,  1.13959090e-04,  1.00000000e+00]]), t=array([ 3.11502190e-05, -8.90543379e-05, -4.08530759e-05]), K=array([[446.04403687,   0.        , 259.        ],\n       [  0.        , 447.8364563 , 259.        ],\n       [  0.        ,   0.        ,   1.        ]])), FramePose(frame_index=1, R=array([[ 0.99971557,  0.02156056,  0.01019352],\n       [-0.02181857,  0.99942601,  0.02591597],\n       [-0.00962891, -0.026131  ,  0.99961215]]), t=array([-0.00401445,  0.01242888,  0.00403834]), K=array([[448.2053833 ,   0.        , 259.        ],\n       [  0.        , 449.62472534, 259.        ],\n       [  0.        ,   0.        ,   1.        ]])), FramePose(frame_index=2, R=array([[ 0.99770468,  0.06577377, -0.01609715],\n       [-0.0614969 ,  0.97962296,  0.19119878],\n       [ 0.028345  , -0.18976998,  0.98141932]]), t=array([-0.02813581,  0.03634437,  0.05619007]), K=array([[446.70446777,   0.        , 259.        ],\n       [  0.        , 447.44219971, 259.        ],\n       [  0.        ,   0.        ,   1.        ]]))], scale_is_metric=False, frame_points_local={0: array([[ 0.17690997, -0.39929458,  0.8998959 ],\n       [ 0.17890994, -0.39934194,  0.9001061 ],\n       [ 0.18091933, -0.39938897,  0.9003246 ],\n       ...,\n       [ 0.32458535,  0.36389312,  0.84254575],\n       [ 0.3256365 ,  0.3629357 ,  0.84029335],\n       [ 0.3266968 ,  0.3619523 ,  0.8379657 ]], dtype=float32), 1: array([[ 0.30031008, -0.36346805,  0.8273178 ],\n       [ 0.301547  , -0.3629154 ,  0.8263472 ],\n       [ 0.3028123 , -0.3623984 ,  0.8253674 ],\n       ...,\n       [ 0.31039885,  0.3668083 ,  0.8537389 ],\n       [ 0.31149754,  0.36591345,  0.85144496],\n       [ 0.312579  ,  0.3650036 ,  0.8491315 ]], dtype=float32), 2: array([[ 0.2880581 , -0.37951395,  0.9237024 ],\n       [ 0.2892935 , -0.3784379 ,  0.9212606 ],\n       [ 0.29052404, -0.37737304,  0.9188566 ],\n       ...,\n       [-0.23908205,  0.33768564,  0.7705004 ],\n       [-0.23749565,  0.33786654,  0.77109265],\n       [-0.23592563,  0.33806062,  0.7716999 ]], dtype=float32)}, frame_confidence_local={0: array([4.3772655, 4.430628 , 4.4615293, ..., 4.619027 , 4.6035676,\n       4.5108485], dtype=float32), 1: array([4.398059 , 4.480056 , 4.51647  , ..., 4.5341473, 4.496021 ,\n       4.4208555], dtype=float32), 2: array([4.3841047, 4.427742 , 4.430418 , ..., 4.434577 , 4.409774 ,\n       4.390336 ], dtype=float32)}, backbone_name='vggt', stats={'device': 'mps', 'image_size': 518, 'confidence_threshold': 4.3741, 'frames': 3}), scale_estimate=ScaleEstimate(scale_factor=4.295719061120186, ci_95=(3.00700334278413, 5.584434779456243), cues=[ScaleCue(name='metric_depth', fired=False, scale_factor=None, relative_sd=None, reason='disabled for this run', detail={}), ScaleCue(name='door_height', fired=False, scale_factor=None, relative_sd=None, reason='disabled for this run', detail={}), ScaleCue(name='ceiling_height', fired=True, scale_factor=4.295719061120186, relative_sd=0.12295081967213115, reason='floor-to-ceiling span 0.568 (scale-free) against a 2.44 m +- 0.3 m prior', detail={'span_scalefree': 0.568})], agreement=0.3, method='single_cue'), scale=4.295719061120186, frames=[Frame(index=0, path=PosixPath('/var/folders/br/c84z4s917xj3ch8_1ddgvjw40000gn/T/cozmo-video-frames-mq2w1u6o/rooms/room_2/frame_000990.jpg'), image=array([[[185, 179, 155],\n        [185, 179, 155],\n        [185, 179, 155],\n        ...,\n        [195, 179, 154],\n        [196, 180, 155],\n        [197, 181, 156]],\n\n       [[185, 179, 155],\n        [185, 179, 155],\n        [185, 179, 155],\n        ...,\n        [195, 179, 154],\n        [196, 180, 155],\n        [197, 181, 156]],\n\n       [[185, 179, 155],\n        [185, 179, 155],\n        [185, 179, 155],\n        ...,\n        [195, 179, 154],\n        [196, 180, 155],\n        [196, 180, 155]],\n\n       ...,\n\n       [[ 85,  71,  68],\n        [ 85,  71,  68],\n        [ 84,  70,  67],\n        ...,\n        [172, 147, 125],\n        [171, 146, 124],\n        [171, 146, 124]],\n\n       [[ 85,  71,  68],\n        [ 85,  71,  68],\n        [ 84,  70,  67],\n        ...,\n        [171, 146, 124],\n        [171, 146, 124],\n        [171, 146, 124]],\n\n       [[ 86,  72,  69],\n        [ 85,  71,  68],\n        [ 83,  69,  66],\n        ...,\n        [171, 146, 124],\n        [171, 146, 124],\n        [171, 146, 124]]], dtype=uint8), K=array([[1.50689815e+03, 0.00000000e+00, 9.60000000e+02],\n       [0.00000000e+00, 1.50689815e+03, 7.20000000e+02],\n       [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), intrinsics_source='fov_default', focal_length_mm=None), Frame(index=1, path=PosixPath('/var/folders/br/c84z4s917xj3ch8_1ddgvjw40000gn/T/cozmo-video-frames-mq2w1u6o/rooms/room_2/frame_001005.jpg'), image=array([[[184, 178, 154],\n        [183, 177, 153],\n        [182, 176, 152],\n        ...,\n        [202, 186, 161],\n        [202, 186, 161],\n        [202, 186, 161]],\n\n       [[183, 177, 153],\n        [183, 177, 153],\n        [182, 176, 152],\n        ...,\n        [202, 186, 161],\n        [202, 186, 161],\n        [202, 186, 161]],\n\n       [[183, 177, 153],\n        [182, 176, 152],\n        [182, 176, 152],\n        ...,\n        [202, 186, 161],\n        [202, 186, 161],\n        [201, 185, 160]],\n\n       ...,\n\n       [[ 70,  55,  52],\n        [ 70,  55,  52],\n        [ 71,  55,  55],\n        ...,\n        [167, 146, 127],\n        [168, 147, 128],\n        [168, 147, 128]],\n\n       [[ 70,  55,  52],\n        [ 70,  55,  52],\n        [ 71,  55,  55],\n        ...,\n        [167, 146, 127],\n        [167, 146, 127],\n        [167, 146, 127]],\n\n       [[ 70,  55,  52],\n        [ 70,  55,  52],\n        [ 70,  54,  54],\n        ...,\n        [167, 146, 127],\n        [167, 146, 127],\n        [167, 146, 127]]], dtype=uint8), K=array([[1.50689815e+03, 0.00000000e+00, 9.60000000e+02],\n       [0.00000000e+00, 1.50689815e+03, 7.20000000e+02],\n       [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), intrinsics_source='fov_default', focal_length_mm=None), Frame(index=2, path=PosixPath('/var/folders/br/c84z4s917xj3ch8_1ddgvjw40000gn/T/cozmo-video-frames-mq2w1u6o/rooms/room_2/frame_001035.jpg'), image=array([[[211, 197, 188],\n        [211, 197, 188],\n        [211, 197, 188],\n        ...,\n        [166, 151, 132],\n        [163, 150, 131],\n        [162, 149, 130]],\n\n       [[211, 197, 188],\n        [211, 197, 188],\n        [211, 197, 188],\n        ...,\n        [166, 151, 132],\n        [163, 150, 131],\n        [162, 149, 130]],\n\n       [[212, 198, 189],\n        [212, 198, 189],\n        [212, 198, 189],\n        ...,\n        [166, 151, 132],\n        [163, 150, 131],\n        [162, 149, 130]],\n\n       ...,\n\n       [[195, 179, 156],\n        [195, 179, 156],\n        [195, 179, 156],\n        ...,\n        [ 95,  76,  59],\n        [ 95,  76,  59],\n        [ 95,  76,  59]],\n\n       [[195, 179, 156],\n        [195, 179, 156],\n        [195, 179, 156],\n        ...,\n        [ 94,  75,  58],\n        [ 94,  75,  58],\n        [ 94,  75,  58]],\n\n       [[195, 179, 156],\n        [195, 179, 156],\n        [195, 179, 156],\n        ...,\n        [ 93,  74,  57],\n        [ 93,  74,  57],\n        [ 93,  74,  57]]], dtype=uint8), K=array([[1.50689815e+03, 0.00000000e+00, 9.60000000e+02],\n       [0.00000000e+00, 1.50689815e+03, 7.20000000e+02],\n       [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), intrinsics_source='fov_default', focal_length_mm=None)], detections=[], opening_consensus=[OpeningConsensus(wall_index=0, kind='window', width_m=2.168088211176218, height_m=0.9015265964627948, offset_along_wall_m=1.1705032985874764, sill_height_m=-0.040337398933195774, sources=['semantic'], confidence=0.41752467155456546, note='detector only; geometry did not find a hole here, so the extent comes from the projected mask and is looser than a measured one')], semantic_openings_available=True, semantic_opening_details={'detector': 'grounding-dino-tiny', 'device': 'mps', 'detections': 6}, timings={'load_frames_s': 0.018, 'reconstruct_s': 13.72, 'layout_s': 0.255, 'scale_s': 0.0, 'opening_detector_s': 6.408, 'openings_s': 6.42}, warnings=[], degradations=['scale cues disagree (agreement 0.30); the scale interval is widened accordingly, not narrowed by averaging over it', \"too few walls detected across the room's u, v axis; that boundary is padded from where the data happens to stop, not a measured wall -- treat this room's size and the walls on that axis as unverified, not just wide\"])",
+      "room_3": "RoomReconstruction(room_id='room_3', room=Room(id='room_3', name='Room 3', pose=Pose2D(x=0.0, y=0.0, theta_rad=-0.14722215869773464), walls=[Wall(id='room_3_w0', start=Point2D(x=1.4336, y=2.6468), end=Point2D(x=-1.246, y=2.6468), length=Measurement(value=2.6796, ci_95=(1.7809000000000001, 3.5783000000000005), unit=<Unit.METERS: 'm'>), height=Measurement(value=2.44, ci_95=(1.6216, 3.2584), unit=<Unit.METERS: 'm'>), thickness=None, is_exterior=None, opening_ids=['room_3_w0_op0'], observation_note='1 view(s), cross-view agreement 1.00, observed across 0% of its length'), Wall(id='room_3_w1', start=Point2D(x=-1.246, y=2.6468), end=Point2D(x=-1.246, y=4.3785), length=Measurement(value=1.7318, ci_95=(1.151, 2.3125999999999998), unit=<Unit.METERS: 'm'>), height=Measurement(value=2.44, ci_95=(1.6216, 3.2584), unit=<Unit.METERS: 'm'>), thickness=None, is_exterior=None, opening_ids=[], observation_note='1 view(s), cross-view agreement 1.00, observed across 0% of its length'), Wall(id='room_3_w2', start=Point2D(x=-1.246, y=4.3785), end=Point2D(x=1.4336, y=4.3785), length=Measurement(value=2.6796, ci_95=(1.7809000000000001, 3.5783000000000005), unit=<Unit.METERS: 'm'>), height=Measurement(value=2.44, ci_95=(1.6216, 3.2584), unit=<Unit.METERS: 'm'>), thickness=None, is_exterior=None, opening_ids=[], observation_note='1 view(s), cross-view agreement 0.50, observed across 0% of its length'), Wall(id='room_3_w3', start=Point2D(x=1.4336, y=4.3785), end=Point2D(x=1.4336, y=2.6468), length=Measurement(value=1.7318, ci_95=(1.151, 2.3125999999999998), unit=<Unit.METERS: 'm'>), height=Measurement(value=2.44, ci_95=(1.6216, 3.2584), unit=<Unit.METERS: 'm'>), thickness=None, is_exterior=None, opening_ids=[], observation_note='1 view(s), cross-view agreement 0.50, observed across 0% of its length')], openings=[Opening(id='room_3_w0_op0', wall_id='room_3_w0', type=<OpeningType.DOOR: 'door'>, width=Measurement(value=0.7379, ci_95=(0.4535, 1.0223), unit=<Unit.METERS: 'm'>), height=Measurement(value=1.7667, ci_95=(1.4823, 2.0511), unit=<Unit.METERS: 'm'>), offset_along_wall=Measurement(value=2.3992, ci_95=(2.1148, 2.6836), unit=<Unit.METERS: 'm'>), sill_height=None, connects_room_id=None, detection_confidence=0.296, detection_sources=['semantic'], source_note='detector only; geometry did not find a hole here, so the extent comes from the projected mask and is looser than a measured one')], surfaces=[Surface(id='room_3_w0_surface', room_id='room_3', kind=<SurfaceKind.WALL: 'wall'>, wall_id='room_3_w0', area=Measurement(value=6.5381, ci_95=(4.345154593446294, 8.731045406553706), unit=<Unit.SQUARE_METERS: 'm2'>)), Surface(id='room_3_w1_surface', room_id='room_3', kind=<SurfaceKind.WALL: 'wall'>, wall_id='room_3_w1', area=Measurement(value=4.2255, ci_95=(2.808224214161196, 5.642775785838804), unit=<Unit.SQUARE_METERS: 'm2'>)), Surface(id='room_3_w2_surface', room_id='room_3', kind=<SurfaceKind.WALL: 'wall'>, wall_id='room_3_w2', area=Measurement(value=6.5381, ci_95=(4.345154593446294, 8.731045406553706), unit=<Unit.SQUARE_METERS: 'm2'>)), Surface(id='room_3_w3_surface', room_id='room_3', kind=<SurfaceKind.WALL: 'wall'>, wall_id='room_3_w3', area=Measurement(value=4.2255, ci_95=(2.808224214161196, 5.642775785838804), unit=<Unit.SQUARE_METERS: 'm2'>)), Surface(id='room_3_floor', room_id='room_3', kind=<SurfaceKind.FLOOR: 'floor'>, wall_id=None, area=Measurement(value=4.6403, ci_95=(1.8526419474259397, 7.42795805257406), unit=<Unit.SQUARE_METERS: 'm2'>)), Surface(id='room_3_ceiling', room_id='room_3', kind=<SurfaceKind.CEILING: 'ceiling'>, wall_id=None, area=Measurement(value=4.6403, ci_95=(1.8526419474259397, 7.42795805257406), unit=<Unit.SQUARE_METERS: 'm2'>))], ceiling_height=Measurement(value=2.44, ci_95=(1.708, 3.1719999999999997), unit=<Unit.METERS: 'm'>), floor_area=Measurement(value=4.6403, ci_95=(1.8526419474259397, 7.42795805257406), unit=<Unit.SQUARE_METERS: 'm2'>), perimeter=Measurement(value=8.8226, ci_95=(5.863409999256553, 11.781790000743445), unit=<Unit.METERS: 'm'>), source_frame_count=2), layout=PhotoLayoutResult(frame=FloorFrame(origin=array([-0.01608121,  0.24958426,  0.03260332]), up=array([ 0.06375919, -0.98955795, -0.12926647]), e1=array([ 0.9871697 ,  0.08153902, -0.13728572]), e2=array([ 0.14639244, -0.11885471,  0.98206049]), rotation_rad=-0.14722215869773464), polygon=<POLYGON ((0.383 0.708, -0.333 0.708, -0.333 1.171, 0.383 1.171, 0.383 0.708))>, walls=[WallSegment(start=(0.38326018102397186, 0.7076091113907501), end=(-0.3331181968590865, 0.7076091113907501), length_m=0.7163783778830584, normal=(-0.0, -1.0), top_height_m=None, support_points=88257), WallSegment(start=(-0.3331181968590865, 0.7076091113907501), end=(-0.3331181968590865, 1.1705941060453502), length_m=0.4629849946546001, normal=(-1.0, 0.0), top_height_m=None, support_points=58303), WallSegment(start=(-0.3331181968590865, 1.1705941060453502), end=(0.38326018102397186, 1.1705941060453502), length_m=0.7163783778830584, normal=(-0.0, 1.0), top_height_m=0.0, support_points=0), WallSegment(start=(0.38326018102397186, 1.1705941060453502), end=(0.38326018102397186, 0.7076091113907501), length_m=0.4629849946546001, normal=(1.0, 0.0), top_height_m=None, support_points=0)], lines=[WallLine(axis=1, coord=1.1705941060453504, extent=(np.float64(-0.6498937520692174), np.float64(0.4295711934175519)), inliers=88257, top_height_m=0.0), WallLine(axis=1, coord=1.1705941060453504, extent=(np.float64(-0.7107393200485649), np.float64(0.3904399625824667)), inliers=58303, top_height_m=0.0)], floor_area_m2=0.33167243945485886, perimeter_m=2.358726745075317, manhattan_snap=True, rotation_deg=-8.435208344185419, stats={'manhattan_score': 0.6218, 'view_details': {0: {'views': [0], 'view_count': 1, 'agreement': 1.0}, 1: {'views': [1], 'view_count': 1, 'agreement': 1.0}}, 'cells_kept': 1, 'bounds_uv': [-1.211, 0.069, 0.931, 1.72], 'axis_fallback': [0, 1]}, layout_method='per_view_merge', view_plane_counts={'floor_views': 2, 'ceiling_views': 2, 'wall_clusters': 2, 'wall_lines': 2}, floor_to_ceiling_span=0.6523339913667071, wall_confidence={0: 1.0, 1: 1.0, 2: 0.5, 3: 0.5}), reconstruction=ReconstructionResult(points=array([[-0.49354517, -0.40477526,  0.85407937],\n       [-0.49792707, -0.40114033,  0.85160303],\n       [-0.49647713, -0.40171564,  0.85255456],\n       ...,\n       [ 0.25412226,  0.16312253,  1.0167084 ],\n       [ 0.25674522,  0.16348124,  1.0179925 ],\n       [ 0.259295  ,  0.16387081,  1.0192006 ]], dtype=float32), point_confidence=array([0.20501871, 0.20588858, 0.21256085, ..., 0.26025158, 0.2606304 ,\n       0.25946367], dtype=float32), point_frame_index=array([0, 0, 0, ..., 1, 1, 1], dtype=int32), poses=[FramePose(frame_index=0, R=array([[ 1.00000000e+00,  3.05567446e-05,  1.08186287e-04],\n       [-3.05453141e-05,  1.00000000e+00, -1.05668849e-04],\n       [-1.08189517e-04,  1.05665546e-04,  1.00000000e+00]]), t=array([ 3.53304895e-05, -1.97307691e-05,  8.60819709e-05]), K=array([[437.93591309,   0.        , 259.        ],\n       [  0.        , 437.70248413, 259.        ],\n       [  0.        ,   0.        ,   1.        ]])), FramePose(frame_index=1, R=array([[ 0.99434733, -0.10496669,  0.01597982],\n       [ 0.10596125,  0.97146297, -0.21220738],\n       [ 0.0067509 ,  0.21270107,  0.97709399]]), t=array([-0.00741121, -0.08806911,  0.00826552]), K=array([[431.13449097,   0.        , 259.        ],\n       [  0.        , 432.75769043, 259.        ],\n       [  0.        ,   0.        ,   1.        ]]))], scale_is_metric=False, frame_points_local={0: array([[-0.4936605 , -0.40468037,  0.8539827 ],\n       [-0.49804226, -0.40104586,  0.85150546],\n       [-0.4965924 , -0.401621  ,  0.8524572 ],\n       ...,\n       [-0.31815428,  0.3110637 ,  0.70568186],\n       [-0.31679106,  0.3113598 ,  0.7062556 ],\n       [-0.31544167,  0.3116459 ,  0.70682615]], dtype=float32), 1: array([[-0.31401816, -0.42076975,  0.8888855 ],\n       [-0.31214163, -0.42097372,  0.8893947 ],\n       [-0.31027752, -0.42117834,  0.889885  ],\n       ...,\n       [ 0.29347956,  0.43106794,  0.936218  ],\n       [ 0.2961344 ,  0.43141422,  0.93743855],\n       [ 0.2987192 ,  0.431782  ,  0.938577  ]], dtype=float32)}, frame_confidence_local={0: array([1.5470682, 1.5536323, 1.603981 , ..., 1.6007602, 1.5832479,\n       1.5572423], dtype=float32), 1: array([1.5970783, 1.6468678, 1.681019 , ..., 1.5549833, 1.5572467,\n       1.5502756], dtype=float32)}, backbone_name='vggt', stats={'device': 'mps', 'image_size': 518, 'confidence_threshold': 1.5438, 'frames': 2}), scale_estimate=ScaleEstimate(scale_factor=3.740415235588058, ci_95=(2.6182906649116404, 4.862539806264476), cues=[ScaleCue(name='metric_depth', fired=False, scale_factor=None, relative_sd=None, reason='disabled for this run', detail={}), ScaleCue(name='door_height', fired=False, scale_factor=None, relative_sd=None, reason='disabled for this run', detail={}), ScaleCue(name='ceiling_height', fired=True, scale_factor=3.740415235588058, relative_sd=0.12295081967213115, reason='floor-to-ceiling span 0.652 (scale-free) against a 2.44 m +- 0.3 m prior', detail={'span_scalefree': 0.6523})], agreement=0.3, method='single_cue'), scale=3.740415235588058, frames=[Frame(index=0, path=PosixPath('/var/folders/br/c84z4s917xj3ch8_1ddgvjw40000gn/T/cozmo-video-frames-mq2w1u6o/rooms/room_3/frame_001200.jpg'), image=array([[[169, 154, 133],\n        [169, 154, 133],\n        [169, 154, 133],\n        ...,\n        [122, 105,  89],\n        [122, 105,  89],\n        [122, 105,  89]],\n\n       [[167, 152, 131],\n        [167, 152, 131],\n        [167, 152, 131],\n        ...,\n        [123, 106,  90],\n        [122, 105,  89],\n        [123, 106,  90]],\n\n       [[165, 150, 129],\n        [165, 150, 129],\n        [165, 150, 129],\n        ...,\n        [124, 107,  91],\n        [123, 106,  90],\n        [123, 106,  90]],\n\n       ...,\n\n       [[142, 131, 113],\n        [142, 131, 113],\n        [142, 131, 113],\n        ...,\n        [233, 211, 187],\n        [233, 211, 187],\n        [233, 211, 187]],\n\n       [[142, 131, 113],\n        [142, 131, 113],\n        [142, 131, 113],\n        ...,\n        [233, 211, 187],\n        [233, 211, 187],\n        [233, 211, 187]],\n\n       [[143, 132, 114],\n        [143, 132, 114],\n        [142, 131, 113],\n        ...,\n        [233, 211, 187],\n        [233, 211, 187],\n        [233, 211, 187]]], dtype=uint8), K=array([[1.50689815e+03, 0.00000000e+00, 9.60000000e+02],\n       [0.00000000e+00, 1.50689815e+03, 7.20000000e+02],\n       [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), intrinsics_source='fov_default', focal_length_mm=None), Frame(index=1, path=PosixPath('/var/folders/br/c84z4s917xj3ch8_1ddgvjw40000gn/T/cozmo-video-frames-mq2w1u6o/rooms/room_3/frame_001215.jpg'), image=array([[[173, 158, 137],\n        [174, 159, 138],\n        [174, 159, 138],\n        ...,\n        [144, 127, 107],\n        [144, 127, 107],\n        [144, 127, 107]],\n\n       [[173, 158, 137],\n        [173, 158, 137],\n        [174, 159, 138],\n        ...,\n        [144, 127, 107],\n        [144, 127, 107],\n        [144, 127, 107]],\n\n       [[172, 157, 136],\n        [173, 158, 137],\n        [173, 158, 137],\n        ...,\n        [144, 127, 107],\n        [145, 128, 108],\n        [145, 128, 108]],\n\n       ...,\n\n       [[191, 176, 155],\n        [191, 176, 155],\n        [191, 176, 155],\n        ...,\n        [196, 184, 160],\n        [196, 184, 160],\n        [196, 184, 160]],\n\n       [[191, 176, 155],\n        [191, 176, 155],\n        [191, 176, 155],\n        ...,\n        [195, 183, 159],\n        [195, 183, 159],\n        [196, 184, 160]],\n\n       [[191, 176, 155],\n        [191, 176, 155],\n        [191, 176, 155],\n        ...,\n        [195, 183, 159],\n        [195, 183, 159],\n        [195, 183, 159]]], dtype=uint8), K=array([[1.50689815e+03, 0.00000000e+00, 9.60000000e+02],\n       [0.00000000e+00, 1.50689815e+03, 7.20000000e+02],\n       [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), intrinsics_source='fov_default', focal_length_mm=None)], detections=[], opening_consensus=[OpeningConsensus(wall_index=0, kind='door', width_m=0.7378807939705392, height_m=1.7667074974454657, offset_along_wall_m=2.399188138805014, sill_height_m=-0.218062114570617, sources=['semantic'], confidence=0.29583191871643066, note='detector only; geometry did not find a hole here, so the extent comes from the projected mask and is looser than a measured one')], semantic_openings_available=True, semantic_opening_details={'detector': 'grounding-dino-tiny', 'device': 'mps', 'detections': 2}, timings={'load_frames_s': 0.012, 'reconstruct_s': 12.949, 'layout_s': 0.165, 'scale_s': 0.0, 'opening_detector_s': 5.533, 'openings_s': 5.54}, warnings=[], degradations=['scale cues disagree (agreement 0.30); the scale interval is widened accordingly, not narrowed by averaging over it', \"too few walls detected across the room's u, v axis; that boundary is padded from where the data happens to stop, not a measured wall -- treat this room's size and the walls on that axis as unverified, not just wide\"])",
+      "room_4": "RoomReconstruction(room_id='room_4', room=Room(id='room_4', name='Room 4', pose=Pose2D(x=0.0, y=0.0, theta_rad=-0.7349960909100486), walls=[Wall(id='room_4_w0', start=Point2D(x=-0.4498, y=1.6527), end=Point2D(x=-8.7339, y=1.6527), length=Measurement(value=8.2842, ci_95=(5.6866, 10.8818), unit=<Unit.METERS: 'm'>), height=Measurement(value=2.44, ci_95=(1.6749, 3.2051), unit=<Unit.METERS: 'm'>), thickness=None, is_exterior=None, opening_ids=[], observation_note='3 view(s), cross-view agreement 0.59, observed across 0% of its length'), Wall(id='room_4_w1', start=Point2D(x=-8.7339, y=1.6527), end=Point2D(x=-8.7339, y=4.4946), length=Measurement(value=2.8419, ci_95=(1.8886999999999998, 3.7950999999999997), unit=<Unit.METERS: 'm'>), height=Measurement(value=2.44, ci_95=(1.6216, 3.2584), unit=<Unit.METERS: 'm'>), thickness=None, is_exterior=None, opening_ids=['room_4_w1_op0'], observation_note='1 view(s), cross-view agreement 0.50, observed across 0% of its length'), Wall(id='room_4_w2', start=Point2D(x=-8.7339, y=4.4946), end=Point2D(x=-0.4498, y=4.4946), length=Measurement(value=8.2842, ci_95=(5.5056, 11.0628), unit=<Unit.METERS: 'm'>), height=Measurement(value=2.44, ci_95=(1.6216, 3.2584), unit=<Unit.METERS: 'm'>), thickness=None, is_exterior=None, opening_ids=[], observation_note='1 view(s), cross-view agreement 0.50, observed across 0% of its length'), Wall(id='room_4_w3', start=Point2D(x=-0.4498, y=4.4946), end=Point2D(x=-0.4498, y=1.6527), length=Measurement(value=2.8419, ci_95=(1.8886999999999998, 3.7950999999999997), unit=<Unit.METERS: 'm'>), height=Measurement(value=2.44, ci_95=(1.6216, 3.2584), unit=<Unit.METERS: 'm'>), thickness=None, is_exterior=None, opening_ids=[], observation_note='1 view(s), cross-view agreement 0.50, observed across 0% of its length')], openings=[Opening(id='room_4_w1_op0', wall_id='room_4_w1', type=<OpeningType.WINDOW: 'window'>, width=Measurement(value=2.5696, ci_95=(1.5793, 3.5599), unit=<Unit.METERS: 'm'>), height=Measurement(value=1.128, ci_95=(0.13769999999999993, 2.1182999999999996), unit=<Unit.METERS: 'm'>), offset_along_wall=Measurement(value=0.7603, ci_95=(-0.22999999999999998, 1.7506), unit=<Unit.METERS: 'm'>), sill_height=Measurement(value=1.6257, ci_95=(0.6354, 2.6159999999999997), unit=<Unit.METERS: 'm'>), connects_room_id=None, detection_confidence=0.365, detection_sources=['semantic'], source_note='detector only; geometry did not find a hole here, so the extent comes from the projected mask and is looser than a measured one')], surfaces=[Surface(id='room_4_w0_surface', room_id='room_4', kind=<SurfaceKind.WALL: 'wall'>, wall_id='room_4_w0', area=Measurement(value=20.2134, ci_95=(13.875364736545091, 26.55143526345491), unit=<Unit.SQUARE_METERS: 'm2'>)), Surface(id='room_4_w1_surface', room_id='room_4', kind=<SurfaceKind.WALL: 'wall'>, wall_id='room_4_w1', area=Measurement(value=6.9341, ci_95=(4.608332155582806, 9.259867844417194), unit=<Unit.SQUARE_METERS: 'm2'>)), Surface(id='room_4_w2_surface', room_id='room_4', kind=<SurfaceKind.WALL: 'wall'>, wall_id='room_4_w2', area=Measurement(value=20.2134, ci_95=(13.433619531540863, 26.993180468459137), unit=<Unit.SQUARE_METERS: 'm2'>)), Surface(id='room_4_w3_surface', room_id='room_4', kind=<SurfaceKind.WALL: 'wall'>, wall_id='room_4_w3', area=Measurement(value=6.9341, ci_95=(4.608332155582806, 9.259867844417194), unit=<Unit.SQUARE_METERS: 'm2'>)), Surface(id='room_4_floor', room_id='room_4', kind=<SurfaceKind.FLOOR: 'floor'>, wall_id=None, area=Measurement(value=23.5425, ci_95=(9.399354146773955, 37.68564585322605), unit=<Unit.SQUARE_METERS: 'm2'>)), Surface(id='room_4_ceiling', room_id='room_4', kind=<SurfaceKind.CEILING: 'ceiling'>, wall_id=None, area=Measurement(value=23.5425, ci_95=(9.399354146773955, 37.68564585322605), unit=<Unit.SQUARE_METERS: 'm2'>))], ceiling_height=Measurement(value=2.44, ci_95=(1.708, 3.1719999999999997), unit=<Unit.METERS: 'm'>), floor_area=Measurement(value=23.5425, ci_95=(9.399354146773955, 37.68564585322605), unit=<Unit.SQUARE_METERS: 'm2'>), perimeter=Measurement(value=22.2521, ci_95=(14.788518763681537, 29.71568123631846), unit=<Unit.METERS: 'm'>), source_frame_count=3), layout=PhotoLayoutResult(frame=FloorFrame(origin=array([ 1.53301286e-03,  6.03504937e-02, -5.34687974e-05]), up=array([-2.53936267e-02, -9.99677138e-01,  8.85685122e-04]), e1=array([ 0.74159416, -0.01943195, -0.6705673 ]), e2=array([ 0.67036801, -0.01637132,  0.74184817]), rotation_rad=-0.7349960909100486), polygon=<POLYGON ((-0.058 0.212, -1.122 0.212, -1.122 0.577, -0.058 0.577, -0.058 0....>, walls=[WallSegment(start=(-0.05775187534287751, 0.2122196396006506), end=(-1.121500815819604, 0.2122196396006506), length_m=1.0637489404767266, normal=(-0.0, -1.0), top_height_m=None, support_points=318715), WallSegment(start=(-1.121500815819604, 0.2122196396006506), end=(-1.121500815819604, 0.577135699127345), length_m=0.36491605952669437, normal=(-1.0, 0.0), top_height_m=None, support_points=0), WallSegment(start=(-1.121500815819604, 0.577135699127345), end=(-0.05775187534287751, 0.577135699127345), length_m=1.0637489404767266, normal=(-0.0, 1.0), top_height_m=0.0, support_points=0), WallSegment(start=(-0.05775187534287751, 0.577135699127345), end=(-0.05775187534287751, 0.2122196396006506), length_m=0.36491605952669437, normal=(1.0, 0.0), top_height_m=None, support_points=0)], lines=[WallLine(axis=1, coord=0.577135699127345, extent=(np.float64(-1.2748361053841462), np.float64(-0.08548875429405636)), inliers=318715, top_height_m=0.0)], floor_area_m2=0.38817907168446325, perimeter_m=2.857330000006842, manhattan_snap=True, rotation_deg=-42.11217396775955, stats={'manhattan_score': 1.0, 'view_details': {0: {'views': [0, 1, 2], 'view_count': 3, 'agreement': 0.588}}, 'cells_kept': 1, 'bounds_uv': [-1.775, -0.379, 0.442, 1.113], 'axis_fallback': [0, 1]}, layout_method='per_view_merge', view_plane_counts={'floor_views': 3, 'ceiling_views': 3, 'wall_clusters': 1, 'wall_lines': 1}, floor_to_ceiling_span=0.31331392224374094, wall_confidence={0: 0.588, 1: 0.5, 2: 0.5, 3: 0.5}), reconstruction=ReconstructionResult(points=array([[-9.1183186e-04, -1.3132703e-01,  3.0577004e-01],\n       [-1.5175343e-04, -1.3131142e-01,  3.0584478e-01],\n       [ 5.9962273e-04, -1.3130057e-01,  3.0594945e-01],\n       ...,\n       [-6.3292181e-01,  5.2723885e-02,  9.4396710e-01],\n       [-6.3315964e-01,  5.3903222e-02,  9.4405282e-01],\n       [-6.3339150e-01,  5.5113554e-02,  9.4426501e-01]], dtype=float32), point_confidence=array([0.6357225 , 0.63934934, 0.6435712 , ..., 0.76841974, 0.7616113 ,\n       0.7517993 ], dtype=float32), point_frame_index=array([0, 0, 0, ..., 2, 2, 2], dtype=int32), poses=[FramePose(frame_index=0, R=array([[ 9.99999881e-01,  1.84267512e-04,  3.87806067e-04],\n       [-1.84259450e-04,  1.00000000e+00, -2.08389083e-05],\n       [-3.87809909e-04,  2.07674493e-05,  9.99999940e-01]]), t=array([ 1.27888910e-04, -8.18249464e-05,  3.91378780e-05]), K=array([[480.78961182,   0.        , 259.        ],\n       [  0.        , 481.30499268, 259.        ],\n       [  0.        ,   0.        ,   1.        ]])), FramePose(frame_index=1, R=array([[ 0.99241859,  0.08972725,  0.08399014],\n       [-0.09026939,  0.9959138 ,  0.00267186],\n       [-0.08340719, -0.01023334,  0.996463  ]]), t=array([-0.43908226, -0.09824038,  0.5903728 ]), K=array([[464.84100342,   0.        , 259.        ],\n       [  0.        , 463.93014526, 259.        ],\n       [  0.        ,   0.        ,   1.        ]])), FramePose(frame_index=2, R=array([[ 0.99688703,  0.07872334,  0.00434298],\n       [-0.07871287,  0.99689412, -0.0025318 ],\n       [-0.0045288 ,  0.00218207,  0.99998736]]), t=array([-0.41423461, -0.10731827,  0.58949906]), K=array([[459.43130493,   0.        , 259.        ],\n       [  0.        , 459.33648682, 259.        ],\n       [  0.        ,   0.        ,   1.        ]]))], scale_is_metric=False, frame_points_local={0: array([[-0.0011341 , -0.13123906,  0.30573323],\n       [-0.00037406, -0.13122329,  0.30580828],\n       [ 0.00037728, -0.13121231,  0.3059132 ],\n       ...,\n       [-0.07205024,  0.10244541,  0.24220487],\n       [-0.07150588,  0.10237923,  0.2421301 ],\n       [-0.07097083,  0.10230959,  0.2420682 ]], dtype=float32), 1: array([[ 0.04398338, -0.18301085,  0.45673695],\n       [ 0.04464193, -0.18253319,  0.45522118],\n       [ 0.04528482, -0.1820293 ,  0.4536254 ],\n       ...,\n       [-0.00435043,  0.21522678,  0.5233988 ],\n       [-0.00339877,  0.21535672,  0.5241136 ],\n       [-0.23596564,  0.14485118,  0.36126772]], dtype=float32), 2: array([[ 0.03489462, -0.168692  ,  0.3936511 ],\n       [ 0.03591296, -0.16872041,  0.39365065],\n       [ 0.03699206, -0.16878802,  0.39374974],\n       ...,\n       [-0.23220913,  0.14310278,  0.3531086 ],\n       [-0.23253943,  0.14425993,  0.3531903 ],\n       [-0.2328668 ,  0.14544871,  0.35339844]], dtype=float32)}, frame_confidence_local={0: array([1.5285497, 1.5372701, 1.5474212, ..., 1.5473554, 1.5448228,\n       1.5371656], dtype=float32), 1: array([1.5308888, 1.5344106, 1.5356308, ..., 1.5363224, 1.5320871,\n       1.5386409], dtype=float32), 2: array([1.531186 , 1.539248 , 1.5472775, ..., 1.5662436, 1.5523661,\n       1.5323668], dtype=float32)}, backbone_name='vggt', stats={'device': 'mps', 'image_size': 518, 'confidence_threshold': 1.5267, 'frames': 3}), scale_estimate=ScaleEstimate(scale_factor=7.78771649381675, ci_95=(5.451401545671724, 10.124031441961774), cues=[ScaleCue(name='metric_depth', fired=False, scale_factor=None, relative_sd=None, reason='disabled for this run', detail={}), ScaleCue(name='door_height', fired=False, scale_factor=None, relative_sd=None, reason='disabled for this run', detail={}), ScaleCue(name='ceiling_height', fired=True, scale_factor=7.78771649381675, relative_sd=0.12295081967213115, reason='floor-to-ceiling span 0.313 (scale-free) against a 2.44 m +- 0.3 m prior', detail={'span_scalefree': 0.3133})], agreement=0.3, method='single_cue'), scale=7.78771649381675, frames=[Frame(index=0, path=PosixPath('/var/folders/br/c84z4s917xj3ch8_1ddgvjw40000gn/T/cozmo-video-frames-mq2w1u6o/rooms/room_4/frame_001500.jpg'), image=array([[[111,  90,  71],\n        [110,  89,  70],\n        [110,  89,  70],\n        ...,\n        [218, 206, 192],\n        [215, 203, 189],\n        [217, 205, 191]],\n\n       [[111,  90,  71],\n        [111,  90,  71],\n        [111,  90,  71],\n        ...,\n        [218, 206, 192],\n        [215, 203, 189],\n        [217, 205, 191]],\n\n       [[111,  90,  71],\n        [111,  90,  71],\n        [111,  90,  71],\n        ...,\n        [218, 206, 192],\n        [215, 203, 189],\n        [217, 205, 191]],\n\n       ...,\n\n       [[232, 225, 215],\n        [232, 225, 215],\n        [232, 225, 215],\n        ...,\n        [181, 169, 155],\n        [181, 169, 155],\n        [180, 168, 154]],\n\n       [[232, 225, 215],\n        [232, 225, 215],\n        [232, 225, 215],\n        ...,\n        [181, 169, 155],\n        [180, 168, 154],\n        [178, 166, 152]],\n\n       [[232, 225, 215],\n        [232, 225, 215],\n        [232, 225, 215],\n        ...,\n        [182, 170, 156],\n        [180, 168, 154],\n        [178, 166, 152]]], dtype=uint8), K=array([[1.50689815e+03, 0.00000000e+00, 9.60000000e+02],\n       [0.00000000e+00, 1.50689815e+03, 7.20000000e+02],\n       [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), intrinsics_source='fov_default', focal_length_mm=None), Frame(index=1, path=PosixPath('/var/folders/br/c84z4s917xj3ch8_1ddgvjw40000gn/T/cozmo-video-frames-mq2w1u6o/rooms/room_4/frame_001695.jpg'), image=array([[[  6,   5,   3],\n        [  6,   5,   3],\n        [  6,   5,   3],\n        ...,\n        [204, 191, 175],\n        [203, 190, 174],\n        [202, 189, 173]],\n\n       [[  6,   5,   3],\n        [  6,   5,   3],\n        [  6,   5,   3],\n        ...,\n        [203, 190, 174],\n        [202, 189, 173],\n        [202, 189, 173]],\n\n       [[  6,   5,   3],\n        [  6,   5,   3],\n        [  6,   5,   3],\n        ...,\n        [202, 189, 173],\n        [201, 188, 172],\n        [201, 188, 172]],\n\n       ...,\n\n       [[201, 194, 178],\n        [201, 194, 178],\n        [200, 193, 177],\n        ...,\n        [142, 129, 112],\n        [142, 129, 112],\n        [142, 129, 112]],\n\n       [[202, 193, 178],\n        [201, 192, 177],\n        [199, 190, 175],\n        ...,\n        [142, 129, 112],\n        [142, 129, 112],\n        [142, 129, 112]],\n\n       [[200, 191, 176],\n        [199, 190, 175],\n        [198, 189, 174],\n        ...,\n        [142, 129, 112],\n        [142, 129, 112],\n        [142, 129, 112]]], dtype=uint8), K=array([[1.50689815e+03, 0.00000000e+00, 9.60000000e+02],\n       [0.00000000e+00, 1.50689815e+03, 7.20000000e+02],\n       [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), intrinsics_source='fov_default', focal_length_mm=None), Frame(index=2, path=PosixPath('/var/folders/br/c84z4s917xj3ch8_1ddgvjw40000gn/T/cozmo-video-frames-mq2w1u6o/rooms/room_4/frame_001710.jpg'), image=array([[[  6,   5,   3],\n        [  6,   5,   3],\n        [  6,   5,   3],\n        ...,\n        [197, 184, 168],\n        [197, 184, 168],\n        [198, 185, 169]],\n\n       [[  6,   5,   3],\n        [  6,   5,   3],\n        [  6,   5,   3],\n        ...,\n        [197, 184, 168],\n        [198, 185, 169],\n        [199, 186, 170]],\n\n       [[  6,   5,   3],\n        [  6,   5,   3],\n        [  6,   5,   3],\n        ...,\n        [198, 185, 169],\n        [199, 186, 170],\n        [200, 187, 171]],\n\n       ...,\n\n       [[202, 195, 179],\n        [202, 195, 179],\n        [202, 195, 179],\n        ...,\n        [172, 159, 142],\n        [172, 159, 142],\n        [172, 159, 142]],\n\n       [[202, 195, 179],\n        [202, 195, 179],\n        [202, 195, 179],\n        ...,\n        [172, 159, 142],\n        [172, 159, 142],\n        [172, 159, 142]],\n\n       [[202, 195, 179],\n        [202, 195, 179],\n        [203, 196, 180],\n        ...,\n        [172, 159, 142],\n        [172, 159, 142],\n        [172, 159, 142]]], dtype=uint8), K=array([[1.50689815e+03, 0.00000000e+00, 9.60000000e+02],\n       [0.00000000e+00, 1.50689815e+03, 7.20000000e+02],\n       [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), intrinsics_source='fov_default', focal_length_mm=None)], detections=[], opening_consensus=[OpeningConsensus(wall_index=1, kind='window', width_m=2.569588530196396, height_m=1.1280167106041392, offset_along_wall_m=0.7602956034299955, sill_height_m=1.6257224675501485, sources=['semantic'], confidence=0.36451447010040283, note='detector only; geometry did not find a hole here, so the extent comes from the projected mask and is looser than a measured one')], semantic_openings_available=True, semantic_opening_details={'detector': 'grounding-dino-tiny', 'device': 'mps', 'detections': 7}, timings={'load_frames_s': 0.019, 'reconstruct_s': 14.348, 'layout_s': 0.258, 'scale_s': 0.0, 'opening_detector_s': 6.358, 'openings_s': 6.369}, warnings=[], degradations=['scale cues disagree (agreement 0.30); the scale interval is widened accordingly, not narrowed by averaging over it', \"too few walls detected across the room's u, v axis; that boundary is padded from where the data happens to stop, not a measured wall -- treat this room's size and the walls on that axis as unverified, not just wide\"])"
+    },
+    "video_sampling": {
+      "stride_frames": 15,
+      "blur_threshold": 15.0,
+      "max_frames": 8,
+      "source_video": "captures/apartment_video/rgb.mp4",
+      "total_video_frames": 1715,
+      "frames_at_stride": 115,
+      "frames_kept_after_blur_filter": 10,
+      "frames_dropped_for_blur": 105,
+      "frames_used": 10,
+      "capped_to_max_frames": false,
+      "sharpness_scores": [
+        23.6,
+        16.3,
+        15.7,
+        33.9,
+        17.4,
+        19.1,
+        17.8,
+        15.9,
+        24.8,
+        28.2
+      ],
+      "pool_max_frames": 48,
+      "pool_frames_sampled": 10,
+      "rooms_found": 4,
+      "room_frame_indices": {
+        "room_1": [
+          15,
+          30
+        ],
+        "room_2": [
+          990,
+          1005,
+          1035
+        ],
+        "room_3": [
+          1200,
+          1215
+        ],
+        "room_4": [
+          1500,
+          1695,
+          1710
+        ]
+      },
+      "segmented_by": "dinov2_consecutive_similarity"
+    }
+  },
+  "reconstruction_settings": {
+    "backbone": "vggt",
+    "weights_dir": null,
+    "video_stride": 15,
+    "video_blur_threshold": 15.0,
+    "video_max_frames": 8
+  },
+  "calibration": {
+    "loaded": false,
+    "path": "calibration/calibration.json",
+    "calibration_version": null,
+    "fitted_at": null
+  },
+  "environment": {
+    "python": "3.9.6",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "source_date_epoch": "1756728000"
+  },
+  "started_at": "2026-09-11T20:57:51.941997+00:00",
+  "duration_s": 87.1008
+}

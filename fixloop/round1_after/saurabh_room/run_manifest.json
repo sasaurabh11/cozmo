@@ -1,0 +1,275 @@
+{
+  "pipeline_version": "0.4.0-video-calibration",
+  "schema_version": "1.3.0",
+  "package_version": "0.1.0",
+  "git": {
+    "commit": "4991fac6ffa2c3cbd0a56c87f777d809504f011f",
+    "branch": "main",
+    "describe": "4991fac-dirty",
+    "dirty": true
+  },
+  "command": "cozmo run --input captures/saurabh_room --out fixloop/round1_after/saurabh_room --quiet --backbone vggt --no-semantics",
+  "argv": [
+    "cozmo",
+    "run",
+    "--input",
+    "captures/saurabh_room",
+    "--out",
+    "fixloop/round1_after/saurabh_room",
+    "--quiet",
+    "--backbone",
+    "vggt",
+    "--no-semantics"
+  ],
+  "seed": {
+    "seed": 20260908,
+    "seeded": [
+      "random",
+      "numpy",
+      "open3d",
+      "torch"
+    ],
+    "unavailable": []
+  },
+  "options": {
+    "drift_correction": true,
+    "ignore_calibration": false
+  },
+  "input": {
+    "path": "/Users/saurabh/Documents/Cozmo/captures/saurabh_room",
+    "sha256": "911381d203835cfbd7020f5ad5c39edde8aeb2d83aa6023f870ab04ba66db3b0",
+    "file_count": 9,
+    "total_bytes": 28932648
+  },
+  "capture": {
+    "capture_id": "living_room_photos_02",
+    "space_id": "apartment_room_b",
+    "tier": "photo",
+    "device": {
+      "model": "Oneplus nord 2T",
+      "os_version": null,
+      "has_lidar": false
+    },
+    "rooms": [
+      "living_room"
+    ],
+    "payload": {
+      "layout": "rooms/<room>/*",
+      "room_count": 1,
+      "image_count": 8,
+      "photos_per_room": {
+        "living_room": 8
+      },
+      "warnings": []
+    },
+    "warnings": []
+  },
+  "outputs": {
+    "plan.json": "6d847d30f14450534e63beabfa6c93bbf970e8378851a31961e6a7b86d35ff16",
+    "plan.png": "61db2f2fc275a346cff185e7cc1d1a540dde6fd874d243d453ca92d20b23fc81",
+    "plan.svg": "c0584d9763e647ce7affeb8ee60ee0b5a24b1a4171701cf33704bfeb89e345df"
+  },
+  "reconstruction": {
+    "backbone": "vggt",
+    "reconstruction_stats": {
+      "device": "mps",
+      "image_size": 518,
+      "confidence_threshold": 1.1784,
+      "frames": 8
+    },
+    "layout": {
+      "manhattan_score": 0.5349,
+      "view_details": {
+        "0": {
+          "views": [
+            0,
+            1
+          ],
+          "view_count": 2,
+          "agreement": 0.443
+        },
+        "1": {
+          "views": [
+            3,
+            4
+          ],
+          "view_count": 2,
+          "agreement": 0.703
+        },
+        "2": {
+          "views": [
+            5
+          ],
+          "view_count": 1,
+          "agreement": 1.0
+        },
+        "3": {
+          "views": [
+            7
+          ],
+          "view_count": 1,
+          "agreement": 1.0
+        }
+      },
+      "cells_kept": 1,
+      "bounds_uv": [
+        -1.108,
+        -0.659,
+        1.496,
+        2.219
+      ],
+      "axis_fallback": []
+    },
+    "layout_method": "per_view_merge",
+    "view_plane_counts": {
+      "floor_views": 8,
+      "ceiling_views": 8,
+      "wall_clusters": 4,
+      "wall_lines": 4
+    },
+    "scale": {
+      "scale_factor": 2.82411,
+      "ci_95": [
+        1.97688,
+        3.67135
+      ],
+      "agreement": 0.3,
+      "method": "single_cue",
+      "cues": [
+        {
+          "name": "metric_depth",
+          "fired": false,
+          "scale_factor": null,
+          "relative_sd": null,
+          "reason": "disabled for this run",
+          "detail": {}
+        },
+        {
+          "name": "door_height",
+          "fired": false,
+          "scale_factor": null,
+          "relative_sd": null,
+          "reason": "disabled for this run",
+          "detail": {}
+        },
+        {
+          "name": "ceiling_height",
+          "fired": true,
+          "scale_factor": 2.82411,
+          "relative_sd": 0.123,
+          "reason": "floor-to-ceiling span 0.864 (scale-free) against a 2.44 m +- 0.3 m prior",
+          "detail": {
+            "span_scalefree": 0.864
+          }
+        }
+      ]
+    },
+    "frames": {
+      "frame_count": 8,
+      "intrinsics_sources": [
+        "fov_default_no_sensor_width",
+        "fov_default_no_sensor_width",
+        "fov_default_no_sensor_width",
+        "fov_default_no_sensor_width",
+        "fov_default_no_sensor_width",
+        "fov_default_no_sensor_width",
+        "fov_default_no_sensor_width",
+        "fov_default_no_sensor_width"
+      ],
+      "focal_px": [
+        3214.7,
+        3214.7,
+        3214.7,
+        2561.7,
+        3214.7,
+        3214.7,
+        3214.7,
+        2561.7
+      ],
+      "sizes": [
+        [
+          4096,
+          3072
+        ],
+        [
+          4096,
+          3072
+        ],
+        [
+          4096,
+          3072
+        ],
+        [
+          3264,
+          2448
+        ],
+        [
+          4096,
+          3072
+        ],
+        [
+          4096,
+          3072
+        ],
+        [
+          4096,
+          3072
+        ],
+        [
+          3264,
+          2448
+        ]
+      ]
+    },
+    "openings": [
+      {
+        "wall_index": 1,
+        "kind": "door",
+        "width_m": 0.617,
+        "confidence": 0.526729154586792,
+        "sources": [
+          "semantic"
+        ]
+      },
+      {
+        "wall_index": 3,
+        "kind": "window",
+        "width_m": 0.451,
+        "confidence": 0.5674962997436523,
+        "sources": [
+          "semantic"
+        ]
+      }
+    ],
+    "opening_detector": {
+      "detector": "grounding-dino-tiny",
+      "device": "mps",
+      "detections": 24
+    },
+    "timings_s": {
+      "load_frames_s": 0.278,
+      "reconstruct_s": 27.211,
+      "layout_s": 0.835,
+      "scale_s": 0.0,
+      "opening_detector_s": 10.776,
+      "openings_s": 10.811
+    }
+  },
+  "reconstruction_settings": {
+    "backbone": "vggt",
+    "weights_dir": null
+  },
+  "calibration": {
+    "loaded": false,
+    "path": "calibration/calibration.json",
+    "calibration_version": null,
+    "fitted_at": null
+  },
+  "environment": {
+    "python": "3.9.6",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "source_date_epoch": "1756728000"
+  },
+  "started_at": "2026-09-11T20:53:27.498964+00:00",
+  "duration_s": 40.08
+}

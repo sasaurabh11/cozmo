@@ -1,0 +1,143 @@
+GATE                       SCOPE                           TIER   MEASURED                                                       GATE THRESHOLD                                                   STATUS
+-------------------------  ------------------------------  -----  -------------------------------------------------------------  ---------------------------------------------------------------  ------
+wall_lengths               apartment_lidar_01              lidar  no wall ground truth                                           -                                                                SKIP
+ceiling_height             apartment_lidar_01              lidar  no ceiling ground truth                                        -                                                                SKIP
+opening_widths             apartment_lidar_01              lidar  no opening ground truth                                        -                                                                SKIP
+footprint                  apartment_lidar_01              lidar  no footprint ground truth                                      -                                                                SKIP
+interval_coverage          apartment_lidar_01              lidar  nothing to check                                               -                                                                SKIP
+room_overlap               apartment_lidar_01              lidar  single room                                                    -                                                                SKIP
+drift_accountability       apartment_lidar_01              lidar  method=loop_closure; footprint on=17.82 m2, off=16.70 m2       named correction + on/off footprint ablation; poses_as_is fails  PASS
+adjacency_correctness      apartment_lidar_01              lidar  no adjacency ground truth                                      -                                                                SKIP
+wall_lengths               scan_floor_only                 lidar  no wall ground truth                                           -                                                                SKIP
+ceiling_height             scan_floor_only                 lidar  no ceiling ground truth                                        -                                                                SKIP
+opening_widths             scan_floor_only                 lidar  no opening ground truth                                        -                                                                SKIP
+footprint                  scan_floor_only                 lidar  no footprint ground truth                                      -                                                                SKIP
+interval_coverage          scan_floor_only                 lidar  nothing to check                                               -                                                                SKIP
+room_overlap               scan_floor_only                 lidar  single room                                                    -                                                                SKIP
+drift_accountability       scan_floor_only                 lidar  method=loop_closure; footprint on=51.33 m2, off=62.24 m2       named correction + on/off footprint ablation; poses_as_is fails  PASS
+adjacency_correctness      scan_floor_only                 lidar  no adjacency ground truth                                      -                                                                SKIP
+wall_lengths               scan_with_ceiling               lidar  no wall ground truth                                           -                                                                SKIP
+ceiling_height             scan_with_ceiling               lidar  no ceiling ground truth                                        -                                                                SKIP
+opening_widths             scan_with_ceiling               lidar  no opening ground truth                                        -                                                                SKIP
+footprint                  scan_with_ceiling               lidar  no footprint ground truth                                      -                                                                SKIP
+interval_coverage          scan_with_ceiling               lidar  nothing to check                                               -                                                                SKIP
+room_overlap               scan_with_ceiling               lidar  single room                                                    -                                                                SKIP
+drift_accountability       scan_with_ceiling               lidar  method=loop_closure; footprint on=39.01 m2, off=42.71 m2       named correction + on/off footprint ablation; poses_as_is fails  PASS
+adjacency_correctness      scan_with_ceiling               lidar  no adjacency ground truth                                      -                                                                SKIP
+wall_lengths               synthetic_no_ceiling            lidar  4/4 within tol (100.0%), worst 0.1 cm                          <= max(2.0 cm, 1.0%) on >= 85.0%                                 PASS
+ceiling_height             synthetic_no_ceiling            lidar  worst 0.5 cm (test_room), 1 room(s)                            <= 1.5 cm every room                                             PASS
+opening_widths             synthetic_no_ceiling            lidar  2/2 (100.0%); 0 missed, 0 phantom                              <= 2 cm on >= 85.0% incl. detection                              PASS
+footprint                  synthetic_no_ceiling            lidar  10.08 m2 vs 10.08 m2 (0.0%)                                    within +-2.0%                                                    PASS
+interval_coverage          synthetic_no_ceiling            lidar  9/9 covered (100.0%), mean +-14.6 cm                           >= 90.0% of 95% intervals                                        PASS
+room_overlap               synthetic_no_ceiling            lidar  single room                                                    -                                                                SKIP
+drift_accountability       synthetic_no_ceiling            lidar  method=pose_graph; footprint on=10.08 m2, off=13.41 m2         named correction + on/off footprint ablation; poses_as_is fails  PASS
+adjacency_correctness      synthetic_no_ceiling            lidar  no adjacency ground truth                                      -                                                                SKIP
+wall_lengths               synthetic_room                  lidar  4/4 within tol (100.0%), worst 0.1 cm                          <= max(2.0 cm, 1.0%) on >= 85.0%                                 PASS
+ceiling_height             synthetic_room                  lidar  worst 0.4 cm (test_room), 1 room(s)                            <= 1.5 cm every room                                             PASS
+opening_widths             synthetic_room                  lidar  2/2 (100.0%); 0 missed, 0 phantom                              <= 2 cm on >= 85.0% incl. detection                              PASS
+footprint                  synthetic_room                  lidar  10.08 m2 vs 10.08 m2 (0.0%)                                    within +-2.0%                                                    PASS
+interval_coverage          synthetic_room                  lidar  9/9 covered (100.0%), mean +-12.7 cm                           >= 90.0% of 95% intervals                                        PASS
+room_overlap               synthetic_room                  lidar  single room                                                    -                                                                SKIP
+drift_accountability       synthetic_room                  lidar  method=pose_graph; footprint on=10.08 m2, off=13.41 m2         named correction + on/off footprint ablation; poses_as_is fails  PASS
+adjacency_correctness      synthetic_room                  lidar  no adjacency ground truth                                      -                                                                SKIP
+wall_lengths               demo_fourroom                   photo  no wall ground truth                                           -                                                                SKIP
+ceiling_height             demo_fourroom                   photo  no ceiling ground truth                                        -                                                                SKIP
+opening_widths             demo_fourroom                   photo  no opening ground truth                                        -                                                                SKIP
+footprint                  demo_fourroom                   photo  no footprint ground truth                                      -                                                                SKIP
+interval_coverage          demo_fourroom                   photo  nothing to check                                               -                                                                SKIP
+room_overlap               demo_fourroom                   photo  no overlap above 0.02 m2 across 2 room(s)                      <= 0.02 m2 for every room pair                                   PASS
+drift_accountability       demo_fourroom                   photo  method=plane_anchored; footprint on=53.93 m2, off=41.17 m2     named correction + on/off footprint ablation; poses_as_is fails  PASS
+adjacency_correctness      demo_fourroom                   photo  no adjacency ground truth                                      -                                                                SKIP
+wall_lengths               demo_office_7scenes             photo  no wall ground truth                                           -                                                                SKIP
+ceiling_height             demo_office_7scenes             photo  no ceiling ground truth                                        -                                                                SKIP
+opening_widths             demo_office_7scenes             photo  no opening ground truth                                        -                                                                SKIP
+footprint                  demo_office_7scenes             photo  no footprint ground truth                                      -                                                                SKIP
+interval_coverage          demo_office_7scenes             photo  nothing to check                                               -                                                                SKIP
+room_overlap               demo_office_7scenes             photo  single room                                                    -                                                                SKIP
+drift_accountability       demo_office_7scenes             photo  single-room route; no accumulated multi-room drift             named correction + on/off footprint ablation                     SKIP
+adjacency_correctness      demo_office_7scenes             photo  no adjacency ground truth                                      -                                                                SKIP
+wall_lengths               living_room_photos_02           photo  no wall ground truth                                           -                                                                SKIP
+ceiling_height             living_room_photos_02           photo  no ceiling ground truth                                        -                                                                SKIP
+opening_widths             living_room_photos_02           photo  no opening ground truth                                        -                                                                SKIP
+footprint                  living_room_photos_02           photo  no footprint ground truth                                      -                                                                SKIP
+interval_coverage          living_room_photos_02           photo  nothing to check                                               -                                                                SKIP
+room_overlap               living_room_photos_02           photo  single room                                                    -                                                                SKIP
+drift_accountability       living_room_photos_02           photo  single-room route; no accumulated multi-room drift             named correction + on/off footprint ablation                     SKIP
+adjacency_correctness      living_room_photos_02           photo  no adjacency ground truth                                      -                                                                SKIP
+wall_lengths               living_room_photos_03           photo  no wall ground truth                                           -                                                                SKIP
+ceiling_height             living_room_photos_03           photo  no ceiling ground truth                                        -                                                                SKIP
+opening_widths             living_room_photos_03           photo  no opening ground truth                                        -                                                                SKIP
+footprint                  living_room_photos_03           photo  no footprint ground truth                                      -                                                                SKIP
+interval_coverage          living_room_photos_03           photo  nothing to check                                               -                                                                SKIP
+room_overlap               living_room_photos_03           photo  no overlap above 0.02 m2 across 3 room(s)                      <= 0.02 m2 for every room pair                                   PASS
+drift_accountability       living_room_photos_03           photo  method=plane_anchored; footprint on=34.20 m2, off=21.05 m2     named correction + on/off footprint ablation; poses_as_is fails  PASS
+adjacency_correctness      living_room_photos_03           photo  no adjacency ground truth                                      -                                                                SKIP
+wall_lengths               apartment_video_01              video  no wall ground truth                                           -                                                                SKIP
+ceiling_height             apartment_video_01              video  no ceiling ground truth                                        -                                                                SKIP
+opening_widths             apartment_video_01              video  no opening ground truth                                        -                                                                SKIP
+footprint                  apartment_video_01              video  no footprint ground truth                                      -                                                                SKIP
+interval_coverage          apartment_video_01              video  nothing to check                                               -                                                                SKIP
+room_overlap               apartment_video_01              video  no overlap above 0.02 m2 across 2 room(s)                      <= 0.02 m2 for every room pair                                   PASS
+drift_accountability       apartment_video_01              video  method=plane_anchored; footprint on=28.18 m2, off=26.80 m2     named correction + on/off footprint ablation; poses_as_is fails  PASS
+adjacency_correctness      apartment_video_01              video  no adjacency ground truth                                      -                                                                SKIP
+wall_lengths               room_video_01                   video  no wall ground truth                                           -                                                                SKIP
+ceiling_height             room_video_01                   video  no ceiling ground truth                                        -                                                                SKIP
+opening_widths             room_video_01                   video  no opening ground truth                                        -                                                                SKIP
+footprint                  room_video_01                   video  no footprint ground truth                                      -                                                                SKIP
+interval_coverage          room_video_01                   video  nothing to check                                               -                                                                SKIP
+room_overlap               room_video_01                   video  no overlap above 0.02 m2 across 3 room(s)                      <= 0.02 m2 for every room pair                                   PASS
+drift_accountability       room_video_01                   video  method=plane_anchored; footprint on=24.06 m2, off=13.96 m2     named correction + on/off footprint ablation; poses_as_is fails  PASS
+adjacency_correctness      room_video_01                   video  no adjacency ground truth                                      -                                                                SKIP
+repeatability              lidar:apartment_full:room_a     lidar  worst 158.0 cm on room_a_w10, 12 matched pair(s), 8 unmatched  <= 1 cm or 0.5% per wall                                         FAIL
+repeatability              lidar:synthetic_room:test_room  lidar  worst 0.0 cm on test_room_w0, 4 matched pair(s), 0 unmatched   <= 1 cm or 0.5% per wall                                         PASS
+ceiling_spread             lidar:apartment_full:room_a     lidar  spread 34.5 cm across 2 captures                               <= 1 cm                                                          FAIL
+ceiling_spread             lidar:synthetic_room:test_room  lidar  spread 0.1 cm across 2 captures                                <= 1 cm                                                          PASS
+interval_coverage_by_kind  lidar:ceiling_height            lidar  2/2 covered (100.0%), mean +-0.1150                            >= 90.0% of 95% intervals (ceiling_height)                       PASS
+interval_coverage_by_kind  lidar:floor_area                lidar  2/2 covered (100.0%), mean +-0.4031                            >= 90.0% of 95% intervals (floor_area)                           PASS
+interval_coverage_by_kind  lidar:footprint_area            lidar  2/2 covered (100.0%), mean +-0.4031                            >= 90.0% of 95% intervals (footprint_area)                       PASS
+interval_coverage_by_kind  lidar:opening_width             lidar  4/4 covered (100.0%), mean +-0.0500                            >= 90.0% of 95% intervals (opening_width)                        PASS
+interval_coverage_by_kind  lidar:wall_length               lidar  8/8 covered (100.0%), mean +-0.0520                            >= 90.0% of 95% intervals (wall_length)                          PASS
+
+30 PASS   2 FAIL   65 SKIP
+SKIP means no ground truth covered that gate. It is not a pass.
+
+Device matrix (generated from this run's captures, not written by hand):
+TIER   DEVICE                                             GATE               N  PASS RATE  WORST VALUE
+-----  -------------------------------------------------  -----------------  -  ---------  -----------
+lidar  iPhone (Pro-class, LiDAR) (LiDAR)                  ceiling_height     0  -          -
+lidar  iPhone (Pro-class, LiDAR) (LiDAR)                  footprint          0  -          -
+lidar  iPhone (Pro-class, LiDAR) (LiDAR)                  interval_coverage  0  -          -
+lidar  iPhone (Pro-class, LiDAR) (LiDAR)                  opening_widths     0  -          -
+lidar  iPhone (Pro-class, LiDAR) (LiDAR)                  wall_lengths       0  -          -
+lidar  synthetic (LiDAR)                                  ceiling_height     2  100%       0.0051
+lidar  synthetic (LiDAR)                                  footprint          2  100%       0.0002
+lidar  synthetic (LiDAR)                                  interval_coverage  2  100%       1.0000
+lidar  synthetic (LiDAR)                                  opening_widths     2  100%       1.0000
+lidar  synthetic (LiDAR)                                  wall_lengths       2  100%       1.0000
+photo  Oneplus nord 2T                                    ceiling_height     0  -          -
+photo  Oneplus nord 2T                                    footprint          0  -          -
+photo  Oneplus nord 2T                                    interval_coverage  0  -          -
+photo  Oneplus nord 2T                                    opening_widths     0  -          -
+photo  Oneplus nord 2T                                    wall_lengths       0  -          -
+photo  unknown (Kinect RGB, MSR 7-Scenes dataset)         ceiling_height     0  -          -
+photo  unknown (Kinect RGB, MSR 7-Scenes dataset)         footprint          0  -          -
+photo  unknown (Kinect RGB, MSR 7-Scenes dataset)         interval_coverage  0  -          -
+photo  unknown (Kinect RGB, MSR 7-Scenes dataset)         opening_widths     0  -          -
+photo  unknown (Kinect RGB, MSR 7-Scenes dataset)         wall_lengths       0  -          -
+photo  unknown (Kinect RGB, MSR 7-Scenes public dataset)  ceiling_height     0  -          -
+photo  unknown (Kinect RGB, MSR 7-Scenes public dataset)  footprint          0  -          -
+photo  unknown (Kinect RGB, MSR 7-Scenes public dataset)  interval_coverage  0  -          -
+photo  unknown (Kinect RGB, MSR 7-Scenes public dataset)  opening_widths     0  -          -
+photo  unknown (Kinect RGB, MSR 7-Scenes public dataset)  wall_lengths       0  -          -
+video  Mac Pro                                            ceiling_height     0  -          -
+video  Mac Pro                                            footprint          0  -          -
+video  Mac Pro                                            interval_coverage  0  -          -
+video  Mac Pro                                            opening_widths     0  -          -
+video  Mac Pro                                            wall_lengths       0  -          -
+video  iPhone (Pro-class, LiDAR) (LiDAR)                  ceiling_height     0  -          -
+video  iPhone (Pro-class, LiDAR) (LiDAR)                  footprint          0  -          -
+video  iPhone (Pro-class, LiDAR) (LiDAR)                  interval_coverage  0  -          -
+video  iPhone (Pro-class, LiDAR) (LiDAR)                  opening_widths     0  -          -
+video  iPhone (Pro-class, LiDAR) (LiDAR)                  wall_lengths       0  -          -
+
+results      fixloop/round1_after/results.json

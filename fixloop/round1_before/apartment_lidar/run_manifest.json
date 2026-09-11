@@ -1,0 +1,240 @@
+{
+  "pipeline_version": "0.4.0-video-calibration",
+  "schema_version": "1.3.0",
+  "package_version": "0.1.0",
+  "git": {
+    "commit": "fa8465d009c19b372446051fa794f57a96dfd0ab",
+    "branch": "main",
+    "describe": "fa8465d-dirty",
+    "dirty": true
+  },
+  "command": "cozmo run --input captures/apartment_lidar --out benchmark_runs/apartment_lidar --quiet --no-semantics",
+  "argv": [
+    "cozmo",
+    "run",
+    "--input",
+    "captures/apartment_lidar",
+    "--out",
+    "benchmark_runs/apartment_lidar",
+    "--quiet",
+    "--no-semantics"
+  ],
+  "seed": {
+    "seed": 20260908,
+    "seeded": [
+      "random",
+      "numpy",
+      "open3d",
+      "torch"
+    ],
+    "unavailable": []
+  },
+  "options": {
+    "drift_correction": true,
+    "ignore_calibration": false
+  },
+  "input": {
+    "path": "/Users/saurabh/Documents/Cozmo/captures/apartment_lidar",
+    "sha256": "ddfea134497d39b14e587de76d4ff8cb9c5e1e5890d7ad58cc35e1788834464c",
+    "file_count": 3435,
+    "total_bytes": 88503865
+  },
+  "capture": {
+    "capture_id": "apartment_lidar_01",
+    "space_id": "apartment_room_a",
+    "tier": "lidar",
+    "device": {
+      "model": "iPhone (Pro-class, LiDAR)",
+      "os_version": null,
+      "has_lidar": true
+    },
+    "rooms": [
+      "room_a"
+    ],
+    "payload": {
+      "frame_count": 1715,
+      "depth_frames": 1715,
+      "confidence_frames": 1715,
+      "depth_resolution": [
+        256,
+        192
+      ],
+      "rgb_resolution": [
+        1920,
+        1440
+      ],
+      "has_intrinsics": true,
+      "depth_intrinsics_fx": 213.2928,
+      "min_confidence_used": 2,
+      "path_length_m": 14.49,
+      "loop_closure_gap_m": 3.179,
+      "fraction_above_camera_height": 0.0371,
+      "ceiling_likely_captured": false,
+      "horizontal_planes_m": [
+        -1.489,
+        -1.469
+      ],
+      "warnings": [
+        "CEILING LIKELY NOT CAPTURED: only 3.7% of points sit above camera height (threshold 15%). Ceiling height will be inferred from wall extent, not measured, and its interval will be wide.",
+        "trajectory ends 3.18 m from where it started; this walk is not a closed loop, so loop closure cannot be used to bound drift"
+      ]
+    },
+    "warnings": [
+      "CEILING LIKELY NOT CAPTURED: only 3.7% of points sit above camera height (threshold 15%). Ceiling height will be inferred from wall extent, not measured, and its interval will be wide.",
+      "trajectory ends 3.18 m from where it started; this walk is not a closed loop, so loop closure cannot be used to bound drift"
+    ]
+  },
+  "outputs": {
+    "plan.json": "1e8d48883eaa818c16a4efc6e006082822b48a5a87b3305db9d48eb35b80e8a6",
+    "plan.png": "b489b3fd53c73f9b3ed998ee3c898001f6962987b6f7e36b541886384e3f0c28",
+    "plan.svg": "791ccb3955c63af23be364e5bc8240353aa255f134c5cecb4bafc6b169be1fc4"
+  },
+  "reconstruction": {
+    "fusion": {
+      "points": 247266,
+      "points_before_downsample": 7902962,
+      "frames_used": 172,
+      "stride": 10,
+      "voxel_size_m": 0.03,
+      "min_confidence": 2,
+      "dropped_frames": 0,
+      "requested_stride": 10,
+      "extent_m": [
+        10.426,
+        2.247,
+        6.391
+      ],
+      "height_range_m": [
+        -1.569,
+        0.678
+      ],
+      "camera_height_median_m": -0.072,
+      "fraction_above_camera": 0.057
+    },
+    "floor_plane": {
+      "normal": [
+        -0.001,
+        0.9999,
+        0.0116
+      ],
+      "height_m": -1.4483,
+      "inliers": 31722,
+      "inlier_ratio": 0.1283
+    },
+    "layout": {
+      "floor_area_m2": 17.8193,
+      "perimeter_m": 19.269,
+      "wall_count": 14,
+      "line_count": 14,
+      "manhattan_snap": true,
+      "rotation_deg": -29.893,
+      "wall_lengths_m": [
+        1.257,
+        0.733,
+        0.702,
+        1.135,
+        0.48,
+        3.206,
+        0.466,
+        0.518,
+        0.466,
+        1.64,
+        2.317,
+        0.741,
+        1.257,
+        3.889
+      ],
+      "manhattan_score": 0.2685,
+      "wall_band_points": 158952,
+      "vertical_points": 113346,
+      "cells_kept": 20,
+      "bounds_uv": [
+        -6.821,
+        -5.675,
+        2.575,
+        1.577
+      ],
+      "axis_fallback": []
+    },
+    "ceiling": {
+      "height_above_floor_m": 2.44,
+      "ci_95_m": [
+        1.9909,
+        2.99
+      ],
+      "method": "scan_cutoff_prior",
+      "support_points": 14,
+      "wall_top_spread_m": 0.7477,
+      "note": "No ceiling plane, and wall tops disagree by 0.75 m (median 1.58 m, highest 1.99 m): the capture stopped below the ceiling. Reported height is a structural prior bounded below by the highest observed wall point; treat it as an interval, not a measurement.",
+      "wall_top_consensus_m": 1.5838,
+      "highest_wall_point_m": 1.9909,
+      "wall_tops_m": [
+        1.513,
+        1.988,
+        1.459,
+        1.336,
+        1.459,
+        1.607,
+        1.682,
+        1.664,
+        1.267,
+        1.607,
+        1.991,
+        1.988,
+        1.561,
+        1.243
+      ]
+    },
+    "wall_observation_fraction": [
+      0.0,
+      0.0,
+      0.6,
+      1.0,
+      0.5,
+      0.538,
+      0.6,
+      0.0,
+      0.6,
+      0.939,
+      0.979,
+      1.0,
+      0.192,
+      0.436
+    ],
+    "semantics": {
+      "detector": "disabled"
+    },
+    "openings": [],
+    "ablation_floor_area_m2": 16.697,
+    "timings_s": {
+      "drift_s": 2.188,
+      "fuse_s": 0.452,
+      "floor_s": 0.007,
+      "layout_s": 0.404,
+      "ceiling_s": 0.0,
+      "openings_s": 0.056,
+      "ablation_s": 0.613
+    }
+  },
+  "reconstruction_settings": {
+    "stride": 10,
+    "voxel_size_m": 0.03,
+    "semantics": false,
+    "frame_stride": 60,
+    "max_frames": 40,
+    "weights_dir": null
+  },
+  "calibration": {
+    "loaded": false,
+    "path": "calibration/calibration.json",
+    "calibration_version": null,
+    "fitted_at": null
+  },
+  "environment": {
+    "python": "3.9.6",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "source_date_epoch": "1756728000"
+  },
+  "started_at": "2026-09-09T18:15:43.440326+00:00",
+  "duration_s": 5.1474
+}

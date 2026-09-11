@@ -1,0 +1,1 @@
+WARNING cozmo.io.lidar: CEILING LIKELY NOT CAPTURED: only 3.7% of points sit above camera height (threshold 15%). Ceiling height will be inferred from wall extent, not measured, and its interval will be wide.

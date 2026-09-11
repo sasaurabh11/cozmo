@@ -192,6 +192,13 @@ class TestStitchGraphDoorwayOnly:
         assert result.edges_used == []
         assert len(result.edges_rejected) == 1
 
+    def test_correction_off_is_a_real_ablation_arm(self):
+        rooms, matches = self._rooms_and_match()
+        result = build_stitch_graph(rooms, matches, drift_correction=False)
+        assert result.global_xy["room_b"] == pytest.approx([0.0, 0.0], abs=1e-6)
+        polygons = {r.room_id: result.transform_polygon(r.room_id, r.polygon) for r in rooms}
+        assert polygons["room_a"].intersection(polygons["room_b"]).area > 0.02
+
 
 class TestStitchGraphThreeRooms:
     def test_a_chain_of_three_rooms_stays_connected(self):

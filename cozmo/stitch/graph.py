@@ -405,8 +405,15 @@ def _resolve_overlaps(
 def build_stitch_graph(
     rooms: Sequence[RoomForStitch], matches: Sequence[RoomPairMatch],
     anchor_room_id: Optional[str] = None,
+    drift_correction: bool = True,
 ) -> StitchResult:
-    """Match edges -> global pose graph -> Manhattan snap -> overlap fix."""
+    """Match edges -> global pose graph -> Manhattan snap -> overlap fix.
+
+    ``drift_correction=False`` is the explicit ablation arm. It keeps every
+    room in its raw local frame and skips the global snap and overlap resolver;
+    callers use that result only to report what the uncorrected stitch would
+    have produced, never as the user-facing plan.
+    """
     rooms_by_id = {r.room_id: r for r in rooms}
     room_ids = [r.room_id for r in rooms]
     anchor = anchor_room_id or room_ids[0]
@@ -424,7 +431,7 @@ def build_stitch_graph(
         rel_xyz = np.array([edge.relative_xy[0], edge.relative_xy[1], 0.0])
         graph_edges.append((ia, ib, rel_xyz, edge.relative_yaw, edge.confidence))
 
-    if graph_edges and len(room_ids) > 1:
+    if drift_correction and graph_edges and len(room_ids) > 1:
         if anchor_index != 0:
             # _optimize_pose_graph always fixes node 0; relabel so the anchor is node 0.
             order = [anchor_index] + [i for i in range(len(room_ids)) if i != anchor_index]
@@ -446,11 +453,11 @@ def build_stitch_graph(
     global_yaw = {room_id: float(opt_yaw[i]) for i, room_id in enumerate(room_ids)}
     global_xy = {room_id: opt_xyz[i, :2].copy() for i, room_id in enumerate(room_ids)}
 
-    manhattan_rotation = _dominant_wall_angle(rooms_by_id, global_yaw)
+    manhattan_rotation = _dominant_wall_angle(rooms_by_id, global_yaw) if drift_correction else 0.0
     # Snap the whole property by the same amount, so every room's own already-
     # axis-aligned polygon stays axis-aligned in the shared frame too.
     snap = -_wrap(manhattan_rotation)
-    if abs(snap) > 1e-6:
+    if drift_correction and abs(snap) > 1e-6:
         c, s = np.cos(snap), np.sin(snap)
         for room_id in room_ids:
             global_yaw[room_id] = _wrap(global_yaw[room_id] + snap)
@@ -466,7 +473,12 @@ def build_stitch_graph(
         )
         for room_id in room_ids
     }
-    shifts, resolved, iterations = _resolve_overlaps(polygons, anchor)
+    if drift_correction:
+        shifts, resolved, iterations = _resolve_overlaps(polygons, anchor)
+    else:
+        shifts, resolved, iterations = (
+            {room_id: (0.0, 0.0) for room_id in room_ids}, False, 0,
+        )
     for room_id, (dx, dy) in shifts.items():
         global_xy[room_id] = global_xy[room_id] + np.array([dx, dy])
 

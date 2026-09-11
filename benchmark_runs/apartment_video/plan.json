@@ -3,7 +3,7 @@
   "capture_id": "apartment_video_01",
   "tier": "video",
   "pipeline_version": "0.4.0-video-calibration",
-  "generated_at": "2025-09-01T12:00:00Z",
+  "generated_at": "2026-09-11T20:40:32.566399Z",
   "scale": {
     "source": "structural_prior",
     "scale_factor": {
@@ -22,8 +22,15 @@
     "method": "plane_anchored",
     "loop_closures": 0,
     "residual_closure_error": null,
-    "ablation_footprint_area": null,
-    "notes": "1 of 1 needed connection(s) made (0 from image matches, 0 from doorway width alone); property snapped to a shared Manhattan frame (-0.0 deg); overlap resolution converged after 2 step(s)."
+    "ablation_footprint_area": {
+      "value": 26.8039,
+      "ci_95": [
+        24.12351,
+        29.484289999999998
+      ],
+      "unit": "m2"
+    },
+    "notes": "1 of 1 needed connection(s) made (0 from image matches, 0 from doorway width alone); property snapped to a shared Manhattan frame (-0.0 deg); overlap resolution converged after 2 step(s). Uncorrected stitch footprint: 26.80 m2."
   },
   "property_totals": {
     "room_count": 2,

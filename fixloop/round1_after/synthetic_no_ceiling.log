@@ -1,0 +1,3 @@
+WARNING cozmo.geometry.layout: no wall lines in the pose frame; the uncorrected layout falls back to the bounding extent of the observed points
+WARNING cozmo.geometry.layout: only 0 wall line(s) across u; bounding it by floor evidence
+WARNING cozmo.geometry.layout: only 0 wall line(s) across v; bounding it by floor evidence

@@ -3,7 +3,7 @@
   "capture_id": "living_room_photos_03",
   "tier": "photo",
   "pipeline_version": "0.4.0-video-calibration",
-  "generated_at": "2025-09-01T12:00:00Z",
+  "generated_at": "2026-09-11T20:38:18.363409Z",
   "scale": {
     "source": "structural_prior",
     "scale_factor": {
@@ -22,8 +22,15 @@
     "method": "plane_anchored",
     "loop_closures": 0,
     "residual_closure_error": null,
-    "ablation_footprint_area": null,
-    "notes": "2 of 2 needed connection(s) made (1 from image matches, 0 from doorway width alone); property snapped to a shared Manhattan frame (-0.0 deg); overlap resolution converged after 1 step(s)."
+    "ablation_footprint_area": {
+      "value": 21.0546,
+      "ci_95": [
+        18.94914,
+        23.16006
+      ],
+      "unit": "m2"
+    },
+    "notes": "2 of 2 needed connection(s) made (1 from image matches, 0 from doorway width alone); property snapped to a shared Manhattan frame (-0.0 deg); overlap resolution converged after 1 step(s). Uncorrected stitch footprint: 21.05 m2."
   },
   "property_totals": {
     "room_count": 3,

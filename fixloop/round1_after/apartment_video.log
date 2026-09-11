@@ -1,0 +1,36 @@
+WARNING cozmo.pipeline.photo: capture.json declares rooms ['room_a'] but the folders found are ['room_1', 'room_2', 'room_3', 'room_4']; using folder names
+/Users/saurabh/Documents/Cozmo/cozmo/recon/layout.py:446: RuntimeWarning: divide by zero encountered in matmul
+  reconstruction.frame_points_local[p.frame_index] @ p.R.T + p.t
+/Users/saurabh/Documents/Cozmo/cozmo/recon/layout.py:446: RuntimeWarning: overflow encountered in matmul
+  reconstruction.frame_points_local[p.frame_index] @ p.R.T + p.t
+/Users/saurabh/Documents/Cozmo/cozmo/recon/layout.py:446: RuntimeWarning: invalid value encountered in matmul
+  reconstruction.frame_points_local[p.frame_index] @ p.R.T + p.t
+WARNING cozmo.geometry.layout: only 0 wall line(s) across u; bounding it by floor evidence
+WARNING cozmo.geometry.layout: only 1 wall line(s) across v; bounding it by floor evidence
+WARNING cozmo.pipeline.photo: room 'room_1' is not in the plan: ValueError: no cell of the wall arrangement is supported by interior evidence
+/Users/saurabh/Documents/Cozmo/cozmo/recon/layout.py:446: RuntimeWarning: divide by zero encountered in matmul
+  reconstruction.frame_points_local[p.frame_index] @ p.R.T + p.t
+/Users/saurabh/Documents/Cozmo/cozmo/recon/layout.py:446: RuntimeWarning: overflow encountered in matmul
+  reconstruction.frame_points_local[p.frame_index] @ p.R.T + p.t
+/Users/saurabh/Documents/Cozmo/cozmo/recon/layout.py:446: RuntimeWarning: invalid value encountered in matmul
+  reconstruction.frame_points_local[p.frame_index] @ p.R.T + p.t
+WARNING cozmo.geometry.layout: only 0 wall line(s) across u; bounding it by floor evidence
+WARNING cozmo.geometry.layout: only 1 wall line(s) across v; bounding it by floor evidence
+/Users/saurabh/Documents/Cozmo/cozmo/recon/layout.py:446: RuntimeWarning: divide by zero encountered in matmul
+  reconstruction.frame_points_local[p.frame_index] @ p.R.T + p.t
+/Users/saurabh/Documents/Cozmo/cozmo/recon/layout.py:446: RuntimeWarning: overflow encountered in matmul
+  reconstruction.frame_points_local[p.frame_index] @ p.R.T + p.t
+/Users/saurabh/Documents/Cozmo/cozmo/recon/layout.py:446: RuntimeWarning: invalid value encountered in matmul
+  reconstruction.frame_points_local[p.frame_index] @ p.R.T + p.t
+WARNING cozmo.geometry.layout: only 0 wall line(s) across u; bounding it by floor evidence
+WARNING cozmo.geometry.layout: only 1 wall line(s) across v; bounding it by floor evidence
+/Users/saurabh/Documents/Cozmo/cozmo/recon/layout.py:446: RuntimeWarning: divide by zero encountered in matmul
+  reconstruction.frame_points_local[p.frame_index] @ p.R.T + p.t
+/Users/saurabh/Documents/Cozmo/cozmo/recon/layout.py:446: RuntimeWarning: overflow encountered in matmul
+  reconstruction.frame_points_local[p.frame_index] @ p.R.T + p.t
+/Users/saurabh/Documents/Cozmo/cozmo/recon/layout.py:446: RuntimeWarning: invalid value encountered in matmul
+  reconstruction.frame_points_local[p.frame_index] @ p.R.T + p.t
+WARNING cozmo.geometry.layout: only 0 wall line(s) across u; bounding it by floor evidence
+WARNING cozmo.geometry.layout: only 1 wall line(s) across v; bounding it by floor evidence
+WARNING cozmo.stitch.graph: no room pair produced a usable transform; every room stays at the origin
+WARNING cozmo.stitch.graph: no room pair produced a usable transform; every room stays at the origin

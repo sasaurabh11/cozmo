@@ -29,7 +29,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 
-from ..schema import Measurement, Plan, Tier
+import numpy as np
+from scipy.optimize import linear_sum_assignment
+
+from ..schema import DriftMethod, Measurement, Plan, Tier
 
 SCORER_VERSION = "1.0.0"
 RESULTS_FILENAME = "results.json"
@@ -214,6 +217,25 @@ class LoadedPlan:
         return self.plan.capture_id
 
     @property
+    def space_id(self) -> str:
+        """Declared physical-space identity from the run manifest.
+
+        ``plan.json`` deliberately stays focused on reconstruction output, so
+        capture identity lives beside it in ``run_manifest.json``. Falling
+        back to ``capture_id`` keeps hand-authored fixture plans and older
+        reports deterministic singletons.
+        """
+        manifest = self.path.with_name("run_manifest.json")
+        try:
+            raw = json.loads(manifest.read_text())
+            return str(raw.get("capture", {}).get("space_id") or self.capture_id)
+        except (FileNotFoundError, OSError, json.JSONDecodeError, TypeError):
+            # Hand-authored unit fixtures have no run manifest. The grouping
+            # helper then falls back to their room id, while real benchmark
+            # runs always carry the explicit capture identity.
+            return ""
+
+    @property
     def tier(self) -> Tier:
         return self.plan.tier
 
@@ -273,6 +295,26 @@ def _pct(x: float) -> str:
 
 def _rel_error(pred: float, truth: float) -> Optional[float]:
     return abs(pred - truth) / abs(truth) if truth else None
+
+
+def _has_plan_truth(lp: LoadedPlan, gt: GroundTruth) -> bool:
+    """Return whether non-property truth actually belongs to this plan.
+
+    A property-level row with ``element_id=property`` is valid for a plan only
+    when the same CSV also identifies at least one wall, opening, or room in
+    that plan. Without this guard, one synthetic fixture's footprint becomes a
+    false global truth value for every unrelated real capture in the benchmark.
+    """
+    wall_ids = set(lp.walls())
+    opening_ids = set(lp.openings())
+    room_ids = set(lp.plan.room_by_id)
+    return any(
+        row.element_id in wall_ids
+        or row.element_id in opening_ids
+        or row.element_id in room_ids
+        for row in gt.rows
+        if row.element != "property"
+    )
 
 
 # --------------------------------------------------------------------------
@@ -424,11 +466,13 @@ def gate_opening_widths(lp: LoadedPlan, gt: GroundTruth) -> GateResult:
     )
 
 
-def gate_footprint(lp: LoadedPlan, gt: GroundTruth) -> GateResult:
+def gate_footprint(
+    lp: LoadedPlan, gt: GroundTruth, *, allow_global_property: bool = True,
+) -> GateResult:
     tol = TOLERANCES[lp.tier]
-    truth_row = gt.lookup("property", "footprint_area") or gt.lookup(
-        lp.capture_id, "footprint_area"
-    )
+    truth_row = gt.lookup(lp.capture_id, "footprint_area")
+    if truth_row is None and (allow_global_property or _has_plan_truth(lp, gt)):
+        truth_row = gt.lookup("property", "footprint_area")
     if truth_row is None:
         return GateResult(
             gate="footprint", scope=lp.capture_id, tier=lp.tier.value, status=SKIP,
@@ -502,6 +546,50 @@ def gate_room_overlap(lp: LoadedPlan) -> GateResult:
         threshold=f"<= {ROOM_OVERLAP_TOLERANCE_M2} m2 for every room pair",
         value=round(worst, 4),
         detail={"overlapping_pairs": pairs, "room_count": len(rooms)},
+    )
+
+
+def gate_drift_accountability(lp: LoadedPlan) -> GateResult:
+    """Check that accumulated drift is named and has an on/off ablation.
+
+    The assignment's automatic-fail case is an output that silently trusts raw
+    poses. For multi-room photo/video plans the same accountability applies to
+    the stitch correction; a method name without a second footprint is not an
+    ablation.
+    """
+    drift = lp.plan.drift_correction
+    requires_ablation = lp.tier is Tier.LIDAR or len(lp.plan.rooms) > 1
+    if not requires_ablation:
+        return GateResult(
+            gate="drift_accountability", scope=lp.capture_id, tier=lp.tier.value,
+            status=SKIP, metric="single-room route; no accumulated multi-room drift",
+            threshold="named correction + on/off footprint ablation",
+            detail={"reason": "gate applies to LiDAR and multi-room stitching"},
+        )
+
+    method_ok = drift.enabled and drift.method is not DriftMethod.NONE_POSES_AS_IS
+    ablation = drift.ablation_footprint_area
+    ablation_ok = ablation is not None
+    on_area = lp.plan.property_totals.footprint_area.value
+    changed = bool(ablation_ok and abs(ablation.value - on_area) > 1e-6)
+    passed = method_ok and ablation_ok
+    return GateResult(
+        gate="drift_accountability", scope=lp.capture_id, tier=lp.tier.value,
+        status=PASS if passed else FAIL,
+        metric=(
+            f"method={drift.method.value}; footprint on={on_area:.2f} m2, "
+            f"off={ablation.value:.2f} m2" if ablation_ok else
+            f"method={drift.method.value}; correction ablation missing"
+        ),
+        threshold="named correction + on/off footprint ablation; poses_as_is fails",
+        value=round(abs(ablation.value - on_area), 5) if ablation_ok else None,
+        detail={
+            "enabled": drift.enabled,
+            "method": drift.method.value,
+            "ablation_present": ablation_ok,
+            "footprint_changed": changed,
+            "ablation_footprint_area_m2": ablation.value if ablation_ok else None,
+        },
     )
 
 
@@ -597,7 +685,7 @@ def covered_measurements(lp: LoadedPlan, gt: GroundTruth) -> List[Dict[str, Any]
         row = gt.lookup(room.id, "floor_area")
         if row:
             add("floor_area", room.id, room.floor_area, row.value_m)
-    row = gt.lookup("property", "footprint_area")
+    row = gt.lookup("property", "footprint_area") if _has_plan_truth(lp, gt) else None
     if row:
         add("footprint_area", "property", lp.plan.property_totals.footprint_area, row.value_m)
     return checks
@@ -639,13 +727,17 @@ def gate_interval_coverage(lp: LoadedPlan, gt: GroundTruth) -> GateResult:
 # --------------------------------------------------------------------------
 
 
-def _repeat_groups(plans: Sequence[LoadedPlan]) -> Dict[Tuple[str, str], List[LoadedPlan]]:
-    """Group plans by (tier, room id): two captures of the same room at the same
-    tier are exactly what the repeatability gate compares."""
-    groups: Dict[Tuple[str, str], List[LoadedPlan]] = {}
+def _repeat_groups(plans: Sequence[LoadedPlan]) -> Dict[Tuple[str, str, str], List[LoadedPlan]]:
+    """Group by declared physical space, tier, and reconstructed room id.
+
+    Room names are not identities: three unrelated captures in the benchmark
+    all called their room ``living_room``. Pairing those by name produced a
+    spectacular but meaningless repeatability failure.
+    """
+    groups: Dict[Tuple[str, str, str], List[LoadedPlan]] = {}
     for lp in plans:
         for room in lp.plan.rooms:
-            groups.setdefault((lp.tier.value, room.id), []).append(lp)
+            groups.setdefault((lp.tier.value, lp.space_id or room.id, room.id), []).append(lp)
     return {key: members for key, members in groups.items() if len(members) > 1}
 
 
@@ -659,40 +751,90 @@ def gate_repeatability(plans: Sequence[LoadedPlan]) -> List[GateResult]:
         )]
 
     results: List[GateResult] = []
-    for (tier, room_id), members in sorted(groups.items()):
+    for (tier, space_id, room_id), members in sorted(groups.items()):
         comparisons: List[Dict[str, Any]] = []
         for i in range(len(members)):
             for j in range(i + 1, len(members)):
                 a, b = members[i], members[j]
                 walls_a, walls_b = a.walls(), b.walls()
-                for wall_id in sorted(set(walls_a) & set(walls_b)):
-                    room_a, m_a = walls_a[wall_id]
-                    if room_a != room_id:
-                        continue
-                    m_b = walls_b[wall_id][1]
+                ids_a = [wall_id for wall_id, (rid, _m) in sorted(walls_a.items()) if rid == room_id]
+                ids_b = [wall_id for wall_id, (rid, _m) in sorted(walls_b.items()) if rid == room_id]
+                if not ids_a or not ids_b:
+                    continue
+
+                # Wall ids are traversal-order labels and are not stable when
+                # a noisy scan splits or merges a boundary. Pair by minimum
+                # absolute length cost, then count unmatched topology as a
+                # failure instead of comparing unrelated positional ids.
+                cost = np.array([
+                    [abs(walls_a[wa][1].value - walls_b[wb][1].value) for wb in ids_b]
+                    for wa in ids_a
+                ])
+                rows, cols = linear_sum_assignment(cost)
+                paired_a = set(rows.tolist())
+                paired_b = set(cols.tolist())
+                for row, col in zip(rows, cols):
+                    wall_id, wall_b_id = ids_a[row], ids_b[col]
+                    m_a = walls_a[wall_id][1]
+                    m_b = walls_b[wall_b_id][1]
                     diff = abs(m_a.value - m_b.value)
                     reference = max(abs(m_a.value), abs(m_b.value)) or 1.0
                     comparisons.append({
                         "wall_id": wall_id,
+                        "wall_id_b": wall_b_id,
                         "capture_a": a.capture_id, "capture_b": b.capture_id,
                         "a_m": m_a.value, "b_m": m_b.value,
                         "diff_m": round(diff, 4),
+                        "unmatched": False,
                         "within_tolerance": diff <= max(
                             REPEATABILITY_ABS_M, REPEATABILITY_REL * reference
                         ) + EPS,
+                    })
+
+                for row, wall_id in enumerate(ids_a):
+                    if row in paired_a:
+                        continue
+                    m_a = walls_a[wall_id][1]
+                    comparisons.append({
+                        "wall_id": wall_id, "wall_id_b": None,
+                        "capture_a": a.capture_id, "capture_b": b.capture_id,
+                        "a_m": m_a.value, "b_m": None,
+                        "diff_m": round(abs(m_a.value), 4), "unmatched": True,
+                        "within_tolerance": False,
+                    })
+                for col, wall_id in enumerate(ids_b):
+                    if col in paired_b:
+                        continue
+                    m_b = walls_b[wall_id][1]
+                    comparisons.append({
+                        "wall_id": None, "wall_id_b": wall_id,
+                        "capture_a": a.capture_id, "capture_b": b.capture_id,
+                        "a_m": None, "b_m": m_b.value,
+                        "diff_m": round(abs(m_b.value), 4), "unmatched": True,
+                        "within_tolerance": False,
                     })
 
         if not comparisons:
             continue
         worst = max(comparisons, key=lambda c: c["diff_m"])
         all_ok = all(c["within_tolerance"] for c in comparisons)
+        unmatched = sum(1 for c in comparisons if c.get("unmatched"))
         results.append(GateResult(
-            gate="repeatability", scope=f"{tier}:{room_id}", tier=tier,
+            gate="repeatability", scope=f"{tier}:{space_id}:{room_id}", tier=tier,
             status=PASS if all_ok else FAIL,
-            metric=f"worst {worst['diff_m'] * 100:.1f} cm on {worst['wall_id']}, {len(comparisons)} wall pair(s)",
+            metric=(
+                f"worst {worst['diff_m'] * 100:.1f} cm on "
+                f"{worst.get('wall_id') or worst.get('wall_id_b')}, "
+                f"{len(comparisons) - unmatched} matched pair(s), {unmatched} unmatched"
+            ),
             threshold=f"<= {REPEATABILITY_ABS_M * 100:.0f} cm or {_pct(REPEATABILITY_REL)} per wall",
             value=round(worst["diff_m"], 4),
-            detail={"captures": [m.capture_id for m in members], "comparisons": comparisons},
+            detail={
+                "captures": [m.capture_id for m in members],
+                "comparisons": comparisons,
+                "unmatched_wall_count": unmatched,
+                "matching": "minimum absolute wall-length cost; unmatched topology fails",
+            },
         ))
     return results
 
@@ -714,7 +856,7 @@ def gate_ceiling_spread(plans: Sequence[LoadedPlan]) -> List[GateResult]:
         )]
 
     results: List[GateResult] = []
-    for (tier, room_id), members in sorted(groups.items()):
+    for (tier, space_id, room_id), members in sorted(groups.items()):
         values = []
         for lp in members:
             room = lp.plan.room_by_id.get(room_id)
@@ -725,7 +867,7 @@ def gate_ceiling_spread(plans: Sequence[LoadedPlan]) -> List[GateResult]:
         heights = [v["ceiling_m"] for v in values]
         spread = max(heights) - min(heights)
         results.append(GateResult(
-            gate="ceiling_spread", scope=f"{tier}:{room_id}", tier=tier,
+            gate="ceiling_spread", scope=f"{tier}:{space_id}:{room_id}", tier=tier,
             status=PASS if spread <= CEILING_SPREAD_MAX_M + EPS else FAIL,
             metric=f"spread {spread * 100:.1f} cm across {len(values)} captures",
             threshold=f"<= {CEILING_SPREAD_MAX_M * 100:.0f} cm",
@@ -929,9 +1071,12 @@ def score_results(results_dir: Path, ground_truth_csv: Path) -> Report:
         gates.append(gate_wall_lengths(lp, gt))
         gates.append(gate_ceiling_height(lp, gt))
         gates.append(gate_opening_widths(lp, gt))
-        gates.append(gate_footprint(lp, gt))
+        gates.append(gate_footprint(
+            lp, gt, allow_global_property=(len(plans) == 1 or _has_plan_truth(lp, gt)),
+        ))
         gates.append(gate_interval_coverage(lp, gt))
         gates.append(gate_room_overlap(lp))
+        gates.append(gate_drift_accountability(lp))
         gates.append(gate_adjacency_correctness(lp, gt))
     gates.extend(gate_repeatability(plans))
     gates.extend(gate_ceiling_spread(plans))
@@ -943,6 +1088,7 @@ def score_results(results_dir: Path, ground_truth_csv: Path) -> Report:
         plans=[
             {
                 "capture_id": lp.capture_id,
+                "space_id": lp.space_id,
                 "tier": lp.tier.value,
                 "path": str(lp.path),
                 "sha256": _sha256(lp.path),

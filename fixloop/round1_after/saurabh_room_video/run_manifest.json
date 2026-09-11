@@ -1,0 +1,1776 @@
+{
+  "pipeline_version": "0.4.0-video-calibration",
+  "schema_version": "1.3.0",
+  "package_version": "0.1.0",
+  "git": {
+    "commit": "4991fac6ffa2c3cbd0a56c87f777d809504f011f",
+    "branch": "main",
+    "describe": "4991fac-dirty",
+    "dirty": true
+  },
+  "command": "cozmo run --input captures/saurabh_room_video --out fixloop/round1_after/saurabh_room_video --quiet --backbone vggt --no-semantics",
+  "argv": [
+    "cozmo",
+    "run",
+    "--input",
+    "captures/saurabh_room_video",
+    "--out",
+    "fixloop/round1_after/saurabh_room_video",
+    "--quiet",
+    "--backbone",
+    "vggt",
+    "--no-semantics"
+  ],
+  "seed": {
+    "seed": 20260908,
+    "seeded": [
+      "random",
+      "numpy",
+      "open3d",
+      "torch"
+    ],
+    "unavailable": []
+  },
+  "options": {
+    "drift_correction": true,
+    "ignore_calibration": false
+  },
+  "input": {
+    "path": "/Users/saurabh/Documents/Cozmo/captures/saurabh_room_video",
+    "sha256": "23662d460a4626c2b386569170f586401d78bcacd25c9b500d5cf7a0278a042e",
+    "file_count": 2,
+    "total_bytes": 51227149
+  },
+  "capture": {
+    "capture_id": "room_video_01",
+    "space_id": "room_video_01",
+    "tier": "video",
+    "device": {
+      "model": "Mac Pro",
+      "os_version": null,
+      "has_lidar": false
+    },
+    "rooms": [
+      "room_a"
+    ],
+    "payload": {
+      "video": "rbc.mov",
+      "size_bytes": 51226877
+    },
+    "warnings": []
+  },
+  "outputs": {
+    "plan.json": "40003b1eae1cb4792961333f0bd10420aa45298537b1d79a18242098a5edb0ad",
+    "plan.png": "89cd6620abe8a217ccba8e7f2d9b3dd7e75ee5984d87052a603c5ad6fe848277",
+    "plan.svg": "e84606a84c6a07585beef64ca95b9025a85bbc8670eb0748c01defb39df3a358"
+  },
+  "reconstruction": {
+    "backbone": "vggt",
+    "rooms": {
+      "room_1": {
+        "layout_method": "per_view_merge",
+        "scale": {
+          "scale_factor": 3.44226,
+          "ci_95": [
+            2.40958,
+            4.47493
+          ],
+          "agreement": 0.3,
+          "method": "single_cue",
+          "cues": [
+            {
+              "name": "metric_depth",
+              "fired": false,
+              "scale_factor": null,
+              "relative_sd": null,
+              "reason": "disabled for this run",
+              "detail": {}
+            },
+            {
+              "name": "door_height",
+              "fired": false,
+              "scale_factor": null,
+              "relative_sd": null,
+              "reason": "disabled for this run",
+              "detail": {}
+            },
+            {
+              "name": "ceiling_height",
+              "fired": true,
+              "scale_factor": 3.44226,
+              "relative_sd": 0.123,
+              "reason": "floor-to-ceiling span 0.709 (scale-free) against a 2.44 m +- 0.3 m prior",
+              "detail": {
+                "span_scalefree": 0.7088
+              }
+            }
+          ]
+        },
+        "timings_s": {
+          "load_frames_s": 0.037,
+          "reconstruct_s": 25.578,
+          "layout_s": 0.939,
+          "scale_s": 0.0,
+          "opening_detector_s": 11.037,
+          "openings_s": 11.067
+        }
+      },
+      "room_2": {
+        "layout_method": "per_view_merge",
+        "scale": {
+          "scale_factor": 2.75123,
+          "ci_95": [
+            1.92586,
+            3.5766
+          ],
+          "agreement": 0.3,
+          "method": "single_cue",
+          "cues": [
+            {
+              "name": "metric_depth",
+              "fired": false,
+              "scale_factor": null,
+              "relative_sd": null,
+              "reason": "disabled for this run",
+              "detail": {}
+            },
+            {
+              "name": "door_height",
+              "fired": false,
+              "scale_factor": null,
+              "relative_sd": null,
+              "reason": "disabled for this run",
+              "detail": {}
+            },
+            {
+              "name": "ceiling_height",
+              "fired": true,
+              "scale_factor": 2.75123,
+              "relative_sd": 0.123,
+              "reason": "floor-to-ceiling span 0.887 (scale-free) against a 2.44 m +- 0.3 m prior",
+              "detail": {
+                "span_scalefree": 0.8869
+              }
+            }
+          ]
+        },
+        "timings_s": {
+          "load_frames_s": 0.056,
+          "reconstruct_s": 22.852,
+          "layout_s": 1.199,
+          "scale_s": 0.001,
+          "opening_detector_s": 10.357,
+          "openings_s": 10.414
+        }
+      },
+      "room_3": {
+        "layout_method": "per_view_merge",
+        "scale": {
+          "scale_factor": 4.318,
+          "ci_95": [
+            3.0226,
+            5.6134
+          ],
+          "agreement": 0.3,
+          "method": "single_cue",
+          "cues": [
+            {
+              "name": "metric_depth",
+              "fired": false,
+              "scale_factor": null,
+              "relative_sd": null,
+              "reason": "disabled for this run",
+              "detail": {}
+            },
+            {
+              "name": "door_height",
+              "fired": false,
+              "scale_factor": null,
+              "relative_sd": null,
+              "reason": "disabled for this run",
+              "detail": {}
+            },
+            {
+              "name": "ceiling_height",
+              "fired": true,
+              "scale_factor": 4.318,
+              "relative_sd": 0.123,
+              "reason": "floor-to-ceiling span 0.565 (scale-free) against a 2.44 m +- 0.3 m prior",
+              "detail": {
+                "span_scalefree": 0.5651
+              }
+            }
+          ]
+        },
+        "timings_s": {
+          "load_frames_s": 0.027,
+          "reconstruct_s": 18.363,
+          "layout_s": 0.493,
+          "scale_s": 0.0,
+          "opening_detector_s": 8.108,
+          "openings_s": 8.128
+        }
+      },
+      "room_4": {
+        "layout_method": "per_view_merge",
+        "scale": {
+          "scale_factor": 2.92114,
+          "ci_95": [
+            2.0448,
+            3.79748
+          ],
+          "agreement": 0.3,
+          "method": "single_cue",
+          "cues": [
+            {
+              "name": "metric_depth",
+              "fired": false,
+              "scale_factor": null,
+              "relative_sd": null,
+              "reason": "disabled for this run",
+              "detail": {}
+            },
+            {
+              "name": "door_height",
+              "fired": false,
+              "scale_factor": null,
+              "relative_sd": null,
+              "reason": "disabled for this run",
+              "detail": {}
+            },
+            {
+              "name": "ceiling_height",
+              "fired": true,
+              "scale_factor": 2.92114,
+              "relative_sd": 0.123,
+              "reason": "floor-to-ceiling span 0.835 (scale-free) against a 2.44 m +- 0.3 m prior",
+              "detail": {
+                "span_scalefree": 0.8353
+              }
+            }
+          ]
+        },
+        "timings_s": {
+          "load_frames_s": 0.008,
+          "reconstruct_s": 12.562,
+          "layout_s": 0.36,
+          "scale_s": 0.0,
+          "opening_detector_s": 5.938,
+          "openings_s": 5.953
+        }
+      }
+    },
+    "skipped_rooms": [],
+    "capture_groups": {
+      "room_1": [
+        "room_1",
+        "room_2"
+      ],
+      "room_3": [
+        "room_3"
+      ],
+      "room_4": [
+        "room_4"
+      ]
+    },
+    "representative_for": {
+      "room_1": "room_1",
+      "room_2": "room_1",
+      "room_3": "room_3",
+      "room_4": "room_4"
+    },
+    "inferred_connections": [
+      {
+        "room_a": "room_1",
+        "room_b": "room_3",
+        "source": "capture_order_inferred"
+      },
+      {
+        "room_a": "room_3",
+        "room_b": "room_4",
+        "source": "capture_order_inferred"
+      }
+    ],
+    "matches": [
+      {
+        "room_a": "room_1",
+        "room_b": "room_2",
+        "dinov2_similarity": 0.6855,
+        "keypoint_match_count": 115,
+        "keypoint_matches": [
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 518.0,
+            "v_a": 351.0,
+            "u_b": 288.0,
+            "v_b": 18.0,
+            "score": 0.7986
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 567.0,
+            "v_a": 380.0,
+            "u_b": 427.0,
+            "v_b": 92.0,
+            "score": 0.8889
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 739.0,
+            "v_a": 384.0,
+            "u_b": 675.0,
+            "v_b": 60.0,
+            "score": 0.9977
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 594.0,
+            "v_a": 391.0,
+            "u_b": 511.0,
+            "v_b": 121.0,
+            "score": 0.7838
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 873.0,
+            "v_a": 393.0,
+            "u_b": 939.0,
+            "v_b": 60.0,
+            "score": 0.9728
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1027.0,
+            "v_a": 396.0,
+            "u_b": 1280.0,
+            "v_b": 36.0,
+            "score": 0.9295
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1070.0,
+            "v_a": 398.0,
+            "u_b": 1384.0,
+            "v_b": 22.0,
+            "score": 0.9962
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1045.0,
+            "v_a": 400.0,
+            "u_b": 1316.0,
+            "v_b": 33.0,
+            "score": 0.9775
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1030.0,
+            "v_a": 420.0,
+            "u_b": 1283.0,
+            "v_b": 85.0,
+            "score": 0.8556
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1017.0,
+            "v_a": 436.0,
+            "u_b": 1260.0,
+            "v_b": 119.0,
+            "score": 0.4832
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1088.0,
+            "v_a": 443.0,
+            "u_b": 1422.0,
+            "v_b": 135.0,
+            "score": 0.9979
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1126.0,
+            "v_a": 445.0,
+            "u_b": 1526.0,
+            "v_b": 128.0,
+            "score": 0.9142
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1017.0,
+            "v_a": 468.0,
+            "u_b": 1247.0,
+            "v_b": 202.0,
+            "score": 0.9944
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1045.0,
+            "v_a": 477.0,
+            "u_b": 1311.0,
+            "v_b": 218.0,
+            "score": 0.9959
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 908.0,
+            "v_a": 479.0,
+            "u_b": 1015.0,
+            "v_b": 234.0,
+            "score": 0.9281
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1075.0,
+            "v_a": 481.0,
+            "u_b": 1387.0,
+            "v_b": 225.0,
+            "score": 0.9994
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1126.0,
+            "v_a": 486.0,
+            "u_b": 1523.0,
+            "v_b": 234.0,
+            "score": 0.3971
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1040.0,
+            "v_a": 499.0,
+            "u_b": 1308.0,
+            "v_b": 265.0,
+            "score": 0.878
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1106.0,
+            "v_a": 499.0,
+            "u_b": 1465.0,
+            "v_b": 265.0,
+            "score": 0.9906
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 744.0,
+            "v_a": 513.0,
+            "u_b": 683.0,
+            "v_b": 317.0,
+            "score": 0.9981
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 764.0,
+            "v_a": 513.0,
+            "u_b": 718.0,
+            "v_b": 315.0,
+            "score": 0.9973
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1015.0,
+            "v_a": 515.0,
+            "u_b": 1237.0,
+            "v_b": 301.0,
+            "score": 0.9922
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1085.0,
+            "v_a": 519.0,
+            "u_b": 1409.0,
+            "v_b": 319.0,
+            "score": 0.6429
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1111.0,
+            "v_a": 522.0,
+            "u_b": 1470.0,
+            "v_b": 324.0,
+            "score": 0.5166
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1037.0,
+            "v_a": 528.0,
+            "u_b": 1290.0,
+            "v_b": 337.0,
+            "score": 0.9998
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 736.0,
+            "v_a": 531.0,
+            "u_b": 673.0,
+            "v_b": 355.0,
+            "score": 0.9958
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 759.0,
+            "v_a": 535.0,
+            "u_b": 716.0,
+            "v_b": 355.0,
+            "score": 0.9956
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1068.0,
+            "v_a": 537.0,
+            "u_b": 1359.0,
+            "v_b": 357.0,
+            "score": 0.8702
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1093.0,
+            "v_a": 540.0,
+            "u_b": 1425.0,
+            "v_b": 360.0,
+            "score": 0.8788
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 878.0,
+            "v_a": 544.0,
+            "u_b": 934.0,
+            "v_b": 371.0,
+            "score": 0.5908
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1118.0,
+            "v_a": 544.0,
+            "u_b": 1506.0,
+            "v_b": 375.0,
+            "score": 0.8881
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1055.0,
+            "v_a": 553.0,
+            "u_b": 1326.0,
+            "v_b": 396.0,
+            "score": 0.9991
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 931.0,
+            "v_a": 555.0,
+            "u_b": 1045.0,
+            "v_b": 405.0,
+            "score": 0.9148
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1015.0,
+            "v_a": 558.0,
+            "u_b": 1230.0,
+            "v_b": 402.0,
+            "score": 0.9987
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1085.0,
+            "v_a": 558.0,
+            "u_b": 1407.0,
+            "v_b": 398.0,
+            "score": 0.3226
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1037.0,
+            "v_a": 560.0,
+            "u_b": 1280.0,
+            "v_b": 407.0,
+            "score": 0.9973
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 949.0,
+            "v_a": 564.0,
+            "u_b": 1080.0,
+            "v_b": 429.0,
+            "score": 0.4399
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1116.0,
+            "v_a": 564.0,
+            "u_b": 1490.0,
+            "v_b": 420.0,
+            "score": 0.9643
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 936.0,
+            "v_a": 567.0,
+            "u_b": 1055.0,
+            "v_b": 427.0,
+            "score": 0.909
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 961.0,
+            "v_a": 567.0,
+            "u_b": 1103.0,
+            "v_b": 423.0,
+            "score": 0.891
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 534.0,
+            "v_a": 578.0,
+            "u_b": 367.0,
+            "v_b": 445.0,
+            "score": 0.5387
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 903.0,
+            "v_a": 578.0,
+            "u_b": 989.0,
+            "v_b": 447.0,
+            "score": 0.9935
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 926.0,
+            "v_a": 580.0,
+            "u_b": 1037.0,
+            "v_b": 452.0,
+            "score": 0.9935
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 807.0,
+            "v_a": 585.0,
+            "u_b": 787.0,
+            "v_b": 459.0,
+            "score": 0.9768
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 956.0,
+            "v_a": 585.0,
+            "u_b": 1101.0,
+            "v_b": 463.0,
+            "score": 0.9965
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 982.0,
+            "v_a": 587.0,
+            "u_b": 1154.0,
+            "v_b": 465.0,
+            "score": 0.9989
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1060.0,
+            "v_a": 589.0,
+            "u_b": 1339.0,
+            "v_b": 477.0,
+            "score": 0.992
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1015.0,
+            "v_a": 598.0,
+            "u_b": 1225.0,
+            "v_b": 492.0,
+            "score": 0.9995
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1085.0,
+            "v_a": 600.0,
+            "u_b": 1402.0,
+            "v_b": 508.0,
+            "score": 0.9909
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 825.0,
+            "v_a": 603.0,
+            "u_b": 835.0,
+            "v_b": 495.0,
+            "score": 0.7272
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 891.0,
+            "v_a": 607.0,
+            "u_b": 959.0,
+            "v_b": 510.0,
+            "score": 0.9993
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 951.0,
+            "v_a": 607.0,
+            "u_b": 1070.0,
+            "v_b": 515.0,
+            "score": 0.6543
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1042.0,
+            "v_a": 614.0,
+            "u_b": 1285.0,
+            "v_b": 531.0,
+            "score": 0.9442
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 997.0,
+            "v_a": 616.0,
+            "u_b": 1177.0,
+            "v_b": 528.0,
+            "score": 0.9952
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 921.0,
+            "v_a": 618.0,
+            "u_b": 992.0,
+            "v_b": 528.0,
+            "score": 0.8807
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 974.0,
+            "v_a": 618.0,
+            "u_b": 1126.0,
+            "v_b": 537.0,
+            "score": 0.9918
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 794.0,
+            "v_a": 621.0,
+            "u_b": 761.0,
+            "v_b": 531.0,
+            "score": 0.9971
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 817.0,
+            "v_a": 623.0,
+            "u_b": 802.0,
+            "v_b": 535.0,
+            "score": 0.9529
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1128.0,
+            "v_a": 627.0,
+            "u_b": 1513.0,
+            "v_b": 576.0,
+            "score": 0.5437
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 840.0,
+            "v_a": 630.0,
+            "u_b": 850.0,
+            "v_b": 567.0,
+            "score": 0.7789
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1017.0,
+            "v_a": 630.0,
+            "u_b": 1225.0,
+            "v_b": 560.0,
+            "score": 0.9621
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 870.0,
+            "v_a": 632.0,
+            "u_b": 916.0,
+            "v_b": 553.0,
+            "score": 0.4608
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 792.0,
+            "v_a": 639.0,
+            "u_b": 756.0,
+            "v_b": 564.0,
+            "score": 0.9883
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 928.0,
+            "v_a": 639.0,
+            "u_b": 1007.0,
+            "v_b": 585.0,
+            "score": 0.9878
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 994.0,
+            "v_a": 639.0,
+            "u_b": 1171.0,
+            "v_b": 582.0,
+            "score": 0.9975
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1037.0,
+            "v_a": 639.0,
+            "u_b": 1280.0,
+            "v_b": 596.0,
+            "score": 0.9265
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 817.0,
+            "v_a": 641.0,
+            "u_b": 799.0,
+            "v_b": 576.0,
+            "score": 0.9715
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 951.0,
+            "v_a": 643.0,
+            "u_b": 1070.0,
+            "v_b": 589.0,
+            "score": 0.9933
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 891.0,
+            "v_a": 648.0,
+            "u_b": 928.0,
+            "v_b": 600.0,
+            "score": 0.6836
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1128.0,
+            "v_a": 648.0,
+            "u_b": 1503.0,
+            "v_b": 630.0,
+            "score": 0.4038
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 903.0,
+            "v_a": 652.0,
+            "u_b": 951.0,
+            "v_b": 612.0,
+            "score": 0.8194
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1098.0,
+            "v_a": 657.0,
+            "u_b": 1437.0,
+            "v_b": 657.0,
+            "score": 0.9226
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1159.0,
+            "v_a": 659.0,
+            "u_b": 1597.0,
+            "v_b": 661.0,
+            "score": 0.8263
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 926.0,
+            "v_a": 661.0,
+            "u_b": 999.0,
+            "v_b": 636.0,
+            "score": 0.9872
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 992.0,
+            "v_a": 663.0,
+            "u_b": 1151.0,
+            "v_b": 650.0,
+            "score": 0.9907
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1030.0,
+            "v_a": 663.0,
+            "u_b": 1232.0,
+            "v_b": 659.0,
+            "score": 0.6856
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 772.0,
+            "v_a": 668.0,
+            "u_b": 731.0,
+            "v_b": 618.0,
+            "score": 0.8125
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 536.0,
+            "v_a": 672.0,
+            "u_b": 364.0,
+            "v_b": 591.0,
+            "score": 0.6076
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 853.0,
+            "v_a": 677.0,
+            "u_b": 863.0,
+            "v_b": 648.0,
+            "score": 0.451
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 903.0,
+            "v_a": 679.0,
+            "u_b": 946.0,
+            "v_b": 672.0,
+            "score": 0.3311
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 923.0,
+            "v_a": 681.0,
+            "u_b": 997.0,
+            "v_b": 684.0,
+            "score": 0.9845
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 974.0,
+            "v_a": 684.0,
+            "u_b": 1113.0,
+            "v_b": 699.0,
+            "score": 0.9394
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1154.0,
+            "v_a": 690.0,
+            "u_b": 1564.0,
+            "v_b": 740.0,
+            "score": 0.4736
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 810.0,
+            "v_a": 695.0,
+            "u_b": 726.0,
+            "v_b": 717.0,
+            "score": 0.533
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 903.0,
+            "v_a": 702.0,
+            "u_b": 951.0,
+            "v_b": 713.0,
+            "score": 0.3193
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1004.0,
+            "v_a": 702.0,
+            "u_b": 1171.0,
+            "v_b": 753.0,
+            "score": 0.9404
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1050.0,
+            "v_a": 706.0,
+            "u_b": 1290.0,
+            "v_b": 765.0,
+            "score": 0.3525
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1149.0,
+            "v_a": 706.0,
+            "u_b": 1561.0,
+            "v_b": 785.0,
+            "score": 0.6918
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1078.0,
+            "v_a": 708.0,
+            "u_b": 1354.0,
+            "v_b": 796.0,
+            "score": 0.9565
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 913.0,
+            "v_a": 717.0,
+            "u_b": 987.0,
+            "v_b": 760.0,
+            "score": 0.3459
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1070.0,
+            "v_a": 740.0,
+            "u_b": 1328.0,
+            "v_b": 859.0,
+            "score": 0.6293
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 587.0,
+            "v_a": 749.0,
+            "u_b": 523.0,
+            "v_b": 769.0,
+            "score": 0.3642
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 989.0,
+            "v_a": 753.0,
+            "u_b": 1126.0,
+            "v_b": 859.0,
+            "score": 0.318
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 673.0,
+            "v_a": 762.0,
+            "u_b": 569.0,
+            "v_b": 769.0,
+            "score": 0.8839
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1030.0,
+            "v_a": 765.0,
+            "u_b": 1240.0,
+            "v_b": 852.0,
+            "score": 0.515
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 992.0,
+            "v_a": 771.0,
+            "u_b": 1126.0,
+            "v_b": 888.0,
+            "score": 0.649
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1060.0,
+            "v_a": 780.0,
+            "u_b": 1296.0,
+            "v_b": 933.0,
+            "score": 0.3408
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1027.0,
+            "v_a": 803.0,
+            "u_b": 1222.0,
+            "v_b": 920.0,
+            "score": 0.5035
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 979.0,
+            "v_a": 807.0,
+            "u_b": 1108.0,
+            "v_b": 938.0,
+            "score": 0.4629
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 683.0,
+            "v_a": 819.0,
+            "u_b": 592.0,
+            "v_b": 868.0,
+            "score": 0.6574
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1113.0,
+            "v_a": 821.0,
+            "u_b": 1402.0,
+            "v_b": 947.0,
+            "score": 0.6984
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 759.0,
+            "v_a": 825.0,
+            "u_b": 706.0,
+            "v_b": 891.0,
+            "score": 0.8832
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 784.0,
+            "v_a": 825.0,
+            "u_b": 746.0,
+            "v_b": 895.0,
+            "score": 0.8644
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1171.0,
+            "v_a": 825.0,
+            "u_b": 1539.0,
+            "v_b": 967.0,
+            "score": 0.8164
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 675.0,
+            "v_a": 839.0,
+            "u_b": 574.0,
+            "v_b": 886.0,
+            "score": 0.4707
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 984.0,
+            "v_a": 841.0,
+            "u_b": 1123.0,
+            "v_b": 969.0,
+            "score": 0.4684
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1022.0,
+            "v_a": 841.0,
+            "u_b": 1207.0,
+            "v_b": 978.0,
+            "score": 0.9258
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 726.0,
+            "v_a": 852.0,
+            "u_b": 637.0,
+            "v_b": 947.0,
+            "score": 0.9396
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 807.0,
+            "v_a": 855.0,
+            "u_b": 779.0,
+            "v_b": 965.0,
+            "score": 0.4093
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1088.0,
+            "v_a": 861.0,
+            "u_b": 1316.0,
+            "v_b": 1012.0,
+            "score": 0.6737
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 642.0,
+            "v_a": 864.0,
+            "u_b": 498.0,
+            "v_b": 942.0,
+            "score": 0.6092
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1025.0,
+            "v_a": 870.0,
+            "u_b": 1220.0,
+            "v_b": 1028.0,
+            "score": 0.9636
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 797.0,
+            "v_a": 873.0,
+            "u_b": 754.0,
+            "v_b": 1012.0,
+            "score": 0.6917
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 1096.0,
+            "v_a": 888.0,
+            "u_b": 1328.0,
+            "v_b": 1053.0,
+            "score": 0.8599
+          },
+          {
+            "frame_index_a": 0,
+            "frame_index_b": 1,
+            "u_a": 850.0,
+            "v_a": 927.0,
+            "u_b": 868.0,
+            "v_b": 1059.0,
+            "score": 0.7693
+          }
+        ],
+        "doorway_matches": [],
+        "best_frame_pair": [
+          0,
+          1
+        ]
+      },
+      {
+        "room_a": "room_1",
+        "room_b": "room_3",
+        "dinov2_similarity": 0.2462,
+        "keypoint_match_count": 0,
+        "keypoint_matches": [],
+        "doorway_matches": [],
+        "best_frame_pair": null
+      },
+      {
+        "room_a": "room_1",
+        "room_b": "room_4",
+        "dinov2_similarity": 0.458,
+        "keypoint_match_count": 15,
+        "keypoint_matches": [
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 0,
+            "u_a": 893.0,
+            "v_a": 279.0,
+            "u_b": 1166.0,
+            "v_b": 87.0,
+            "score": 0.9888
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 0,
+            "u_a": 539.0,
+            "v_a": 324.0,
+            "u_b": 972.0,
+            "v_b": 281.0,
+            "score": 0.4981
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 0,
+            "u_a": 397.0,
+            "v_a": 438.0,
+            "u_b": 594.0,
+            "v_b": 283.0,
+            "score": 0.5387
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 0,
+            "u_a": 660.0,
+            "v_a": 497.0,
+            "u_b": 1255.0,
+            "v_b": 564.0,
+            "score": 0.5655
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 0,
+            "u_a": 956.0,
+            "v_a": 612.0,
+            "u_b": 1083.0,
+            "v_b": 382.0,
+            "score": 0.4815
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 0,
+            "u_a": 878.0,
+            "v_a": 636.0,
+            "u_b": 379.0,
+            "v_b": 92.0,
+            "score": 0.4259
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 0,
+            "u_a": 959.0,
+            "v_a": 645.0,
+            "u_b": 1050.0,
+            "v_b": 686.0,
+            "score": 0.3232
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 0,
+            "u_a": 860.0,
+            "v_a": 681.0,
+            "u_b": 222.0,
+            "v_b": 157.0,
+            "score": 0.3134
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 0,
+            "u_a": 888.0,
+            "v_a": 684.0,
+            "u_b": 374.0,
+            "v_b": 177.0,
+            "score": 0.3517
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 0,
+            "u_a": 858.0,
+            "v_a": 702.0,
+            "u_b": 212.0,
+            "v_b": 193.0,
+            "score": 0.9544
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 0,
+            "u_a": 885.0,
+            "v_a": 706.0,
+            "u_b": 377.0,
+            "v_b": 204.0,
+            "score": 0.3429
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 0,
+            "u_a": 235.0,
+            "v_a": 756.0,
+            "u_b": 961.0,
+            "v_b": 681.0,
+            "score": 0.3601
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 0,
+            "u_a": 210.0,
+            "v_a": 812.0,
+            "u_b": 969.0,
+            "v_b": 814.0,
+            "score": 0.3837
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 0,
+            "u_a": 167.0,
+            "v_a": 830.0,
+            "u_b": 891.0,
+            "v_b": 875.0,
+            "score": 0.4851
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 0,
+            "u_a": 139.0,
+            "v_a": 855.0,
+            "u_b": 865.0,
+            "v_b": 915.0,
+            "score": 0.8315
+          }
+        ],
+        "doorway_matches": [],
+        "best_frame_pair": [
+          1,
+          0
+        ]
+      },
+      {
+        "room_a": "room_2",
+        "room_b": "room_3",
+        "dinov2_similarity": 0.2373,
+        "keypoint_match_count": 0,
+        "keypoint_matches": [],
+        "doorway_matches": [],
+        "best_frame_pair": null
+      },
+      {
+        "room_a": "room_2",
+        "room_b": "room_4",
+        "dinov2_similarity": 0.5498,
+        "keypoint_match_count": 11,
+        "keypoint_matches": [
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 0,
+            "u_a": 683.0,
+            "v_a": 317.0,
+            "u_b": 1258.0,
+            "v_b": 528.0,
+            "score": 0.345
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 0,
+            "u_a": 673.0,
+            "v_a": 355.0,
+            "u_b": 1255.0,
+            "v_b": 564.0,
+            "score": 0.7481
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 0,
+            "u_a": 716.0,
+            "v_a": 355.0,
+            "u_b": 1306.0,
+            "v_b": 562.0,
+            "score": 0.5227
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 0,
+            "u_a": 1030.0,
+            "v_a": 481.0,
+            "u_b": 377.0,
+            "v_b": 204.0,
+            "score": 0.5406
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 0,
+            "u_a": 1070.0,
+            "v_a": 515.0,
+            "u_b": 1083.0,
+            "v_b": 382.0,
+            "score": 0.4811
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 0,
+            "u_a": 1035.0,
+            "v_a": 627.0,
+            "u_b": 961.0,
+            "v_b": 681.0,
+            "score": 0.6273
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 0,
+            "u_a": 1151.0,
+            "v_a": 650.0,
+            "u_b": 1197.0,
+            "v_b": 776.0,
+            "score": 0.3085
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 0,
+            "u_a": 974.0,
+            "v_a": 652.0,
+            "u_b": 288.0,
+            "v_b": 598.0,
+            "score": 0.3803
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 0,
+            "u_a": 1146.0,
+            "v_a": 677.0,
+            "u_b": 1177.0,
+            "v_b": 801.0,
+            "score": 0.3856
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 0,
+            "u_a": 1083.0,
+            "v_a": 693.0,
+            "u_b": 1073.0,
+            "v_b": 816.0,
+            "score": 0.3281
+          },
+          {
+            "frame_index_a": 1,
+            "frame_index_b": 0,
+            "u_a": 1080.0,
+            "v_a": 715.0,
+            "u_b": 1090.0,
+            "v_b": 861.0,
+            "score": 0.3627
+          }
+        ],
+        "doorway_matches": [],
+        "best_frame_pair": [
+          1,
+          0
+        ]
+      },
+      {
+        "room_a": "room_3",
+        "room_b": "room_4",
+        "dinov2_similarity": 0.2169,
+        "keypoint_match_count": 0,
+        "keypoint_matches": [],
+        "doorway_matches": [],
+        "best_frame_pair": null
+      }
+    ],
+    "edges_used": [],
+    "edges_rejected": [
+      [
+        "room_1",
+        "room_3",
+        "dinov2 similarity 0.25, no doorway match"
+      ],
+      [
+        "room_1",
+        "room_4",
+        "only 15 keypoint match(es), no doorway match"
+      ],
+      [
+        "room_2",
+        "room_3",
+        "dinov2 similarity 0.24, no doorway match"
+      ],
+      [
+        "room_2",
+        "room_4",
+        "only 11 keypoint match(es), no doorway match"
+      ],
+      [
+        "room_3",
+        "room_4",
+        "dinov2 similarity 0.22, no doorway match"
+      ]
+    ],
+    "manhattan_rotation_deg": 3.3,
+    "overlap_resolved": true,
+    "timings_s": {
+      "room_1_s": 37.628,
+      "room_2_s": 34.536,
+      "room_3_s": 27.016,
+      "room_4_s": 18.887,
+      "match_s": 9.722,
+      "graph_s": 1.796,
+      "video_sample_s": 1.279,
+      "video_embed_s": 2.787
+    },
+    "multi_room_plan": true,
+    "per_room_reconstructions": {
+      "room_1": "RoomReconstruction(room_id='room_1', room=Room(id='room_1', name='Room 1', pose=Pose2D(x=0.0, y=0.0, theta_rad=-0.7075045779112105), walls=[Wall(id='room_1_w0', start=Point2D(x=-0.2013, y=1.5343), end=Point2D(x=-3.2437, y=1.5343), length=Measurement(value=3.0424, ci_95=(2.0958, 3.9890000000000003), unit=<Unit.METERS: 'm'>), height=Measurement(value=2.44, ci_95=(1.6808, 3.1992), unit=<Unit.METERS: 'm'>), thickness=None, is_exterior=None, opening_ids=['room_1_w0_op0'], observation_note='8 view(s), cross-view agreement 0.68, observed across 0% of its length'), Wall(id='room_1_w1', start=Point2D(x=-3.2437, y=1.5343), end=Point2D(x=-3.2437, y=4.2268), length=Measurement(value=2.6925, ci_95=(1.7893999999999999, 3.5956), unit=<Unit.METERS: 'm'>), height=Measurement(value=2.44, ci_95=(1.6216, 3.2584), unit=<Unit.METERS: 'm'>), thickness=None, is_exterior=None, opening_ids=[], observation_note='1 view(s), cross-view agreement 0.50, observed across 0% of its length'), Wall(id='room_1_w2', start=Point2D(x=-3.2437, y=4.2268), end=Point2D(x=-0.2013, y=4.2268), length=Measurement(value=3.0424, ci_95=(2.0220000000000002, 4.0628), unit=<Unit.METERS: 'm'>), height=Measurement(value=2.44, ci_95=(1.6216, 3.2584), unit=<Unit.METERS: 'm'>), thickness=None, is_exterior=None, opening_ids=[], observation_note='1 view(s), cross-view agreement 0.50, observed across 0% of its length'), Wall(id='room_1_w3', start=Point2D(x=-0.2013, y=4.2268), end=Point2D(x=-0.2013, y=1.5343), length=Measurement(value=2.6925, ci_95=(1.7893999999999999, 3.5956), unit=<Unit.METERS: 'm'>), height=Measurement(value=2.44, ci_95=(1.6216, 3.2584), unit=<Unit.METERS: 'm'>), thickness=None, is_exterior=None, opening_ids=[], observation_note='1 view(s), cross-view agreement 0.50, observed across 0% of its length')], openings=[Opening(id='room_1_w0_op0', wall_id='room_1_w0', type=<OpeningType.WINDOW: 'window'>, width=Measurement(value=0.537, ci_95=(0.34310000000000007, 0.7309), unit=<Unit.METERS: 'm'>), height=Measurement(value=0.5217, ci_95=(0.3278000000000001, 0.7156), unit=<Unit.METERS: 'm'>), offset_along_wall=Measurement(value=0.6833, ci_95=(0.48940000000000006, 0.8772), unit=<Unit.METERS: 'm'>), sill_height=Measurement(value=0.8079, ci_95=(0.614, 1.0018), unit=<Unit.METERS: 'm'>), connects_room_id=None, detection_confidence=0.289, detection_sources=['semantic'], source_note='detector only; geometry did not find a hole here, so the extent comes from the projected mask and is looser than a measured one')], surfaces=[Surface(id='room_1_w0_surface', room_id='room_1', kind=<SurfaceKind.WALL: 'wall'>, wall_id='room_1_w0', area=Measurement(value=7.4234, ci_95=(5.113705388643284, 9.733094611356716), unit=<Unit.SQUARE_METERS: 'm2'>)), Surface(id='room_1_w1_surface', room_id='room_1', kind=<SurfaceKind.WALL: 'wall'>, wall_id='room_1_w1', area=Measurement(value=6.5696, ci_95=(4.366089172252607, 8.773110827747393), unit=<Unit.SQUARE_METERS: 'm2'>)), Surface(id='room_1_w2_surface', room_id='room_1', kind=<SurfaceKind.WALL: 'wall'>, wall_id='room_1_w2', area=Measurement(value=7.4234, ci_95=(4.933515946374209, 9.913284053625791), unit=<Unit.SQUARE_METERS: 'm2'>)), Surface(id='room_1_w3_surface', room_id='room_1', kind=<SurfaceKind.WALL: 'wall'>, wall_id='room_1_w3', area=Measurement(value=6.5696, ci_95=(4.366089172252607, 8.773110827747393), unit=<Unit.SQUARE_METERS: 'm2'>)), Surface(id='room_1_floor', room_id='room_1', kind=<SurfaceKind.FLOOR: 'floor'>, wall_id=None, area=Measurement(value=8.1914, ci_95=(3.270420284926587, 13.112379715073413), unit=<Unit.SQUARE_METERS: 'm2'>)), Surface(id='room_1_ceiling', room_id='room_1', kind=<SurfaceKind.CEILING: 'ceiling'>, wall_id=None, area=Measurement(value=8.1914, ci_95=(3.270420284926587, 13.112379715073413), unit=<Unit.SQUARE_METERS: 'm2'>))], ceiling_height=Measurement(value=2.44, ci_95=(1.708, 3.1719999999999997), unit=<Unit.METERS: 'm'>), floor_area=Measurement(value=8.1914, ci_95=(3.270420284926587, 13.112379715073413), unit=<Unit.SQUARE_METERS: 'm2'>), perimeter=Measurement(value=11.4696, ci_95=(7.6225792087902615, 15.316620791209738), unit=<Unit.METERS: 'm'>), source_frame_count=8), layout=PhotoLayoutResult(frame=FloorFrame(origin=array([0.00907661, 0.34615737, 0.00648679]), up=array([-0.02620745, -0.99948105, -0.0187297 ]), e1=array([ 0.75972508, -0.00773645, -0.6501984 ]), e2=array([ 0.64971607, -0.03126947,  0.75953357]), rotation_rad=-0.7075045779112105), polygon=<POLYGON ((-0.058 0.446, -0.942 0.446, -0.942 1.228, -0.058 1.228, -0.058 0....>, walls=[WallSegment(start=(-0.058478824382530936, 0.44573006027110174), end=(-0.9423063528480037, 0.44573006027110174), length_m=0.8838275284654727, normal=(-0.0, -1.0), top_height_m=None, support_points=609883), WallSegment(start=(-0.9423063528480037, 0.44573006027110174), end=(-0.9423063528480037, 1.2279078294685566), length_m=0.7821777691974549, normal=(-1.0, 0.0), top_height_m=None, support_points=0), WallSegment(start=(-0.9423063528480037, 1.2279078294685566), end=(-0.058478824382530936, 1.2279078294685566), length_m=0.8838275284654727, normal=(-0.0, 1.0), top_height_m=0.0, support_points=0), WallSegment(start=(-0.058478824382530936, 1.2279078294685566), end=(-0.058478824382530936, 0.44573006027110174), length_m=0.7821777691974549, normal=(1.0, 0.0), top_height_m=None, support_points=0)], lines=[WallLine(axis=1, coord=1.2279078294685566, extent=(np.float64(-1.2721486893687504), np.float64(-0.00937729502333795)), inliers=609883, top_height_m=0.0)], floor_area_m2=0.6913102445704234, perimeter_m=3.332010595325855, manhattan_snap=True, rotation_deg=-40.53702630049709, stats={'manhattan_score': 1.0, 'view_details': {0: {'views': [0, 1, 2, 3, 4, 5, 6, 7], 'view_count': 8, 'agreement': 0.675}}, 'cells_kept': 1, 'bounds_uv': [-1.786, -0.454, 0.491, 1.825], 'axis_fallback': [0, 1]}, layout_method='per_view_merge', view_plane_counts={'floor_views': 8, 'ceiling_views': 8, 'wall_clusters': 1, 'wall_lines': 1}, floor_to_ceiling_span=0.708837518746374, wall_confidence={0: 0.675, 1: 0.5, 2: 0.5, 3: 0.5}), reconstruction=ReconstructionResult(points=array([[-0.33618855, -0.30430806,  0.59157896],\n       [-0.33558428, -0.30520678,  0.59329593],\n       [-0.33495486, -0.30611122,  0.5949732 ],\n       ...,\n       [ 0.19394231,  0.36223686,  1.020514  ],\n       [ 0.1830405 ,  0.35958874,  0.9997308 ],\n       [ 0.18503714,  0.36015272,  1.0025246 ]], dtype=float32), point_confidence=array([0.1204007 , 0.12048077, 0.12054295, ..., 0.11263983, 0.11264401,\n       0.11264946], dtype=float32), point_frame_index=array([0, 0, 0, ..., 7, 7, 7], dtype=int32), poses=[FramePose(frame_index=0, R=array([[ 9.99999940e-01, -2.17932116e-04, -3.10277916e-04],\n       [ 2.17853463e-04,  9.99999940e-01, -2.53524369e-04],\n       [ 3.10333126e-04,  2.53456761e-04,  9.99999940e-01]]), t=array([1.75190471e-05, 6.75098090e-06, 2.09787089e-04]), K=array([[358.06585693,   0.        , 259.        ],\n       [  0.        , 358.69281006, 259.        ],\n       [  0.        ,   0.        ,   1.        ]])), FramePose(frame_index=1, R=array([[ 9.99988079e-01, -9.71177535e-04, -4.79127653e-03],\n       [ 9.52979259e-04,  9.99992311e-01, -3.79901426e-03],\n       [ 4.79492918e-03,  3.79440282e-03,  9.99981284e-01]]), t=array([ 0.00027185,  0.00059065, -0.00093127]), K=array([[357.68240356,   0.        , 259.        ],\n       [  0.        , 359.02096558, 259.        ],\n       [  0.        ,   0.        ,   1.        ]])), FramePose(frame_index=2, R=array([[ 0.99997681,  0.00407763,  0.0054545 ],\n       [-0.00408559,  0.99999058,  0.00145048],\n       [-0.00544853, -0.00147273,  0.99998409]]), t=array([0.00021875, 0.00079853, 0.00108593]), K=array([[357.46035767,   0.        , 259.        ],\n       [  0.        , 358.75714111, 259.        ],\n       [  0.        ,   0.        ,   1.        ]])), FramePose(frame_index=3, R=array([[ 0.99695277,  0.02297027,  0.0745485 ],\n       [-0.02431336,  0.99955714,  0.01715886],\n       [-0.07412134, -0.0189191 ,  0.99706978]]), t=array([-0.00416091,  0.00322903,  0.02665658]), K=array([[357.78039551,   0.        , 259.        ],\n       [  0.        , 358.66833496, 259.        ],\n       [  0.        ,   0.        ,   1.        ]])), FramePose(frame_index=4, R=array([[ 0.99923509, -0.00133125,  0.03908219],\n       [ 0.00218424,  0.99976015, -0.02179093],\n       [-0.03904381,  0.02185963,  0.99899834]]), t=array([-0.00153341, -0.00197667,  0.08588022]), K=array([[357.37728882,   0.        , 259.        ],\n       [  0.        , 358.21307373, 259.        ],\n       [  0.        ,   0.        ,   1.        ]])), FramePose(frame_index=5, R=array([[ 0.9990136 ,  0.04014393, -0.01898027],\n       [-0.0405682 ,  0.99892288, -0.02252292],\n       [ 0.01805567,  0.0232707 ,  0.99956614]]), t=array([0.00032416, 0.00496573, 0.11810018]), K=array([[357.99349976,   0.        , 259.        ],\n       [  0.        , 358.93597412, 259.        ],\n       [  0.        ,   0.        ,   1.        ]])), FramePose(frame_index=6, R=array([[ 0.88646954,  0.07094298, -0.45731694],\n       [-0.09858   ,  0.99444765, -0.03682148],\n       [ 0.45216554,  0.07772343,  0.88854116]]), t=array([0.14255202, 0.01146692, 0.17129867]), K=array([[355.38760376,   0.        , 259.        ],\n       [  0.        , 355.95788574, 259.        ],\n       [  0.        ,   0.        ,   1.        ]])), FramePose(frame_index=7, R=array([[ 0.8848303 ,  0.09816833, -0.45545396],\n       [-0.12340013,  0.99201852, -0.02591562],\n       [ 0.44927466,  0.079134  ,  0.88988209]]), t=array([0.20326959, 0.01729351, 0.14936139]), K=array([[356.28634644,   0.        , 259.        ],\n       [  0.        , 356.90203857, 259.        ],\n       [  0.        ,   0.        ,   1.        ]]))], scale_is_metric=False, frame_points_local={0: array([[-0.33608884, -0.30409166,  0.5915506 ],\n       [-0.3354842 , -0.30499005,  0.5932676 ],\n       [-0.33485448, -0.30589423,  0.5949449 ],\n       ...,\n       [ 0.30911583,  0.34675196,  0.65679365],\n       [ 0.31152442,  0.34684336,  0.65731966],\n       [ 0.31386968,  0.34683052,  0.6575868 ]], dtype=float32), 1: array([[-0.33523345, -0.30499256,  0.59257907],\n       [-0.33462578, -0.3059533 ,  0.5943514 ],\n       [-0.33399904, -0.30690348,  0.59611803],\n       ...,\n       [ 0.3061512 ,  0.34922218,  0.6711546 ],\n       [ 0.30796784,  0.3486191 ,  0.6703533 ],\n       [ 0.31008354,  0.34820086,  0.67005473]], dtype=float32), 2: array([[-0.3398703 , -0.30080304,  0.57920384],\n       [-0.33941874, -0.30177933,  0.58118147],\n       [-0.3389537 , -0.30277023,  0.5831721 ],\n       ...,\n       [ 0.28259808,  0.3410476 ,  0.648201  ],\n       [ 0.2842458 ,  0.34080985,  0.6477717 ],\n       [ 0.28601617,  0.34059814,  0.64749724]], dtype=float32), 3: array([[-0.40387994, -0.40038952,  0.5154939 ],\n       [-0.39197433, -0.40063632,  0.5209379 ],\n       [-0.3893393 , -0.39856252,  0.52317435],\n       ...,\n       [ 0.2599318 ,  0.3465449 ,  0.6681823 ],\n       [ 0.26279348,  0.34705165,  0.66978616],\n       [ 0.26512465,  0.3472283 ,  0.6703867 ]], dtype=float32), 4: array([[-0.38072318, -0.39126202,  0.5024952 ],\n       [-0.35918573, -0.27583948,  0.48642302],\n       [-0.3592676 , -0.27448446,  0.48657942],\n       ...,\n       [-0.3707238 ,  0.26427367,  0.46693847],\n       [-0.3761491 ,  0.2678791 ,  0.47592202],\n       [-0.38089862,  0.27145368,  0.48407552]], dtype=float32), 5: array([[-0.35627255, -0.35674217,  0.4551435 ],\n       [-0.34563547, -0.35709766,  0.45964885],\n       [-0.3425047 , -0.3537652 ,  0.46045926],\n       ...,\n       [-0.15545458,  0.35485   ,  0.6901631 ],\n       [-0.15360323,  0.35486364,  0.69019777],\n       [-0.15169571,  0.35485822,  0.6902209 ]], dtype=float32), 6: array([[-0.34819543, -0.35621837,  0.45296547],\n       [-0.20178883, -0.32505336,  0.60162383],\n       [-0.20056221, -0.32579908,  0.60311824],\n       ...,\n       [ 0.3757722 ,  0.38430572,  0.7176115 ],\n       [ 0.41541106,  0.41673788,  0.7921962 ],\n       [ 0.41855904,  0.41788387,  0.7936844 ]], dtype=float32), 7: array([[-0.37384707, -0.38308525,  0.49079597],\n       [-0.23565376, -0.34562185,  0.64705396],\n       [-0.23445441, -0.34641358,  0.6485267 ],\n       ...,\n       [ 0.3405677 ,  0.41021234,  0.77053183],\n       [ 0.32191086,  0.40487048,  0.7570712 ],\n       [ 0.32486314,  0.40584704,  0.7586333 ]], dtype=float32)}, frame_confidence_local={0: array([1.0033962, 1.0040635, 1.0045817, ..., 1.0041398, 1.0036898,\n       1.0025564], dtype=float32), 1: array([1.0030593, 1.0047228, 1.0075732, ..., 1.0048562, 1.003682 ,\n       1.0025504], dtype=float32), 2: array([1.0029685, 1.0045172, 1.006835 , ..., 1.0058556, 1.0047795,\n       1.0030466], dtype=float32), 3: array([1.0054765, 1.0339645, 1.0076686, ..., 1.0042481, 1.00374  ,\n       1.002654 ], dtype=float32), 4: array([1.0024424, 1.0025334, 1.0033456, ..., 1.0039632, 1.0034652,\n       1.0028263], dtype=float32), 5: array([1.0112671, 1.0900216, 1.0560461, ..., 1.0067868, 1.0052944,\n       1.0032747], dtype=float32), 6: array([1.0055275, 1.0026481, 1.003949 , ..., 1.0045384, 1.0033194,\n       1.002498 ], dtype=float32), 7: array([1.0026125, 1.0024527, 1.0029548, ..., 1.0024258, 1.002463 ,\n       1.0025115], dtype=float32)}, backbone_name='vggt', stats={'device': 'mps', 'image_size': 518, 'confidence_threshold': 1.0024, 'frames': 8}), scale_estimate=ScaleEstimate(scale_factor=3.4422557151253805, ci_95=(2.409579000587766, 4.474932429662995), cues=[ScaleCue(name='metric_depth', fired=False, scale_factor=None, relative_sd=None, reason='disabled for this run', detail={}), ScaleCue(name='door_height', fired=False, scale_factor=None, relative_sd=None, reason='disabled for this run', detail={}), ScaleCue(name='ceiling_height', fired=True, scale_factor=3.4422557151253805, relative_sd=0.12295081967213115, reason='floor-to-ceiling span 0.709 (scale-free) against a 2.44 m +- 0.3 m prior', detail={'span_scalefree': 0.7088})], agreement=0.3, method='single_cue'), scale=3.4422557151253805, frames=[Frame(index=0, path=PosixPath('/var/folders/br/c84z4s917xj3ch8_1ddgvjw40000gn/T/cozmo-video-frames-w_2a37b2/rooms/room_1/frame_000000.jpg'), image=array([[[178, 174, 171],\n        [178, 174, 171],\n        [178, 174, 171],\n        ...,\n        [222, 200, 177],\n        [222, 200, 177],\n        [222, 200, 177]],\n\n       [[178, 174, 171],\n        [178, 174, 171],\n        [178, 174, 171],\n        ...,\n        [222, 200, 177],\n        [222, 200, 177],\n        [222, 200, 177]],\n\n       [[178, 174, 171],\n        [178, 174, 171],\n        [178, 174, 171],\n        ...,\n        [221, 199, 175],\n        [222, 200, 176],\n        [222, 200, 176]],\n\n       ...,\n\n       [[ 82,  70,  48],\n        [ 82,  70,  48],\n        [ 82,  70,  48],\n        ...,\n        [114,  57,  50],\n        [113,  56,  49],\n        [113,  56,  49]],\n\n       [[ 80,  68,  46],\n        [ 80,  68,  46],\n        [ 80,  68,  46],\n        ...,\n        [116,  59,  52],\n        [116,  59,  52],\n        [116,  59,  52]],\n\n       [[ 78,  66,  44],\n        [ 78,  66,  44],\n        [ 78,  66,  44],\n        ...,\n        [119,  62,  55],\n        [119,  62,  55],\n        [118,  61,  54]]], dtype=uint8), K=array([[1.27144532e+03, 0.00000000e+00, 8.10000000e+02],\n       [0.00000000e+00, 1.27144532e+03, 5.40000000e+02],\n       [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), intrinsics_source='fov_default', focal_length_mm=None), Frame(index=1, path=PosixPath('/var/folders/br/c84z4s917xj3ch8_1ddgvjw40000gn/T/cozmo-video-frames-w_2a37b2/rooms/room_1/frame_000015.jpg'), image=array([[[176, 173, 168],\n        [176, 173, 168],\n        [176, 173, 168],\n        ...,\n        [216, 196, 172],\n        [216, 196, 172],\n        [216, 196, 172]],\n\n       [[176, 173, 168],\n        [176, 173, 168],\n        [176, 173, 168],\n        ...,\n        [216, 196, 172],\n        [216, 196, 172],\n        [216, 196, 172]],\n\n       [[176, 173, 168],\n        [176, 173, 168],\n        [176, 173, 168],\n        ...,\n        [216, 196, 172],\n        [215, 195, 171],\n        [215, 195, 171]],\n\n       ...,\n\n       [[ 73,  60,  44],\n        [ 75,  62,  46],\n        [ 77,  64,  48],\n        ...,\n        [105,  64,  62],\n        [ 97,  57,  55],\n        [ 96,  56,  54]],\n\n       [[ 70,  58,  42],\n        [ 71,  59,  43],\n        [ 73,  61,  45],\n        ...,\n        [109,  68,  64],\n        [101,  62,  57],\n        [100,  61,  56]],\n\n       [[ 66,  54,  38],\n        [ 68,  56,  40],\n        [ 69,  57,  41],\n        ...,\n        [111,  70,  66],\n        [104,  65,  60],\n        [104,  65,  60]]], dtype=uint8), K=array([[1.27144532e+03, 0.00000000e+00, 8.10000000e+02],\n       [0.00000000e+00, 1.27144532e+03, 5.40000000e+02],\n       [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), intrinsics_source='fov_default', focal_length_mm=None), Frame(index=2, path=PosixPath('/var/folders/br/c84z4s917xj3ch8_1ddgvjw40000gn/T/cozmo-video-frames-w_2a37b2/rooms/room_1/frame_000030.jpg'), image=array([[[178, 174, 171],\n        [178, 174, 171],\n        [178, 174, 173],\n        ...,\n        [218, 200, 178],\n        [218, 200, 178],\n        [218, 200, 178]],\n\n       [[178, 174, 171],\n        [178, 174, 171],\n        [178, 174, 173],\n        ...,\n        [218, 200, 178],\n        [218, 200, 178],\n        [218, 200, 178]],\n\n       [[178, 174, 171],\n        [178, 174, 171],\n        [178, 174, 171],\n        ...,\n        [218, 200, 178],\n        [218, 200, 178],\n        [218, 200, 178]],\n\n       ...,\n\n       [[ 66,  60,  48],\n        [ 66,  60,  48],\n        [ 65,  59,  47],\n        ...,\n        [160, 120, 118],\n        [160, 120, 118],\n        [160, 120, 118]],\n\n       [[ 63,  56,  46],\n        [ 63,  56,  46],\n        [ 63,  56,  46],\n        ...,\n        [163, 124, 119],\n        [163, 124, 119],\n        [163, 124, 119]],\n\n       [[ 60,  53,  43],\n        [ 60,  53,  43],\n        [ 60,  53,  43],\n        ...,\n        [165, 126, 121],\n        [165, 126, 121],\n        [165, 126, 121]]], dtype=uint8), K=array([[1.27144532e+03, 0.00000000e+00, 8.10000000e+02],\n       [0.00000000e+00, 1.27144532e+03, 5.40000000e+02],\n       [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), intrinsics_source='fov_default', focal_length_mm=None), Frame(index=3, path=PosixPath('/var/folders/br/c84z4s917xj3ch8_1ddgvjw40000gn/T/cozmo-video-frames-w_2a37b2/rooms/room_1/frame_000045.jpg'), image=array([[[195, 195, 195],\n        [195, 195, 195],\n        [195, 195, 195],\n        ...,\n        [238, 200, 161],\n        [238, 200, 161],\n        [238, 200, 161]],\n\n       [[195, 195, 195],\n        [195, 195, 195],\n        [195, 195, 195],\n        ...,\n        [238, 200, 161],\n        [238, 200, 161],\n        [238, 200, 161]],\n\n       [[195, 195, 195],\n        [195, 195, 195],\n        [195, 195, 195],\n        ...,\n        [238, 200, 161],\n        [238, 200, 161],\n        [238, 200, 161]],\n\n       ...,\n\n       [[197, 173, 135],\n        [198, 174, 136],\n        [200, 176, 138],\n        ...,\n        [  3,   1,   2],\n        [  3,   1,   2],\n        [  3,   1,   2]],\n\n       [[197, 175, 136],\n        [199, 177, 138],\n        [199, 177, 138],\n        ...,\n        [  3,   1,   2],\n        [  3,   1,   2],\n        [  3,   1,   2]],\n\n       [[198, 176, 137],\n        [199, 177, 138],\n        [199, 177, 138],\n        ...,\n        [  3,   1,   2],\n        [  3,   1,   2],\n        [  3,   1,   2]]], dtype=uint8), K=array([[1.27144532e+03, 0.00000000e+00, 8.10000000e+02],\n       [0.00000000e+00, 1.27144532e+03, 5.40000000e+02],\n       [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), intrinsics_source='fov_default', focal_length_mm=None), Frame(index=4, path=PosixPath('/var/folders/br/c84z4s917xj3ch8_1ddgvjw40000gn/T/cozmo-video-frames-w_2a37b2/rooms/room_1/frame_000060.jpg'), image=array([[[209, 213, 214],\n        [208, 212, 213],\n        [210, 211, 213],\n        ...,\n        [217, 198, 181],\n        [217, 198, 181],\n        [217, 198, 181]],\n\n       [[208, 212, 213],\n        [208, 212, 213],\n        [209, 210, 212],\n        ...,\n        [217, 198, 181],\n        [217, 198, 181],\n        [217, 198, 181]],\n\n       [[208, 212, 213],\n        [208, 212, 213],\n        [210, 211, 213],\n        ...,\n        [219, 198, 181],\n        [219, 198, 181],\n        [219, 198, 181]],\n\n       ...,\n\n       [[ 95,  63,  42],\n        [ 96,  64,  43],\n        [ 98,  66,  45],\n        ...,\n        [175, 124, 123],\n        [176, 126, 125],\n        [177, 127, 126]],\n\n       [[ 94,  62,  41],\n        [ 95,  63,  42],\n        [ 97,  65,  44],\n        ...,\n        [175, 125, 124],\n        [175, 125, 124],\n        [175, 125, 124]],\n\n       [[ 93,  61,  40],\n        [ 94,  62,  41],\n        [ 95,  63,  42],\n        ...,\n        [177, 127, 126],\n        [175, 125, 124],\n        [174, 124, 123]]], dtype=uint8), K=array([[1.27144532e+03, 0.00000000e+00, 8.10000000e+02],\n       [0.00000000e+00, 1.27144532e+03, 5.40000000e+02],\n       [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), intrinsics_source='fov_default', focal_length_mm=None), Frame(index=5, path=PosixPath('/var/folders/br/c84z4s917xj3ch8_1ddgvjw40000gn/T/cozmo-video-frames-w_2a37b2/rooms/room_1/frame_000075.jpg'), image=array([[[196, 194, 195],\n        [196, 194, 195],\n        [196, 194, 195],\n        ...,\n        [203, 175, 151],\n        [203, 175, 151],\n        [203, 175, 151]],\n\n       [[196, 194, 195],\n        [196, 194, 195],\n        [196, 194, 195],\n        ...,\n        [202, 174, 150],\n        [202, 174, 150],\n        [202, 174, 150]],\n\n       [[196, 194, 195],\n        [196, 194, 195],\n        [196, 194, 195],\n        ...,\n        [202, 174, 150],\n        [202, 174, 150],\n        [202, 174, 150]],\n\n       ...,\n\n       [[105,  80,  60],\n        [105,  80,  60],\n        [103,  80,  62],\n        ...,\n        [127,  83,  84],\n        [120,  74,  76],\n        [114,  70,  71]],\n\n       [[103,  81,  60],\n        [102,  80,  59],\n        [102,  79,  61],\n        ...,\n        [133,  91,  93],\n        [127,  82,  85],\n        [118,  76,  78]],\n\n       [[102,  80,  59],\n        [102,  80,  59],\n        [102,  79,  61],\n        ...,\n        [137,  95,  97],\n        [132,  90,  92],\n        [126,  84,  86]]], dtype=uint8), K=array([[1.27144532e+03, 0.00000000e+00, 8.10000000e+02],\n       [0.00000000e+00, 1.27144532e+03, 5.40000000e+02],\n       [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), intrinsics_source='fov_default', focal_length_mm=None), Frame(index=6, path=PosixPath('/var/folders/br/c84z4s917xj3ch8_1ddgvjw40000gn/T/cozmo-video-frames-w_2a37b2/rooms/room_1/frame_000120.jpg'), image=array([[[165, 154, 148],\n        [165, 154, 148],\n        [165, 154, 148],\n        ...,\n        [166, 159, 151],\n        [166, 159, 151],\n        [166, 159, 151]],\n\n       [[165, 154, 148],\n        [165, 154, 148],\n        [165, 154, 148],\n        ...,\n        [165, 158, 150],\n        [165, 158, 150],\n        [165, 158, 150]],\n\n       [[165, 154, 148],\n        [165, 154, 148],\n        [165, 154, 148],\n        ...,\n        [165, 158, 150],\n        [165, 158, 150],\n        [165, 158, 150]],\n\n       ...,\n\n       [[154, 106, 128],\n        [153, 108, 129],\n        [158, 111, 131],\n        ...,\n        [ 61,  57,  48],\n        [ 61,  57,  48],\n        [ 61,  57,  48]],\n\n       [[144,  95, 117],\n        [145,  97, 119],\n        [147,  98, 119],\n        ...,\n        [ 61,  57,  48],\n        [ 61,  57,  48],\n        [ 61,  57,  48]],\n\n       [[140,  91, 113],\n        [144,  95, 117],\n        [143,  94, 115],\n        ...,\n        [ 61,  57,  48],\n        [ 61,  57,  48],\n        [ 61,  57,  48]]], dtype=uint8), K=array([[1.27144532e+03, 0.00000000e+00, 8.10000000e+02],\n       [0.00000000e+00, 1.27144532e+03, 5.40000000e+02],\n       [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), intrinsics_source='fov_default', focal_length_mm=None), Frame(index=7, path=PosixPath('/var/folders/br/c84z4s917xj3ch8_1ddgvjw40000gn/T/cozmo-video-frames-w_2a37b2/rooms/room_1/frame_000135.jpg'), image=array([[[166, 159, 151],\n        [166, 159, 151],\n        [166, 159, 151],\n        ...,\n        [173, 164, 155],\n        [173, 164, 155],\n        [173, 164, 155]],\n\n       [[166, 159, 151],\n        [166, 159, 151],\n        [166, 159, 151],\n        ...,\n        [173, 164, 155],\n        [173, 164, 155],\n        [173, 164, 155]],\n\n       [[166, 159, 151],\n        [166, 159, 151],\n        [166, 159, 151],\n        ...,\n        [173, 163, 154],\n        [173, 163, 154],\n        [173, 163, 154]],\n\n       ...,\n\n       [[ 24,  39,  58],\n        [ 24,  39,  58],\n        [ 23,  38,  57],\n        ...,\n        [ 77,  62,  57],\n        [ 77,  62,  57],\n        [ 77,  62,  57]],\n\n       [[ 24,  39,  58],\n        [ 24,  39,  58],\n        [ 23,  38,  57],\n        ...,\n        [ 77,  62,  57],\n        [ 77,  62,  57],\n        [ 77,  62,  57]],\n\n       [[ 23,  38,  57],\n        [ 23,  38,  57],\n        [ 22,  37,  56],\n        ...,\n        [ 77,  62,  57],\n        [ 77,  62,  57],\n        [ 77,  62,  57]]], dtype=uint8), K=array([[1.27144532e+03, 0.00000000e+00, 8.10000000e+02],\n       [0.00000000e+00, 1.27144532e+03, 5.40000000e+02],\n       [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), intrinsics_source='fov_default', focal_length_mm=None)], detections=[], opening_consensus=[OpeningConsensus(wall_index=0, kind='window', width_m=0.5370415485231258, height_m=0.5216741019372018, offset_along_wall_m=0.6833035577277747, sill_height_m=0.8079109344160942, sources=['semantic'], confidence=0.2888011693954468, note='detector only; geometry did not find a hole here, so the extent comes from the projected mask and is looser than a measured one')], semantic_openings_available=True, semantic_opening_details={'detector': 'grounding-dino-tiny', 'device': 'mps', 'detections': 22}, timings={'load_frames_s': 0.037, 'reconstruct_s': 25.578, 'layout_s': 0.939, 'scale_s': 0.0, 'opening_detector_s': 11.037, 'openings_s': 11.067}, warnings=[], degradations=['scale cues disagree (agreement 0.30); the scale interval is widened accordingly, not narrowed by averaging over it', \"too few walls detected across the room's u, v axis; that boundary is padded from where the data happens to stop, not a measured wall -- treat this room's size and the walls on that axis as unverified, not just wide\"])",
+      "room_2": "RoomReconstruction(room_id='room_2', room=Room(id='room_2', name='Room 2', pose=Pose2D(x=0.0, y=0.0, theta_rad=-0.463947416418804), walls=[Wall(id='room_2_w0', start=Point2D(x=1.1986, y=1.4725), end=Point2D(x=-2.6023, y=1.4725), length=Measurement(value=3.8009, ci_95=(2.5656, 5.0362), unit=<Unit.METERS: 'm'>), height=Measurement(value=2.44, ci_95=(1.6469999999999998, 3.233), unit=<Unit.METERS: 'm'>), thickness=None, is_exterior=None, opening_ids=['room_2_w0_op0'], observation_note='6 view(s), cross-view agreement 0.25, observed across 0% of its length'), Wall(id='room_2_w1', start=Point2D(x=-2.6023, y=1.4725), end=Point2D(x=-2.6023, y=3.392), length=Measurement(value=1.9195, ci_95=(1.2757, 2.5633), unit=<Unit.METERS: 'm'>), height=Measurement(value=2.44, ci_95=(1.6216, 3.2584), unit=<Unit.METERS: 'm'>), thickness=None, is_exterior=None, opening_ids=[], observation_note='1 view(s), cross-view agreement 1.00, observed across 0% of its length'), Wall(id='room_2_w2', start=Point2D(x=-2.6023, y=3.392), end=Point2D(x=1.1986, y=3.392), length=Measurement(value=3.8009, ci_95=(2.5261, 5.075699999999999), unit=<Unit.METERS: 'm'>), height=Measurement(value=2.44, ci_95=(1.6216, 3.2584), unit=<Unit.METERS: 'm'>), thickness=None, is_exterior=None, opening_ids=['room_2_w2_op0'], observation_note='1 view(s), cross-view agreement 0.50, observed across 0% of its length'), Wall(id='room_2_w3', start=Point2D(x=1.1986, y=3.392), end=Point2D(x=1.1986, y=1.4725), length=Measurement(value=1.9195, ci_95=(1.2757, 2.5633), unit=<Unit.METERS: 'm'>), height=Measurement(value=2.44, ci_95=(1.6216, 3.2584), unit=<Unit.METERS: 'm'>), thickness=None, is_exterior=None, opening_ids=[], observation_note='1 view(s), cross-view agreement 0.50, observed across 0% of its length')], openings=[Opening(id='room_2_w0_op0', wall_id='room_2_w0', type=<OpeningType.WINDOW: 'window'>, width=Measurement(value=0.3957, ci_95=(0.2473, 0.5441), unit=<Unit.METERS: 'm'>), height=Measurement(value=0.9483, ci_95=(0.7999, 1.0967), unit=<Unit.METERS: 'm'>), offset_along_wall=Measurement(value=2.0062, ci_95=(1.8578000000000001, 2.1546000000000003), unit=<Unit.METERS: 'm'>), sill_height=Measurement(value=0.8186, ci_95=(0.6702, 0.967), unit=<Unit.METERS: 'm'>), connects_room_id=None, detection_confidence=0.263, detection_sources=['semantic'], source_note='detector only; geometry did not find a hole here, so the extent comes from the projected mask and is looser than a measured one'), Opening(id='room_2_w2_op0', wall_id='room_2_w2', type=<OpeningType.DOOR: 'door'>, width=Measurement(value=0.5565, ci_95=(0.34199999999999997, 0.771), unit=<Unit.METERS: 'm'>), height=Measurement(value=1.246, ci_95=(1.0315, 1.4605), unit=<Unit.METERS: 'm'>), offset_along_wall=Measurement(value=2.0782, ci_95=(1.8637, 2.2927), unit=<Unit.METERS: 'm'>), sill_height=None, connects_room_id=None, detection_confidence=0.301, detection_sources=['semantic'], source_note='detector only; geometry did not find a hole here, so the extent comes from the projected mask and is looser than a measured one')], surfaces=[Surface(id='room_2_w0_surface', room_id='room_2', kind=<SurfaceKind.WALL: 'wall'>, wall_id='room_2_w0', area=Measurement(value=9.2741, ci_95=(6.260017499999999, 12.288182500000001), unit=<Unit.SQUARE_METERS: 'm2'>)), Surface(id='room_2_w1_surface', room_id='room_2', kind=<SurfaceKind.WALL: 'wall'>, wall_id='room_2_w1', area=Measurement(value=4.6835, ci_95=(3.1126063441069602, 6.254393655893041), unit=<Unit.SQUARE_METERS: 'm2'>)), Surface(id='room_2_w2_surface', room_id='room_2', kind=<SurfaceKind.WALL: 'wall'>, wall_id='room_2_w2', area=Measurement(value=9.2741, ci_95=(6.163472295480379, 12.384727704519623), unit=<Unit.SQUARE_METERS: 'm2'>)), Surface(id='room_2_w3_surface', room_id='room_2', kind=<SurfaceKind.WALL: 'wall'>, wall_id='room_2_w3', area=Measurement(value=4.6835, ci_95=(3.1126063441069602, 6.254393655893041), unit=<Unit.SQUARE_METERS: 'm2'>)), Surface(id='room_2_floor', room_id='room_2', kind=<SurfaceKind.FLOOR: 'floor'>, wall_id=None, area=Measurement(value=7.2956, ci_95=(2.912771715544401, 11.678428284455599), unit=<Unit.SQUARE_METERS: 'm2'>)), Surface(id='room_2_ceiling', room_id='room_2', kind=<SurfaceKind.CEILING: 'ceiling'>, wall_id=None, area=Measurement(value=7.2956, ci_95=(2.912771715544401, 11.678428284455599), unit=<Unit.SQUARE_METERS: 'm2'>))], ceiling_height=Measurement(value=2.44, ci_95=(1.708, 3.1719999999999997), unit=<Unit.METERS: 'm'>), floor_area=Measurement(value=7.2956, ci_95=(2.912771715544401, 11.678428284455599), unit=<Unit.SQUARE_METERS: 'm2'>), perimeter=Measurement(value=11.4406, ci_95=(7.603306104492384, 15.277893895507615), unit=<Unit.METERS: 'm'>), source_frame_count=7), layout=PhotoLayoutResult(frame=FloorFrame(origin=array([-0.01009468,  0.44266605,  0.01001416]), up=array([ 0.02279253, -0.99948449, -0.02261073]), e1=array([ 0.89406075,  0.0304985 , -0.44690627]), e2=array([ 0.44736548, -0.01002924,  0.894295  ]), rotation_rad=-0.463947416418804), polygon=<POLYGON ((0.436 0.535, -0.946 0.535, -0.946 1.233, 0.436 1.233, 0.436 0.535))>, walls=[WallSegment(start=(0.4356610519201114, 0.5352179179906594), end=(-0.9458520860196044, 0.5352179179906594), length_m=1.3815131379397156, normal=(-0.0, -1.0), top_height_m=None, support_points=1097981), WallSegment(start=(-0.9458520860196044, 0.5352179179906594), end=(-0.9458520860196044, 1.232888435473212), length_m=0.6976705174825525, normal=(-1.0, 0.0), top_height_m=0.0, support_points=194958), WallSegment(start=(-0.9458520860196044, 1.232888435473212), end=(0.4356610519201114, 1.232888435473212), length_m=1.3815131379397156, normal=(-0.0, 1.0), top_height_m=0.0, support_points=0), WallSegment(start=(0.4356610519201114, 1.232888435473212), end=(0.4356610519201114, 0.5352179179906594), length_m=0.6976705174825525, normal=(1.0, 0.0), top_height_m=None, support_points=0)], lines=[WallLine(axis=1, coord=1.2328884354732117, extent=(np.float64(-0.9398357110212401), np.float64(0.5414078692032733)), inliers=1097981, top_height_m=0.0), WallLine(axis=0, coord=-0.9458520860196045, extent=(np.float64(-0.5355475012755232), np.float64(0.7647209050519431)), inliers=194958, top_height_m=0.0)], floor_area_m2=0.9638409858553463, perimeter_m=4.158367310844536, manhattan_snap=True, rotation_deg=-26.582228876795984, stats={'manhattan_score': 0.8615, 'view_details': {0: {'views': [0, 1, 2, 3, 4, 5], 'view_count': 6, 'agreement': 0.25}, 1: {'views': [6], 'view_count': 1, 'agreement': 1.0}}, 'cells_kept': 1, 'bounds_uv': [-1.446, -1.048, 1.047, 1.937], 'axis_fallback': [0, 1]}, layout_method='per_view_merge', view_plane_counts={'floor_views': 7, 'ceiling_views': 7, 'wall_clusters': 2, 'wall_lines': 2}, floor_to_ceiling_span=0.8868768396414632, wall_confidence={0: 0.25, 1: 1.0, 2: 0.5, 3: 0.5}), reconstruction=ReconstructionResult(points=array([[-0.5867094 , -0.58264923,  0.73847306],\n       [-0.5745832 , -0.58468556,  0.7558012 ],\n       [-0.57144225, -0.58254826,  0.7610086 ],\n       ...,\n       [-0.45840406,  0.31460714,  1.0630012 ],\n       [-0.41891623,  0.31423438,  1.0442362 ],\n       [-0.3790629 ,  0.2885518 ,  0.75720584]], dtype=float32), point_confidence=array([0.07872272, 0.07871269, 0.07871217, ..., 0.20917405, 0.20917553,\n       0.20922843], dtype=float32), point_frame_index=array([0, 0, 0, ..., 6, 6, 6], dtype=int32), poses=[FramePose(frame_index=0, R=array([[ 9.99999940e-01, -2.51921301e-04,  4.42315650e-05],\n       [ 2.51923921e-04,  9.99999940e-01, -5.87154827e-05],\n       [-4.42167657e-05,  5.87266259e-05,  1.00000000e+00]]), t=array([ 3.87031214e-05, -7.64173237e-05,  1.64384299e-04]), K=array([[366.19699097,   0.        , 259.        ],\n       [  0.        , 367.99255371, 259.        ],\n       [  0.        ,   0.        ,   1.        ]])), FramePose(frame_index=1, R=array([[ 0.99176729, -0.02946073,  0.12461833],\n       [ 0.02638018,  0.99930602,  0.0262986 ],\n       [-0.12530661, -0.02279464,  0.99185616]]), t=array([ 0.00863523, -0.00511031,  0.06013341]), K=array([[365.25671387,   0.        , 259.        ],\n       [  0.        , 367.29031372, 259.        ],\n       [  0.        ,   0.        ,   1.        ]])), FramePose(frame_index=2, R=array([[ 0.92393357, -0.0426509 ,  0.38016793],\n       [ 0.04934634,  0.99875063, -0.00787842],\n       [-0.37935692,  0.02603903,  0.92488396]]), t=array([-0.00711004, -0.01144959,  0.18602735]), K=array([[361.45645142,   0.        , 259.        ],\n       [  0.        , 363.0612793 , 259.        ],\n       [  0.        ,   0.        ,   1.        ]])), FramePose(frame_index=3, R=array([[ 0.88477588, -0.07276963,  0.46030018],\n       [ 0.0651526 ,  0.99734795,  0.03243794],\n       [-0.46143991,  0.00128945,  0.88717055]]), t=array([ 0.02958343, -0.02504084,  0.30130228]), K=array([[360.47293091,   0.        , 259.        ],\n       [  0.        , 362.1260376 , 259.        ],\n       [  0.        ,   0.        ,   1.        ]])), FramePose(frame_index=4, R=array([[ 8.89511585e-01, -3.59287049e-04,  4.56912547e-01],\n       [ 1.15773100e-02,  9.99696374e-01, -2.17524599e-02],\n       [-4.56765980e-01,  2.46388819e-02,  8.89245629e-01]]), t=array([ 0.12002417, -0.03079985,  0.39132223]), K=array([[361.36758423,   0.        , 259.        ],\n       [  0.        , 362.90783691, 259.        ],\n       [  0.        ,   0.        ,   1.        ]])), FramePose(frame_index=5, R=array([[ 0.90651751,  0.03420249,  0.42078045],\n       [ 0.00259738,  0.99624205, -0.08657373],\n       [-0.42216024,  0.07957353,  0.90302205]]), t=array([ 0.14458498, -0.02281628,  0.4513315 ]), K=array([[360.57321167,   0.        , 259.        ],\n       [  0.        , 362.13522339, 259.        ],\n       [  0.        ,   0.        ,   1.        ]])), FramePose(frame_index=6, R=array([[ 0.05264425, -0.02233301, -0.99836361],\n       [-0.12909885,  0.99120814, -0.02898041],\n       [ 0.99023336,  0.13041323,  0.04929829]]), t=array([ 0.10026484, -0.05776813,  0.53641045]), K=array([[369.88534546,   0.        , 259.        ],\n       [  0.        , 371.35870361, 259.        ],\n       [  0.        ,   0.        ,   1.        ]]))], scale_is_metric=False, frame_points_local={0: array([[-0.5869274 , -0.58238167,  0.7383169 ],\n       [-0.5748025 , -0.58441997,  0.7556457 ],\n       [-0.57166123, -0.58228314,  0.7608532 ],\n       ...,\n       [ 0.5382164 ,  0.55170923,  0.7433531 ],\n       [ 0.5418782 ,  0.54450303,  0.7357799 ],\n       [ 0.38857985,  0.45761845,  0.55628425]], dtype=float32), 1: array([[-0.60215473, -0.6146579 ,  0.7856365 ],\n       [-0.59204376, -0.6165853 ,  0.79675686],\n       [-0.58596474, -0.61224544,  0.7989041 ],\n       ...,\n       [ 0.52655053,  0.5332823 ,  0.73140395],\n       [ 0.529114  ,  0.52507776,  0.7234342 ],\n       [ 0.3793007 ,  0.44304907,  0.53350306]], dtype=float32), 2: array([[-0.5705241 , -0.57849383,  0.7389567 ],\n       [-0.5598431 , -0.5851898 ,  0.7522898 ],\n       [-0.54863906, -0.57910174,  0.7515268 ],\n       ...,\n       [ 0.56893075,  0.58005744,  0.7852661 ],\n       [ 0.5670958 ,  0.57039136,  0.77512974],\n       [ 0.42353335,  0.47716275,  0.5361996 ]], dtype=float32), 3: array([[-0.50329894, -0.5122576 ,  0.6475509 ],\n       [-0.48611072, -0.5119739 ,  0.6482482 ],\n       [-0.47242647, -0.50223696,  0.64548457],\n       ...,\n       [ 0.5512517 ,  0.5619267 ,  0.7565621 ],\n       [ 0.54925483,  0.55290276,  0.74558467],\n       [ 0.41857398,  0.47139293,  0.48503464]], dtype=float32), 4: array([[-0.43564916, -0.45617414,  0.5804207 ],\n       [-0.4234819 , -0.45383462,  0.5761691 ],\n       [-0.4127976 , -0.44499445,  0.57450265],\n       ...,\n       [ 0.47894642,  0.5008967 ,  0.673862  ],\n       [ 0.47457793,  0.48983884,  0.6598031 ],\n       [ 0.353327  ,  0.42111441,  0.38339725]], dtype=float32), 5: array([[-0.4142838 , -0.43189958,  0.5484925 ],\n       [-0.4003823 , -0.43004093,  0.54398   ],\n       [-0.39059606, -0.42143777,  0.5416399 ],\n       ...,\n       [ 0.3293219 ,  0.34402624,  0.4441039 ],\n       [ 0.32952952,  0.34341452,  0.44116446],\n       [ 0.2525413 ,  0.29257703,  0.21543726]], dtype=float32), 6: array([[-0.53044087, -0.58474505,  0.7525849 ],\n       [-0.5367848 , -0.5814501 ,  0.77253324],\n       [-0.54813004, -0.59179336,  0.7745638 ],\n       ...,\n       [ 0.44396377,  0.45025256,  0.5729231 ],\n       [ 0.42750898,  0.446554  ,  0.5325856 ],\n       [ 0.14869562,  0.38277462,  0.4793917 ]], dtype=float32)}, frame_confidence_local={0: array([1.0001357, 1.0000082, 1.0000015, ..., 1.0018216, 1.0028838,\n       1.0072025], dtype=float32), 1: array([1.000269 , 1.0000203, 1.0000046, ..., 1.0008345, 1.0013636,\n       1.004854 ], dtype=float32), 2: array([1.0001186, 1.000008 , 1.0000013, ..., 1.0007802, 1.001301 ,\n       1.003772 ], dtype=float32), 3: array([1.0000759, 1.0000066, 1.000001 , ..., 1.0008142, 1.0014269,\n       1.00451  ], dtype=float32), 4: array([1.0003588, 1.000078 , 1.0000116, ..., 1.0000196, 1.0000931,\n       1.0015137], dtype=float32), 5: array([1.0001392, 1.0000223, 1.0000025, ..., 1.0000445, 1.0005631,\n       1.0104009], dtype=float32), 6: array([1.0000002, 1.       , 1.       , ..., 1.0000013, 1.0000083,\n       1.0002613], dtype=float32)}, backbone_name='vggt', stats={'device': 'mps', 'image_size': 518, 'confidence_threshold': 1.0, 'frames': 7}), scale_estimate=ScaleEstimate(scale_factor=2.75122755600024, ci_95=(1.925859289200168, 3.5765958228003125), cues=[ScaleCue(name='metric_depth', fired=False, scale_factor=None, relative_sd=None, reason='disabled for this run', detail={}), ScaleCue(name='door_height', fired=False, scale_factor=None, relative_sd=None, reason='disabled for this run', detail={}), ScaleCue(name='ceiling_height', fired=True, scale_factor=2.75122755600024, relative_sd=0.12295081967213115, reason='floor-to-ceiling span 0.887 (scale-free) against a 2.44 m +- 0.3 m prior', detail={'span_scalefree': 0.8869})], agreement=0.3, method='single_cue'), scale=2.75122755600024, frames=[Frame(index=0, path=PosixPath('/var/folders/br/c84z4s917xj3ch8_1ddgvjw40000gn/T/cozmo-video-frames-w_2a37b2/rooms/room_2/frame_000270.jpg'), image=array([[[205, 200, 196],\n        [205, 200, 196],\n        [205, 200, 196],\n        ...,\n        [174, 160, 149],\n        [173, 159, 148],\n        [173, 159, 148]],\n\n       [[205, 200, 196],\n        [205, 200, 196],\n        [204, 199, 195],\n        ...,\n        [174, 160, 149],\n        [173, 159, 148],\n        [173, 159, 148]],\n\n       [[203, 198, 194],\n        [203, 198, 194],\n        [203, 198, 194],\n        ...,\n        [175, 161, 150],\n        [174, 160, 149],\n        [173, 159, 148]],\n\n       ...,\n\n       [[ 51,  34,  24],\n        [ 50,  33,  23],\n        [ 49,  32,  22],\n        ...,\n        [ 81,  75,  63],\n        [ 81,  75,  63],\n        [ 81,  75,  63]],\n\n       [[ 54,  36,  26],\n        [ 52,  34,  24],\n        [ 51,  33,  23],\n        ...,\n        [ 81,  75,  63],\n        [ 81,  75,  63],\n        [ 81,  75,  63]],\n\n       [[ 54,  36,  26],\n        [ 53,  35,  25],\n        [ 51,  33,  23],\n        ...,\n        [ 81,  75,  63],\n        [ 81,  75,  63],\n        [ 81,  75,  63]]], dtype=uint8), K=array([[1.27144532e+03, 0.00000000e+00, 8.10000000e+02],\n       [0.00000000e+00, 1.27144532e+03, 5.40000000e+02],\n       [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), intrinsics_source='fov_default', focal_length_mm=None), Frame(index=1, path=PosixPath('/var/folders/br/c84z4s917xj3ch8_1ddgvjw40000gn/T/cozmo-video-frames-w_2a37b2/rooms/room_2/frame_000285.jpg'), image=array([[[204, 195, 188],\n        [204, 195, 188],\n        [204, 195, 188],\n        ...,\n        [189, 170, 163],\n        [189, 170, 163],\n        [188, 169, 162]],\n\n       [[204, 195, 188],\n        [204, 195, 188],\n        [204, 195, 188],\n        ...,\n        [194, 175, 168],\n        [194, 175, 168],\n        [193, 174, 167]],\n\n       [[204, 195, 188],\n        [204, 195, 188],\n        [204, 195, 188],\n        ...,\n        [196, 179, 171],\n        [195, 178, 170],\n        [194, 177, 169]],\n\n       ...,\n\n       [[  4,  10,  26],\n        [  4,  10,  26],\n        [  4,  10,  26],\n        ...,\n        [ 58,  56,  44],\n        [ 59,  57,  45],\n        [ 60,  58,  46]],\n\n       [[  4,  10,  26],\n        [  4,  10,  26],\n        [  4,  10,  26],\n        ...,\n        [ 58,  56,  44],\n        [ 60,  58,  46],\n        [ 60,  58,  46]],\n\n       [[  4,  10,  26],\n        [  4,  10,  26],\n        [  4,  10,  26],\n        ...,\n        [ 58,  56,  44],\n        [ 60,  58,  46],\n        [ 61,  59,  47]]], dtype=uint8), K=array([[1.27144532e+03, 0.00000000e+00, 8.10000000e+02],\n       [0.00000000e+00, 1.27144532e+03, 5.40000000e+02],\n       [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), intrinsics_source='fov_default', focal_length_mm=None), Frame(index=2, path=PosixPath('/var/folders/br/c84z4s917xj3ch8_1ddgvjw40000gn/T/cozmo-video-frames-w_2a37b2/rooms/room_2/frame_000300.jpg'), image=array([[[199, 210, 228],\n        [200, 211, 229],\n        [202, 213, 231],\n        ...,\n        [238, 225, 216],\n        [238, 225, 216],\n        [238, 225, 216]],\n\n       [[198, 209, 227],\n        [199, 210, 228],\n        [201, 212, 230],\n        ...,\n        [238, 225, 216],\n        [238, 225, 216],\n        [238, 225, 216]],\n\n       [[197, 208, 226],\n        [199, 210, 228],\n        [200, 211, 229],\n        ...,\n        [238, 225, 216],\n        [238, 225, 216],\n        [238, 225, 216]],\n\n       ...,\n\n       [[ 79,  77,  64],\n        [ 79,  77,  64],\n        [ 79,  77,  64],\n        ...,\n        [161, 167, 165],\n        [161, 167, 165],\n        [161, 167, 165]],\n\n       [[ 74,  70,  58],\n        [ 74,  70,  58],\n        [ 75,  71,  59],\n        ...,\n        [161, 167, 165],\n        [161, 167, 165],\n        [161, 167, 165]],\n\n       [[ 70,  66,  54],\n        [ 68,  64,  52],\n        [ 66,  62,  50],\n        ...,\n        [161, 167, 165],\n        [161, 167, 165],\n        [161, 167, 165]]], dtype=uint8), K=array([[1.27144532e+03, 0.00000000e+00, 8.10000000e+02],\n       [0.00000000e+00, 1.27144532e+03, 5.40000000e+02],\n       [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), intrinsics_source='fov_default', focal_length_mm=None), Frame(index=3, path=PosixPath('/var/folders/br/c84z4s917xj3ch8_1ddgvjw40000gn/T/cozmo-video-frames-w_2a37b2/rooms/room_2/frame_000315.jpg'), image=array([[[200, 199, 197],\n        [199, 198, 196],\n        [201, 197, 196],\n        ...,\n        [233, 226, 216],\n        [233, 226, 216],\n        [233, 226, 216]],\n\n       [[200, 199, 197],\n        [200, 199, 197],\n        [202, 198, 197],\n        ...,\n        [233, 226, 216],\n        [233, 226, 216],\n        [233, 226, 216]],\n\n       [[201, 200, 198],\n        [201, 200, 198],\n        [202, 198, 197],\n        ...,\n        [233, 226, 216],\n        [233, 226, 216],\n        [233, 226, 216]],\n\n       ...,\n\n       [[ 94,  94,  84],\n        [ 95,  95,  85],\n        [ 96,  96,  86],\n        ...,\n        [180, 185, 181],\n        [180, 185, 181],\n        [180, 185, 181]],\n\n       [[ 95,  95,  85],\n        [ 95,  95,  85],\n        [ 96,  96,  86],\n        ...,\n        [179, 184, 180],\n        [180, 185, 181],\n        [180, 185, 181]],\n\n       [[ 96,  96,  86],\n        [ 96,  96,  86],\n        [ 97,  97,  87],\n        ...,\n        [179, 184, 180],\n        [180, 185, 181],\n        [180, 185, 181]]], dtype=uint8), K=array([[1.27144532e+03, 0.00000000e+00, 8.10000000e+02],\n       [0.00000000e+00, 1.27144532e+03, 5.40000000e+02],\n       [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), intrinsics_source='fov_default', focal_length_mm=None), Frame(index=4, path=PosixPath('/var/folders/br/c84z4s917xj3ch8_1ddgvjw40000gn/T/cozmo-video-frames-w_2a37b2/rooms/room_2/frame_000330.jpg'), image=array([[[224, 224, 224],\n        [224, 224, 224],\n        [224, 224, 224],\n        ...,\n        [231, 215, 200],\n        [231, 215, 200],\n        [231, 215, 200]],\n\n       [[224, 224, 224],\n        [224, 224, 224],\n        [224, 224, 224],\n        ...,\n        [231, 215, 200],\n        [231, 215, 200],\n        [231, 215, 200]],\n\n       [[224, 224, 224],\n        [224, 224, 224],\n        [224, 224, 224],\n        ...,\n        [231, 215, 200],\n        [231, 215, 200],\n        [231, 215, 200]],\n\n       ...,\n\n       [[108, 105,  98],\n        [107, 104,  97],\n        [107, 104,  97],\n        ...,\n        [116, 104,  92],\n        [116, 104,  92],\n        [116, 104,  92]],\n\n       [[105, 102,  95],\n        [104, 101,  94],\n        [104, 101,  94],\n        ...,\n        [116, 104,  92],\n        [116, 104,  92],\n        [116, 104,  92]],\n\n       [[102,  99,  92],\n        [102,  99,  92],\n        [102,  99,  92],\n        ...,\n        [116, 104,  92],\n        [116, 104,  92],\n        [116, 104,  92]]], dtype=uint8), K=array([[1.27144532e+03, 0.00000000e+00, 8.10000000e+02],\n       [0.00000000e+00, 1.27144532e+03, 5.40000000e+02],\n       [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), intrinsics_source='fov_default', focal_length_mm=None), Frame(index=5, path=PosixPath('/var/folders/br/c84z4s917xj3ch8_1ddgvjw40000gn/T/cozmo-video-frames-w_2a37b2/rooms/room_2/frame_000345.jpg'), image=array([[[221, 223, 222],\n        [221, 223, 222],\n        [221, 223, 222],\n        ...,\n        [193, 180, 163],\n        [194, 181, 164],\n        [194, 181, 164]],\n\n       [[221, 223, 222],\n        [221, 223, 222],\n        [221, 223, 222],\n        ...,\n        [193, 180, 163],\n        [194, 181, 164],\n        [194, 181, 164]],\n\n       [[221, 223, 222],\n        [221, 223, 222],\n        [221, 223, 222],\n        ...,\n        [193, 180, 163],\n        [194, 181, 164],\n        [194, 181, 164]],\n\n       ...,\n\n       [[ 89,  90,  85],\n        [ 89,  90,  85],\n        [ 89,  90,  85],\n        ...,\n        [129, 100,  82],\n        [129, 100,  82],\n        [129, 100,  82]],\n\n       [[ 89,  90,  85],\n        [ 89,  90,  85],\n        [ 89,  90,  85],\n        ...,\n        [129, 100,  82],\n        [129, 100,  82],\n        [129, 100,  82]],\n\n       [[ 89,  90,  85],\n        [ 89,  90,  85],\n        [ 88,  89,  84],\n        ...,\n        [130, 101,  83],\n        [130, 101,  83],\n        [130, 101,  83]]], dtype=uint8), K=array([[1.27144532e+03, 0.00000000e+00, 8.10000000e+02],\n       [0.00000000e+00, 1.27144532e+03, 5.40000000e+02],\n       [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), intrinsics_source='fov_default', focal_length_mm=None), Frame(index=6, path=PosixPath('/var/folders/br/c84z4s917xj3ch8_1ddgvjw40000gn/T/cozmo-video-frames-w_2a37b2/rooms/room_2/frame_000465.jpg'), image=array([[[151, 147, 144],\n        [151, 147, 144],\n        [150, 146, 143],\n        ...,\n        [182, 178, 169],\n        [182, 178, 169],\n        [182, 178, 169]],\n\n       [[151, 147, 144],\n        [151, 147, 144],\n        [151, 147, 144],\n        ...,\n        [182, 178, 169],\n        [182, 178, 169],\n        [182, 178, 169]],\n\n       [[152, 148, 145],\n        [151, 147, 144],\n        [151, 147, 144],\n        ...,\n        [182, 178, 169],\n        [182, 178, 169],\n        [182, 178, 169]],\n\n       ...,\n\n       [[ 50,  59,  66],\n        [ 50,  59,  66],\n        [ 51,  58,  66],\n        ...,\n        [133, 132, 127],\n        [133, 132, 127],\n        [133, 132, 127]],\n\n       [[ 52,  59,  65],\n        [ 52,  59,  65],\n        [ 53,  58,  64],\n        ...,\n        [133, 132, 127],\n        [133, 132, 127],\n        [133, 132, 127]],\n\n       [[ 54,  62,  65],\n        [ 52,  60,  63],\n        [ 53,  58,  64],\n        ...,\n        [133, 132, 127],\n        [133, 132, 127],\n        [133, 132, 127]]], dtype=uint8), K=array([[1.27144532e+03, 0.00000000e+00, 8.10000000e+02],\n       [0.00000000e+00, 1.27144532e+03, 5.40000000e+02],\n       [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), intrinsics_source='fov_default', focal_length_mm=None)], detections=[], opening_consensus=[OpeningConsensus(wall_index=0, kind='window', width_m=0.3956533852789099, height_m=0.9483419465115511, offset_along_wall_m=2.0061947490110716, sill_height_m=0.818605685282963, sources=['semantic'], confidence=0.2625398874282837, note='detector only; geometry did not find a hole here, so the extent comes from the projected mask and is looser than a measured one'), OpeningConsensus(wall_index=2, kind='door', width_m=0.5565392924277743, height_m=1.2460078920571902, offset_along_wall_m=2.078230920375189, sill_height_m=0.8948177794866459, sources=['semantic'], confidence=0.30105433464050296, note='detector only; geometry did not find a hole here, so the extent comes from the projected mask and is looser than a measured one')], semantic_openings_available=True, semantic_opening_details={'detector': 'grounding-dino-tiny', 'device': 'mps', 'detections': 16}, timings={'load_frames_s': 0.056, 'reconstruct_s': 22.852, 'layout_s': 1.199, 'scale_s': 0.001, 'opening_detector_s': 10.357, 'openings_s': 10.414}, warnings=[], degradations=['scale cues disagree (agreement 0.30); the scale interval is widened accordingly, not narrowed by averaging over it', \"too few walls detected across the room's u, v axis; that boundary is padded from where the data happens to stop, not a measured wall -- treat this room's size and the walls on that axis as unverified, not just wide\"])",
+      "room_3": "RoomReconstruction(room_id='room_3', room=Room(id='room_3', name='Room 3', pose=Pose2D(x=0.0, y=0.0, theta_rad=-0.6181499422696717), walls=[Wall(id='room_3_w0', start=Point2D(x=0.2581, y=2.2823), end=Point2D(x=-3.9683, y=2.2823), length=Measurement(value=4.2264, ci_95=(2.9234, 5.5294), unit=<Unit.METERS: 'm'>), height=Measurement(value=2.44, ci_95=(1.6878, 3.1921999999999997), unit=<Unit.METERS: 'm'>), thickness=None, is_exterior=None, opening_ids=['room_3_w0_op0'], observation_note='4 view(s), cross-view agreement 0.79, observed across 0% of its length'), Wall(id='room_3_w1', start=Point2D(x=-3.9683, y=2.2823), end=Point2D(x=-3.9683, y=4.6465), length=Measurement(value=2.3642, ci_95=(1.5711999999999997, 3.1572), unit=<Unit.METERS: 'm'>), height=Measurement(value=2.44, ci_95=(1.6216, 3.2584), unit=<Unit.METERS: 'm'>), thickness=None, is_exterior=None, opening_ids=[], observation_note='1 view(s), cross-view agreement 1.00, observed across 0% of its length'), Wall(id='room_3_w2', start=Point2D(x=-3.9683, y=4.6465), end=Point2D(x=0.2581, y=4.6465), length=Measurement(value=4.2264, ci_95=(2.8087999999999997, 5.644), unit=<Unit.METERS: 'm'>), height=Measurement(value=2.44, ci_95=(1.6216, 3.2584), unit=<Unit.METERS: 'm'>), thickness=None, is_exterior=None, opening_ids=[], observation_note='1 view(s), cross-view agreement 0.50, observed across 0% of its length'), Wall(id='room_3_w3', start=Point2D(x=0.2581, y=4.6465), end=Point2D(x=0.2581, y=2.2823), length=Measurement(value=2.3642, ci_95=(1.5711999999999997, 3.1572), unit=<Unit.METERS: 'm'>), height=Measurement(value=2.44, ci_95=(1.6216, 3.2584), unit=<Unit.METERS: 'm'>), thickness=None, is_exterior=None, opening_ids=[], observation_note='1 view(s), cross-view agreement 0.50, observed across 0% of its length')], openings=[Opening(id='room_3_w0_op0', wall_id='room_3_w0', type=<OpeningType.WINDOW: 'window'>, width=Measurement(value=1.4312, ci_95=(0.9184, 1.944), unit=<Unit.METERS: 'm'>), height=Measurement(value=0.571, ci_95=(0.05819999999999992, 1.0838), unit=<Unit.METERS: 'm'>), offset_along_wall=Measurement(value=2.9819, ci_95=(2.4691, 3.4947), unit=<Unit.METERS: 'm'>), sill_height=Measurement(value=2.3061, ci_95=(1.7933, 2.8188999999999997), unit=<Unit.METERS: 'm'>), connects_room_id=None, detection_confidence=0.438, detection_sources=['semantic'], source_note='detector only; geometry did not find a hole here, so the extent comes from the projected mask and is looser than a measured one')], surfaces=[Surface(id='room_3_w0_surface', room_id='room_3', kind=<SurfaceKind.WALL: 'wall'>, wall_id='room_3_w0', area=Measurement(value=10.3125, ci_95=(7.133288211261122, 13.491711788738879), unit=<Unit.SQUARE_METERS: 'm2'>)), Surface(id='room_3_w1_surface', room_id='room_3', kind=<SurfaceKind.WALL: 'wall'>, wall_id='room_3_w1', area=Measurement(value=5.7687, ci_95=(3.833819198729544, 7.703580801270456), unit=<Unit.SQUARE_METERS: 'm2'>)), Surface(id='room_3_w2_surface', room_id='room_3', kind=<SurfaceKind.WALL: 'wall'>, wall_id='room_3_w2', area=Measurement(value=10.3125, ci_95=(6.853582347305012, 13.77141765269499), unit=<Unit.SQUARE_METERS: 'm2'>)), Surface(id='room_3_w3_surface', room_id='room_3', kind=<SurfaceKind.WALL: 'wall'>, wall_id='room_3_w3', area=Measurement(value=5.7687, ci_95=(3.833819198729544, 7.703580801270456), unit=<Unit.SQUARE_METERS: 'm2'>)), Surface(id='room_3_floor', room_id='room_3', kind=<SurfaceKind.FLOOR: 'floor'>, wall_id=None, area=Measurement(value=9.9921, ci_95=(3.9893506029512595, 15.994849397048743), unit=<Unit.SQUARE_METERS: 'm2'>)), Surface(id='room_3_ceiling', room_id='room_3', kind=<SurfaceKind.CEILING: 'ceiling'>, wall_id=None, area=Measurement(value=9.9921, ci_95=(3.9893506029512595, 15.994849397048743), unit=<Unit.SQUARE_METERS: 'm2'>))], ceiling_height=Measurement(value=2.44, ci_95=(1.708, 3.1719999999999997), unit=<Unit.METERS: 'm'>), floor_area=Measurement(value=9.9921, ci_95=(3.9893506029512595, 15.994849397048743), unit=<Unit.SQUARE_METERS: 'm2'>), perimeter=Measurement(value=13.1813, ci_95=(8.760157575227302, 17.602442424772697), unit=<Unit.METERS: 'm'>), source_frame_count=5), layout=PhotoLayoutResult(frame=FloorFrame(origin=array([-0.00972641,  0.26821409, -0.02911127]), up=array([ 0.03602845, -0.9935159 ,  0.10783369]), e1=array([ 0.81442292, -0.03334326, -0.57931299]), e2=array([0.57915219, 0.10869398, 0.80794081]), rotation_rad=-0.6181499422696717), polygon=<POLYGON ((0.06 0.529, -0.919 0.529, -0.919 1.076, 0.06 1.076, 0.06 0.529))>, walls=[WallSegment(start=(0.05977748871910403, 0.5285583759851418), end=(-0.9190146233824429, 0.5285583759851418), length_m=0.9787921121015469, normal=(-0.0, -1.0), top_height_m=None, support_points=467039), WallSegment(start=(-0.9190146233824429, 0.5285583759851418), end=(-0.9190146233824429, 1.0760805715293067), length_m=0.5475221955441649, normal=(-1.0, 0.0), top_height_m=None, support_points=122343), WallSegment(start=(-0.9190146233824429, 1.0760805715293067), end=(0.05977748871910403, 1.0760805715293067), length_m=0.9787921121015469, normal=(-0.0, 1.0), top_height_m=0.0, support_points=0), WallSegment(start=(0.05977748871910403, 1.0760805715293067), end=(0.05977748871910403, 0.5285583759851418), length_m=0.5475221955441649, normal=(1.0, 0.0), top_height_m=None, support_points=0)], lines=[WallLine(axis=1, coord=1.0760805715293067, extent=(np.float64(-1.0256120374727966), np.float64(0.09321954556193995)), inliers=467039, top_height_m=0.0), WallLine(axis=1, coord=1.0760805715293067, extent=(np.float64(-0.7310317296392276), np.float64(0.20711596482621258)), inliers=122343, top_height_m=0.0)], floor_area_m2=0.5359104061991494, perimeter_m=3.0526286152914235, manhattan_snap=True, rotation_deg=-35.41738279830768, stats={'manhattan_score': 0.0838, 'view_details': {0: {'views': [0, 1, 2, 3], 'view_count': 4, 'agreement': 0.79}, 1: {'views': [4], 'view_count': 1, 'agreement': 1.0}}, 'cells_kept': 1, 'bounds_uv': [-1.532, -0.221, 0.707, 1.576], 'axis_fallback': [0, 1]}, layout_method='per_view_merge', view_plane_counts={'floor_views': 5, 'ceiling_views': 5, 'wall_clusters': 2, 'wall_lines': 2}, floor_to_ceiling_span=0.5650759400189065, wall_confidence={0: 0.79, 1: 1.0, 2: 0.5, 3: 0.5}), reconstruction=ReconstructionResult(points=array([[ 0.32786155, -0.44244218,  0.90275466],\n       [ 0.32938218, -0.44080687,  0.8993318 ],\n       [ 0.33080947, -0.43909264,  0.8954803 ],\n       ...,\n       [ 0.41406417,  0.36206114,  0.52443445],\n       [ 0.4157133 ,  0.3622986 ,  0.52334845],\n       [ 0.41755307,  0.362597  ,  0.52230275]], dtype=float32), point_confidence=array([0.11529594, 0.14129461, 0.15307197, ..., 0.15635924, 0.13649239,\n       0.11749098], dtype=float32), point_frame_index=array([0, 0, 0, ..., 4, 4, 4], dtype=int32), poses=[FramePose(frame_index=0, R=array([[ 1.00000000e+00, -6.14240053e-05,  7.38714380e-06],\n       [ 6.14242090e-05,  1.00000000e+00, -2.72100333e-05],\n       [-7.38547214e-06,  2.72104880e-05,  1.00000000e+00]]), t=array([ 4.63744509e-05, -2.33341743e-05,  6.21267900e-05]), K=array([[367.31069946,   0.        , 259.        ],\n       [  0.        , 369.9095459 , 259.        ],\n       [  0.        ,   0.        ,   1.        ]])), FramePose(frame_index=1, R=array([[ 0.96364456, -0.03978267,  0.26420918],\n       [ 0.01350804,  0.99484247,  0.10052844],\n       [-0.26684582, -0.09330473,  0.95921195]]), t=array([-0.06571463, -0.02396677,  0.11017541]), K=array([[371.61325073,   0.        , 259.        ],\n       [  0.        , 374.81900024, 259.        ],\n       [  0.        ,   0.        ,   1.        ]])), FramePose(frame_index=2, R=array([[ 0.97152793, -0.08574279,  0.22086561],\n       [ 0.04869598,  0.98457915,  0.16802555],\n       [-0.23186664, -0.15248625,  0.96072149]]), t=array([-0.07315576, -0.02562628,  0.17294502]), K=array([[371.68182373,   0.        , 259.        ],\n       [  0.        , 374.81045532, 259.        ],\n       [  0.        ,   0.        ,   1.        ]])), FramePose(frame_index=3, R=array([[ 0.9943164 ,  0.05820783, -0.08914459],\n       [-0.04082689,  0.9817636 ,  0.18567005],\n       [ 0.09832636, -0.18097529,  0.97856009]]), t=array([-0.0813693 , -0.02777078,  0.22646342]), K=array([[368.64379883,   0.        , 259.        ],\n       [  0.        , 371.56350708, 259.        ],\n       [  0.        ,   0.        ,   1.        ]])), FramePose(frame_index=4, R=array([[ 0.81394786, -0.11932977,  0.56855017],\n       [ 0.00631142,  0.98043489,  0.19674237],\n       [-0.58090371, -0.15654968,  0.79877603]]), t=array([-0.08628967, -0.02839131,  0.26797491]), K=array([[368.15802002,   0.        , 259.        ],\n       [  0.        , 371.0189209 , 259.        ],\n       [  0.        ,   0.        ,   1.        ]]))], scale_is_metric=False, frame_points_local={0: array([[ 0.32778132, -0.44241443,  0.90270704],\n       [ 0.3293021 , -0.4407793 ,  0.8992841 ],\n       [ 0.3307295 , -0.43906525,  0.89543253],\n       ...,\n       [-0.23213567,  0.440848  ,  0.89214206],\n       [-0.2301949 ,  0.4417986 ,  0.8935845 ],\n       [-0.22825472,  0.44275552,  0.8949549 ]], dtype=float32), 1: array([[ 0.2306256 , -0.40182787,  0.8115589 ],\n       [ 0.23240894, -0.40102243,  0.81005806],\n       [ 0.22565638, -0.402611  ,  0.8173251 ],\n       ...,\n       [-0.5341099 ,  0.39559436,  0.8008796 ],\n       [-0.53266335,  0.3961737 ,  0.8017104 ],\n       [-0.5312122 ,  0.39675292,  0.80247957]], dtype=float32), 2: array([[ 0.05460042, -0.36417148,  0.7505404 ],\n       [ 0.05654762, -0.36366442,  0.749595  ],\n       [ 0.05846503, -0.36332703,  0.7490418 ],\n       ...,\n       [-0.44753313,  0.3255391 ,  0.6508724 ],\n       [-0.44570157,  0.32544643,  0.65131587],\n       [-0.44414476,  0.32555604,  0.65171856]], dtype=float32), 3: array([[-0.2862561 , -0.3460245 ,  0.6937436 ],\n       [-0.2840606 , -0.34590498,  0.6933972 ],\n       [-0.28209624, -0.3459021 ,  0.6932463 ],\n       ...,\n       [ 0.32929552,  0.3863829 ,  0.79507685],\n       [ 0.33122808,  0.38597038,  0.7940151 ],\n       [ 0.33315393,  0.38564202,  0.7930043 ]], dtype=float32), 4: array([[-0.16955271, -0.3225658 ,  0.65239835],\n       [-0.16799259, -0.32273585,  0.65284604],\n       [-0.16645786, -0.3229802 ,  0.65342194],\n       ...,\n       [ 0.26074794,  0.28295746,  0.5661485 ],\n       [ 0.2627226 ,  0.28316346,  0.5662654 ],\n       [ 0.2648294 ,  0.28340018,  0.5665348 ]], dtype=float32)}, frame_confidence_local={0: array([1.6597759, 2.0340471, 2.2035916, ..., 1.6175947, 1.5866238,\n       1.5271815], dtype=float32), 1: array([1.4739412, 1.477323 , 1.5352871, ..., 1.5123134, 1.4905834,\n       1.4600025], dtype=float32), 2: array([1.5473078, 1.7634857, 1.9423809, ..., 1.5477285, 1.5145948,\n       1.4608815], dtype=float32), 3: array([1.4978508, 1.5834273, 1.761553 , ..., 1.6217172, 1.5637975,\n       1.4877888], dtype=float32), 4: array([1.4481363, 1.5192053, 1.4939059, ..., 1.91535  , 1.6719875,\n       1.4392265], dtype=float32)}, backbone_name='vggt', stats={'device': 'mps', 'image_size': 518, 'confidence_threshold': 1.4286, 'frames': 5}), scale_estimate=ScaleEstimate(scale_factor=4.318003700384698, ci_95=(3.022602590269288, 5.613404810500107), cues=[ScaleCue(name='metric_depth', fired=False, scale_factor=None, relative_sd=None, reason='disabled for this run', detail={}), ScaleCue(name='door_height', fired=False, scale_factor=None, relative_sd=None, reason='disabled for this run', detail={}), ScaleCue(name='ceiling_height', fired=True, scale_factor=4.318003700384698, relative_sd=0.12295081967213115, reason='floor-to-ceiling span 0.565 (scale-free) against a 2.44 m +- 0.3 m prior', detail={'span_scalefree': 0.5651})], agreement=0.3, method='single_cue'), scale=4.318003700384698, frames=[Frame(index=0, path=PosixPath('/var/folders/br/c84z4s917xj3ch8_1ddgvjw40000gn/T/cozmo-video-frames-w_2a37b2/rooms/room_3/frame_000585.jpg'), image=array([[[195, 188, 180],\n        [194, 187, 179],\n        [194, 187, 179],\n        ...,\n        [116, 108,  97],\n        [116, 108,  97],\n        [116, 108,  97]],\n\n       [[195, 188, 180],\n        [195, 188, 180],\n        [195, 188, 180],\n        ...,\n        [116, 108,  97],\n        [116, 108,  97],\n        [116, 108,  97]],\n\n       [[195, 188, 180],\n        [195, 188, 180],\n        [195, 188, 180],\n        ...,\n        [116, 107,  98],\n        [116, 107,  98],\n        [116, 107,  98]],\n\n       ...,\n\n       [[ 39,  32,  24],\n        [ 39,  32,  24],\n        [ 39,  32,  24],\n        ...,\n        [ 89,  82,  74],\n        [ 89,  82,  74],\n        [ 89,  82,  74]],\n\n       [[ 39,  32,  24],\n        [ 39,  32,  24],\n        [ 39,  32,  24],\n        ...,\n        [ 89,  82,  74],\n        [ 89,  82,  74],\n        [ 89,  82,  74]],\n\n       [[ 39,  32,  24],\n        [ 39,  32,  24],\n        [ 39,  32,  24],\n        ...,\n        [ 89,  82,  74],\n        [ 89,  82,  74],\n        [ 89,  82,  74]]], dtype=uint8), K=array([[1.27144532e+03, 0.00000000e+00, 8.10000000e+02],\n       [0.00000000e+00, 1.27144532e+03, 5.40000000e+02],\n       [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), intrinsics_source='fov_default', focal_length_mm=None), Frame(index=1, path=PosixPath('/var/folders/br/c84z4s917xj3ch8_1ddgvjw40000gn/T/cozmo-video-frames-w_2a37b2/rooms/room_3/frame_000615.jpg'), image=array([[[ 10,  15,  18],\n        [ 10,  15,  18],\n        [ 10,  15,  18],\n        ...,\n        [211, 212, 206],\n        [211, 212, 206],\n        [211, 212, 206]],\n\n       [[ 10,  15,  18],\n        [ 10,  15,  18],\n        [ 10,  15,  18],\n        ...,\n        [210, 211, 205],\n        [210, 211, 205],\n        [210, 211, 205]],\n\n       [[  8,  16,  18],\n        [  8,  16,  18],\n        [  8,  16,  18],\n        ...,\n        [209, 210, 204],\n        [209, 210, 204],\n        [209, 210, 204]],\n\n       ...,\n\n       [[ 55, 109, 121],\n        [ 55, 109, 121],\n        [ 55, 109, 121],\n        ...,\n        [ 46,  45,  41],\n        [ 43,  42,  38],\n        [ 41,  40,  36]],\n\n       [[ 55, 109, 121],\n        [ 55, 109, 121],\n        [ 55, 109, 121],\n        ...,\n        [ 45,  44,  40],\n        [ 42,  41,  37],\n        [ 40,  39,  35]],\n\n       [[ 55, 109, 121],\n        [ 55, 109, 121],\n        [ 55, 109, 121],\n        ...,\n        [ 44,  43,  39],\n        [ 41,  40,  36],\n        [ 40,  39,  35]]], dtype=uint8), K=array([[1.27144532e+03, 0.00000000e+00, 8.10000000e+02],\n       [0.00000000e+00, 1.27144532e+03, 5.40000000e+02],\n       [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), intrinsics_source='fov_default', focal_length_mm=None), Frame(index=2, path=PosixPath('/var/folders/br/c84z4s917xj3ch8_1ddgvjw40000gn/T/cozmo-video-frames-w_2a37b2/rooms/room_3/frame_000630.jpg'), image=array([[[  2,  13,  15],\n        [  2,  13,  15],\n        [  2,  13,  15],\n        ...,\n        [220, 217, 208],\n        [219, 216, 207],\n        [219, 216, 207]],\n\n       [[  2,  13,  15],\n        [  2,  13,  15],\n        [  2,  13,  15],\n        ...,\n        [220, 217, 208],\n        [219, 216, 207],\n        [219, 216, 207]],\n\n       [[  3,  13,  14],\n        [  4,  14,  15],\n        [  4,  14,  15],\n        ...,\n        [220, 217, 208],\n        [219, 216, 207],\n        [219, 216, 207]],\n\n       ...,\n\n       [[ 27,  28,  23],\n        [ 27,  28,  23],\n        [ 27,  28,  23],\n        ...,\n        [189, 188, 186],\n        [189, 188, 186],\n        [189, 188, 186]],\n\n       [[ 27,  28,  23],\n        [ 27,  28,  23],\n        [ 27,  28,  23],\n        ...,\n        [189, 188, 186],\n        [189, 188, 186],\n        [189, 188, 186]],\n\n       [[ 27,  28,  23],\n        [ 27,  28,  23],\n        [ 27,  28,  23],\n        ...,\n        [189, 188, 186],\n        [189, 188, 186],\n        [189, 188, 186]]], dtype=uint8), K=array([[1.27144532e+03, 0.00000000e+00, 8.10000000e+02],\n       [0.00000000e+00, 1.27144532e+03, 5.40000000e+02],\n       [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), intrinsics_source='fov_default', focal_length_mm=None), Frame(index=3, path=PosixPath('/var/folders/br/c84z4s917xj3ch8_1ddgvjw40000gn/T/cozmo-video-frames-w_2a37b2/rooms/room_3/frame_000660.jpg'), image=array([[[199, 195, 183],\n        [199, 195, 183],\n        [199, 195, 183],\n        ...,\n        [226, 222, 213],\n        [226, 222, 213],\n        [226, 222, 213]],\n\n       [[199, 195, 183],\n        [199, 195, 183],\n        [199, 195, 183],\n        ...,\n        [226, 222, 213],\n        [226, 222, 213],\n        [226, 222, 213]],\n\n       [[199, 195, 183],\n        [199, 195, 183],\n        [199, 195, 183],\n        ...,\n        [226, 222, 213],\n        [226, 222, 213],\n        [226, 222, 213]],\n\n       ...,\n\n       [[132, 140, 127],\n        [133, 141, 128],\n        [134, 142, 129],\n        ...,\n        [ 68,  62,  48],\n        [ 68,  62,  48],\n        [ 68,  62,  48]],\n\n       [[132, 140, 127],\n        [132, 140, 127],\n        [134, 142, 129],\n        ...,\n        [ 68,  62,  48],\n        [ 68,  62,  48],\n        [ 68,  62,  48]],\n\n       [[131, 139, 126],\n        [132, 140, 127],\n        [133, 141, 128],\n        ...,\n        [ 68,  62,  48],\n        [ 68,  62,  48],\n        [ 68,  62,  48]]], dtype=uint8), K=array([[1.27144532e+03, 0.00000000e+00, 8.10000000e+02],\n       [0.00000000e+00, 1.27144532e+03, 5.40000000e+02],\n       [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), intrinsics_source='fov_default', focal_length_mm=None), Frame(index=4, path=PosixPath('/var/folders/br/c84z4s917xj3ch8_1ddgvjw40000gn/T/cozmo-video-frames-w_2a37b2/rooms/room_3/frame_000690.jpg'), image=array([[[234, 231, 222],\n        [234, 231, 222],\n        [234, 231, 222],\n        ...,\n        [216, 216, 206],\n        [216, 216, 206],\n        [216, 216, 206]],\n\n       [[234, 231, 222],\n        [234, 231, 222],\n        [234, 231, 222],\n        ...,\n        [216, 216, 206],\n        [216, 216, 206],\n        [216, 216, 206]],\n\n       [[234, 231, 222],\n        [234, 231, 222],\n        [234, 231, 222],\n        ...,\n        [215, 215, 205],\n        [215, 215, 205],\n        [215, 215, 205]],\n\n       ...,\n\n       [[ 54,  51,  34],\n        [ 54,  51,  34],\n        [ 54,  51,  34],\n        ...,\n        [ 96,  93,  88],\n        [ 96,  93,  88],\n        [ 96,  93,  88]],\n\n       [[ 54,  51,  34],\n        [ 54,  51,  34],\n        [ 54,  51,  34],\n        ...,\n        [ 96,  93,  88],\n        [ 96,  93,  88],\n        [ 96,  93,  88]],\n\n       [[ 54,  51,  34],\n        [ 54,  51,  34],\n        [ 54,  51,  34],\n        ...,\n        [ 96,  93,  88],\n        [ 96,  93,  88],\n        [ 96,  93,  88]]], dtype=uint8), K=array([[1.27144532e+03, 0.00000000e+00, 8.10000000e+02],\n       [0.00000000e+00, 1.27144532e+03, 5.40000000e+02],\n       [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), intrinsics_source='fov_default', focal_length_mm=None)], detections=[], opening_consensus=[OpeningConsensus(wall_index=0, kind='window', width_m=1.4312223491836926, height_m=0.5710396246109575, offset_along_wall_m=2.9818907832705763, sill_height_m=2.3061318067310856, sources=['semantic'], confidence=0.43803176879882816, note='detector only; geometry did not find a hole here, so the extent comes from the projected mask and is looser than a measured one')], semantic_openings_available=True, semantic_opening_details={'detector': 'grounding-dino-tiny', 'device': 'mps', 'detections': 6}, timings={'load_frames_s': 0.027, 'reconstruct_s': 18.363, 'layout_s': 0.493, 'scale_s': 0.0, 'opening_detector_s': 8.108, 'openings_s': 8.128}, warnings=[], degradations=['scale cues disagree (agreement 0.30); the scale interval is widened accordingly, not narrowed by averaging over it', \"too few walls detected across the room's u, v axis; that boundary is padded from where the data happens to stop, not a measured wall -- treat this room's size and the walls on that axis as unverified, not just wide\"])",
+      "room_4": "RoomReconstruction(room_id='room_4', room=Room(id='room_4', name='Room 4', pose=Pose2D(x=0.0, y=0.0, theta_rad=-0.3923262584025065), walls=[Wall(id='room_4_w0', start=Point2D(x=0.3299, y=1.1155), end=Point2D(x=-2.6132, y=1.1155), length=Measurement(value=2.943, ci_95=(2.0114, 3.8746), unit=<Unit.METERS: 'm'>), height=Measurement(value=2.44, ci_95=(1.6676, 3.2123999999999997), unit=<Unit.METERS: 'm'>), thickness=None, is_exterior=None, opening_ids=[], observation_note='2 view(s), cross-view agreement 0.49, observed across 0% of its length'), Wall(id='room_4_w1', start=Point2D(x=-2.6132, y=1.1155), end=Point2D(x=-2.6132, y=3.1116), length=Measurement(value=1.9961, ci_95=(1.3266, 2.6656), unit=<Unit.METERS: 'm'>), height=Measurement(value=2.44, ci_95=(1.6216, 3.2584), unit=<Unit.METERS: 'm'>), thickness=None, is_exterior=None, opening_ids=[], observation_note='1 view(s), cross-view agreement 0.50, observed across 0% of its length'), Wall(id='room_4_w2', start=Point2D(x=-2.6132, y=3.1116), end=Point2D(x=0.3299, y=3.1116), length=Measurement(value=2.943, ci_95=(1.9559000000000002, 3.9301), unit=<Unit.METERS: 'm'>), height=Measurement(value=2.44, ci_95=(1.6216, 3.2584), unit=<Unit.METERS: 'm'>), thickness=None, is_exterior=None, opening_ids=[], observation_note='1 view(s), cross-view agreement 0.50, observed across 0% of its length'), Wall(id='room_4_w3', start=Point2D(x=0.3299, y=3.1116), end=Point2D(x=0.3299, y=1.1155), length=Measurement(value=1.9961, ci_95=(1.3266, 2.6656), unit=<Unit.METERS: 'm'>), height=Measurement(value=2.44, ci_95=(1.6216, 3.2584), unit=<Unit.METERS: 'm'>), thickness=None, is_exterior=None, opening_ids=[], observation_note='1 view(s), cross-view agreement 0.50, observed across 0% of its length')], openings=[], surfaces=[Surface(id='room_4_w0_surface', room_id='room_4', kind=<SurfaceKind.WALL: 'wall'>, wall_id='room_4_w0', area=Measurement(value=7.181, ci_95=(4.907887372134631, 9.454112627865369), unit=<Unit.SQUARE_METERS: 'm2'>)), Surface(id='room_4_w1_surface', room_id='room_4', kind=<SurfaceKind.WALL: 'wall'>, wall_id='room_4_w1', area=Measurement(value=4.8705, ci_95=(3.2368846373380906, 6.504115362661909), unit=<Unit.SQUARE_METERS: 'm2'>)), Surface(id='room_4_w2_surface', room_id='room_4', kind=<SurfaceKind.WALL: 'wall'>, wall_id='room_4_w2', area=Measurement(value=7.181, ci_95=(4.772419378036101, 9.589580621963899), unit=<Unit.SQUARE_METERS: 'm2'>)), Surface(id='room_4_w3_surface', room_id='room_4', kind=<SurfaceKind.WALL: 'wall'>, wall_id='room_4_w3', area=Measurement(value=4.8705, ci_95=(3.2368846373380906, 6.504115362661909), unit=<Unit.SQUARE_METERS: 'm2'>)), Surface(id='room_4_floor', room_id='room_4', kind=<SurfaceKind.FLOOR: 'floor'>, wall_id=None, area=Measurement(value=5.8747, ci_95=(2.3454767253287856, 9.403923274671214), unit=<Unit.SQUARE_METERS: 'm2'>)), Surface(id='room_4_ceiling', room_id='room_4', kind=<SurfaceKind.CEILING: 'ceiling'>, wall_id=None, area=Measurement(value=5.8747, ci_95=(2.3454767253287856, 9.403923274671214), unit=<Unit.SQUARE_METERS: 'm2'>))], ceiling_height=Measurement(value=2.44, ci_95=(1.708, 3.1719999999999997), unit=<Unit.METERS: 'm'>), floor_area=Measurement(value=5.8747, ci_95=(2.3454767253287856, 9.403923274671214), unit=<Unit.SQUARE_METERS: 'm2'>), perimeter=Measurement(value=9.8783, ci_95=(6.565017454679573, 13.191582545320426), unit=<Unit.METERS: 'm'>), source_frame_count=2), layout=PhotoLayoutResult(frame=FloorFrame(origin=array([-0.01357003,  0.34108372, -0.01265542]), up=array([ 0.0397263 , -0.99852351,  0.03704878]), e1=array([ 0.92329272,  0.02250635, -0.38343712]), e2=array([0.38203714, 0.04943941, 0.92282358]), rotation_rad=-0.3923262584025065), polygon=<POLYGON ((0.113 0.382, -0.895 0.382, -0.895 1.065, 0.113 1.065, 0.113 0.382))>, walls=[WallSegment(start=(0.11292972241592047, 0.38187309908604306), end=(-0.89457007810005, 0.38187309908604306), length_m=1.0074998005159705, normal=(-0.0, -1.0), top_height_m=None, support_points=316688), WallSegment(start=(-0.89457007810005, 0.38187309908604306), end=(-0.89457007810005, 1.0652087272473785), length_m=0.6833356281613354, normal=(-1.0, 0.0), top_height_m=None, support_points=0), WallSegment(start=(-0.89457007810005, 1.0652087272473785), end=(0.11292972241592047, 1.0652087272473785), length_m=1.0074998005159705, normal=(-0.0, 1.0), top_height_m=0.0, support_points=0), WallSegment(start=(0.11292972241592047, 1.0652087272473785), end=(0.11292972241592047, 0.38187309908604306), length_m=0.6833356281613354, normal=(1.0, 0.0), top_height_m=None, support_points=0)], lines=[WallLine(axis=1, coord=1.0652087272473785, extent=(np.float64(-1.0189981841504936), np.float64(0.2067220794641568)), inliers=316688, top_height_m=0.0)], floor_area_m2=0.6884605090580008, perimeter_m=3.381670857354612, manhattan_snap=True, rotation_deg=-22.478638798622573, stats={'manhattan_score': 1.0, 'view_details': {0: {'views': [0, 1], 'view_count': 2, 'agreement': 0.49}}, 'cells_kept': 1, 'bounds_uv': [-1.519, -0.167, 0.707, 2.249], 'axis_fallback': [0, 1]}, layout_method='per_view_merge', view_plane_counts={'floor_views': 2, 'ceiling_views': 2, 'wall_clusters': 1, 'wall_lines': 1}, floor_to_ceiling_span=0.8352908608933987, wall_confidence={0: 0.49, 1: 0.5, 2: 0.5, 3: 0.5}), reconstruction=ReconstructionResult(points=array([[-0.62531185, -0.61796606,  0.80420434],\n       [-0.60704243, -0.6164334 ,  0.80790806],\n       [-0.6033658 , -0.6133224 ,  0.81021154],\n       ...,\n       [ 0.2654066 ,  0.42057896,  0.59024966],\n       [ 0.2719419 ,  0.41560137,  0.58555496],\n       [ 0.1894089 ,  0.3575045 ,  0.45077097]], dtype=float32), point_confidence=array([0.10036942, 0.09973088, 0.09959315, ..., 0.09907034, 0.09907324,\n       0.09922519], dtype=float32), point_frame_index=array([0, 0, 0, ..., 1, 1, 1], dtype=int32), poses=[FramePose(frame_index=0, R=array([[ 1.00000000e+00, -9.02597021e-05,  1.94567314e-04],\n       [ 9.02600950e-05,  1.00000000e+00, -1.99682017e-06],\n       [-1.94567139e-04,  2.01438161e-06,  1.00000000e+00]]), t=array([ 1.04527920e-04, -1.62113240e-04, -3.00630363e-05]), K=array([[368.93722534,   0.        , 259.        ],\n       [  0.        , 372.43371582, 259.        ],\n       [  0.        ,   0.        ,   1.        ]])), FramePose(frame_index=1, R=array([[ 0.99033242, -0.07612357,  0.11596049],\n       [ 0.0671251 ,  0.99456221,  0.07962593],\n       [-0.12139133, -0.07107229,  0.99005699]]), t=array([-0.11542963, -0.00406224,  0.18354274]), K=array([[363.92822266,   0.        , 259.        ],\n       [  0.        , 368.30386353, 259.        ],\n       [  0.        ,   0.        ,   1.        ]]))], scale_is_metric=False, frame_points_local={0: array([[-0.62562865, -0.6177459 ,  0.8041139 ],\n       [-0.60735977, -0.6162149 ,  0.8078212 ],\n       [-0.60368335, -0.61310416,  0.8101254 ],\n       ...,\n       [ 0.35319176,  0.364608  ,  0.47666427],\n       [ 0.35577062,  0.36020476,  0.4723171 ],\n       [ 0.26189128,  0.3061415 ,  0.36877248]], dtype=float32), 1: array([[-0.57491195, -0.5621371 ,  0.73372006],\n       [-0.5544782 , -0.56205803,  0.73609143],\n       [-0.54891634, -0.5562654 ,  0.7363081 ],\n       ...,\n       [ 0.35628787,  0.36443585,  0.48063746],\n       [ 0.36299577,  0.35932153,  0.47635093],\n       [ 0.29372248,  0.3174027 ,  0.3287105 ]], dtype=float32)}, frame_confidence_local={0: array([1.0090071, 1.0025878, 1.0012032, ..., 1.0000024, 1.0000254,\n       1.0011619], dtype=float32), 1: array([1.0013222, 1.0002488, 1.0000775, ..., 1.0000035, 1.0000327,\n       1.0015664], dtype=float32)}, backbone_name='vggt', stats={'device': 'mps', 'image_size': 518, 'confidence_threshold': 1.0, 'frames': 2}), scale_estimate=ScaleEstimate(scale_factor=2.921138149877827, ci_95=(2.0447967049144786, 3.7974795948411755), cues=[ScaleCue(name='metric_depth', fired=False, scale_factor=None, relative_sd=None, reason='disabled for this run', detail={}), ScaleCue(name='door_height', fired=False, scale_factor=None, relative_sd=None, reason='disabled for this run', detail={}), ScaleCue(name='ceiling_height', fired=True, scale_factor=2.921138149877827, relative_sd=0.12295081967213115, reason='floor-to-ceiling span 0.835 (scale-free) against a 2.44 m +- 0.3 m prior', detail={'span_scalefree': 0.8353})], agreement=0.3, method='single_cue'), scale=2.921138149877827, frames=[Frame(index=0, path=PosixPath('/var/folders/br/c84z4s917xj3ch8_1ddgvjw40000gn/T/cozmo-video-frames-w_2a37b2/rooms/room_4/frame_000855.jpg'), image=array([[[216, 215, 213],\n        [216, 215, 213],\n        [216, 215, 213],\n        ...,\n        [224, 225, 227],\n        [224, 225, 227],\n        [224, 225, 227]],\n\n       [[216, 215, 213],\n        [216, 215, 213],\n        [216, 215, 213],\n        ...,\n        [224, 225, 227],\n        [224, 225, 227],\n        [224, 225, 227]],\n\n       [[216, 215, 213],\n        [216, 215, 213],\n        [216, 215, 213],\n        ...,\n        [224, 225, 227],\n        [224, 225, 227],\n        [224, 225, 227]],\n\n       ...,\n\n       [[102,  98,  89],\n        [102,  98,  89],\n        [102,  98,  89],\n        ...,\n        [165, 152, 133],\n        [164, 151, 132],\n        [164, 151, 132]],\n\n       [[102,  98,  89],\n        [102,  98,  89],\n        [102,  98,  89],\n        ...,\n        [165, 152, 133],\n        [165, 152, 133],\n        [164, 151, 132]],\n\n       [[102,  98,  89],\n        [102,  98,  89],\n        [102,  98,  89],\n        ...,\n        [165, 152, 133],\n        [165, 152, 133],\n        [164, 151, 132]]], dtype=uint8), K=array([[1.27144532e+03, 0.00000000e+00, 8.10000000e+02],\n       [0.00000000e+00, 1.27144532e+03, 5.40000000e+02],\n       [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), intrinsics_source='fov_default', focal_length_mm=None), Frame(index=1, path=PosixPath('/var/folders/br/c84z4s917xj3ch8_1ddgvjw40000gn/T/cozmo-video-frames-w_2a37b2/rooms/room_4/frame_000885.jpg'), image=array([[[144,  99,  68],\n        [145, 100,  69],\n        [146, 101,  72],\n        ...,\n        [207, 202, 196],\n        [207, 202, 196],\n        [207, 202, 196]],\n\n       [[143,  98,  67],\n        [144,  99,  68],\n        [145, 100,  71],\n        ...,\n        [207, 202, 196],\n        [207, 202, 196],\n        [207, 202, 196]],\n\n       [[145,  98,  68],\n        [145,  98,  68],\n        [146, 101,  72],\n        ...,\n        [207, 202, 196],\n        [207, 202, 196],\n        [207, 202, 196]],\n\n       ...,\n\n       [[114, 110,  98],\n        [114, 110,  98],\n        [114, 110,  98],\n        ...,\n        [ 65,  56,  47],\n        [ 66,  57,  48],\n        [ 65,  56,  47]],\n\n       [[114, 110,  98],\n        [114, 110,  98],\n        [114, 110,  98],\n        ...,\n        [ 64,  55,  46],\n        [ 64,  55,  46],\n        [ 64,  55,  46]],\n\n       [[114, 110,  98],\n        [114, 110,  98],\n        [114, 110,  98],\n        ...,\n        [ 63,  54,  45],\n        [ 63,  54,  45],\n        [ 63,  54,  45]]], dtype=uint8), K=array([[1.27144532e+03, 0.00000000e+00, 8.10000000e+02],\n       [0.00000000e+00, 1.27144532e+03, 5.40000000e+02],\n       [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]]), intrinsics_source='fov_default', focal_length_mm=None)], detections=[], opening_consensus=[], semantic_openings_available=True, semantic_opening_details={'detector': 'grounding-dino-tiny', 'device': 'mps', 'detections': 7}, timings={'load_frames_s': 0.008, 'reconstruct_s': 12.562, 'layout_s': 0.36, 'scale_s': 0.0, 'opening_detector_s': 5.938, 'openings_s': 5.953}, warnings=[], degradations=['scale cues disagree (agreement 0.30); the scale interval is widened accordingly, not narrowed by averaging over it', \"too few walls detected across the room's u, v axis; that boundary is padded from where the data happens to stop, not a measured wall -- treat this room's size and the walls on that axis as unverified, not just wide\"])"
+    },
+    "video_sampling": {
+      "stride_frames": 15,
+      "blur_threshold": 15.0,
+      "max_frames": 8,
+      "source_video": "captures/saurabh_room_video/rbc.mov",
+      "total_video_frames": 1105,
+      "frames_at_stride": 74,
+      "frames_kept_after_blur_filter": 27,
+      "frames_dropped_for_blur": 47,
+      "frames_used": 22,
+      "capped_to_max_frames": false,
+      "sharpness_scores": [
+        41.1,
+        33.6,
+        31.7,
+        35.6,
+        32.3,
+        25.7,
+        21.5,
+        21.6,
+        25.3,
+        23.0,
+        17.8,
+        18.8,
+        18.7,
+        15.3,
+        25.6,
+        27.4,
+        33.6,
+        31.2,
+        21.2,
+        16.7,
+        19.9,
+        20.2,
+        18.5,
+        19.3,
+        16.7,
+        18.8,
+        15.3
+      ],
+      "pool_max_frames": 48,
+      "pool_frames_sampled": 27,
+      "rooms_found": 4,
+      "room_frame_indices": {
+        "room_1": [
+          0,
+          15,
+          30,
+          45,
+          60,
+          75,
+          120,
+          135
+        ],
+        "room_2": [
+          270,
+          285,
+          300,
+          315,
+          330,
+          345,
+          465
+        ],
+        "room_3": [
+          585,
+          615,
+          630,
+          660,
+          690
+        ],
+        "room_4": [
+          855,
+          885
+        ]
+      },
+      "segmented_by": "dinov2_consecutive_similarity"
+    }
+  },
+  "reconstruction_settings": {
+    "backbone": "vggt",
+    "weights_dir": null,
+    "video_stride": 15,
+    "video_blur_threshold": 15.0,
+    "video_max_frames": 8
+  },
+  "calibration": {
+    "loaded": false,
+    "path": "calibration/calibration.json",
+    "calibration_version": null,
+    "fitted_at": null
+  },
+  "environment": {
+    "python": "3.9.6",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "source_date_epoch": "1756728000"
+  },
+  "started_at": "2026-09-11T20:59:20.319079+00:00",
+  "duration_s": 136.5481
+}

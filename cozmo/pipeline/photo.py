@@ -983,6 +983,26 @@ def build_multi_room_photo_plan(
         room_ids, per_room, matches,
     )
     kept_room_ids = [room_id for room_id in room_ids if representative_for[room_id] == room_id]
+
+    # The correction-accountability gate needs a genuine off arm, not just a
+    # note saying that the graph exists. Re-run the cheap 2-D stitch with pose
+    # graph, Manhattan snap, and overlap resolution disabled. Its footprint is
+    # recorded as evidence only; the corrected result above remains the plan.
+    ablation_footprint_area: Optional[float] = None
+    if len(kept_room_ids) > 1:
+        stitch_off = build_stitch_graph(
+            rooms_for_stitch, matches, drift_correction=False,
+        )
+        ablation_footprint_area = float(unary_union([
+            stitch_off.transform_polygon(
+                room_id,
+                affine_transform(
+                    per_room[room_id].layout.polygon,
+                    [per_room[room_id].scale, 0, 0, per_room[room_id].scale, 0, 0],
+                ),
+            )
+            for room_id in kept_room_ids
+        ]).area)
     merged_groups = [members for members in capture_groups.values() if len(members) > 1]
     kept_prefixes = tuple(f"{room_id}:" for room_id in kept_room_ids)
     all_degradations = [
@@ -1106,6 +1126,10 @@ def build_multi_room_photo_plan(
         ),
         drift_correction=DriftCorrection(
             enabled=True, method=DriftMethod.PLANE_ANCHORED, loop_closures=0,
+            ablation_footprint_area=(
+                Measurement.relative(round(ablation_footprint_area, 4), 0.10, Unit.SQUARE_METERS)
+                if ablation_footprint_area is not None else None
+            ),
             notes=(
                 f"{len(all_connections)} of {len(kept_room_ids) - 1} needed connection(s) made "
                 f"({sum(1 for e, _, _ in kept_edges if 'keypoints' in e.source)} from image "
@@ -1114,6 +1138,10 @@ def build_multi_room_photo_plan(
                 f"({np.degrees(stitch_result.manhattan_rotation_rad):.1f} deg); overlap resolution "
                 f"{'converged' if stitch_result.overlap_resolved else 'did not fully converge'} "
                 f"after {stitch_result.overlap_iterations} step(s)."
+                + (
+                    f" Uncorrected stitch footprint: {ablation_footprint_area:.2f} m2."
+                    if ablation_footprint_area is not None else ""
+                )
             ),
         ),
         property_totals=PropertyTotals(

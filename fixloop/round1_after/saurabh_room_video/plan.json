@@ -1,0 +1,1023 @@
+{
+  "schema_version": "1.3.0",
+  "capture_id": "room_video_01",
+  "tier": "video",
+  "pipeline_version": "0.4.0-video-calibration",
+  "generated_at": "2025-09-01T12:00:00Z",
+  "scale": {
+    "source": "structural_prior",
+    "scale_factor": {
+      "value": 1.0,
+      "ci_95": [
+        0.7,
+        1.3
+      ],
+      "unit": "ratio"
+    },
+    "reference_description": "per-room scale, 4 room(s); each room's own cues -- see per-room detail in the manifest",
+    "notes": null
+  },
+  "drift_correction": {
+    "enabled": true,
+    "method": "plane_anchored",
+    "loop_closures": 0,
+    "residual_closure_error": null,
+    "ablation_footprint_area": {
+      "value": 13.9572,
+      "ci_95": [
+        12.56148,
+        15.352920000000001
+      ],
+      "unit": "m2"
+    },
+    "notes": "2 of 2 needed connection(s) made (0 from image matches, 0 from doorway width alone); property snapped to a shared Manhattan frame (3.3 deg); overlap resolution converged after 4 step(s). Uncorrected stitch footprint: 13.96 m2."
+  },
+  "property_totals": {
+    "room_count": 3,
+    "total_floor_area": {
+      "value": 24.0582,
+      "ci_95": [
+        9.573245465224959,
+        38.54315453477504
+      ],
+      "unit": "m2"
+    },
+    "footprint_area": {
+      "value": 24.0582,
+      "ci_95": [
+        9.573245465224959,
+        38.54315453477504
+      ],
+      "unit": "m2"
+    },
+    "total_wall_area": null,
+    "bounding_box_m": null
+  },
+  "rooms": [
+    {
+      "id": "room_1",
+      "name": "Room 1",
+      "pose": {
+        "x": 0.0,
+        "y": 0.0,
+        "theta_rad": -0.76515
+      },
+      "walls": [
+        {
+          "id": "room_1_w0",
+          "start": {
+            "x": -0.1126,
+            "y": 1.5433
+          },
+          "end": {
+            "x": -3.1499,
+            "y": 1.7186
+          },
+          "length": {
+            "value": 3.0424,
+            "ci_95": [
+              2.0958,
+              3.9890000000000003
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.44,
+            "ci_95": [
+              1.6808,
+              3.1992
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [
+            "room_1_w0_op0"
+          ],
+          "observation_note": "8 view(s), cross-view agreement 0.68, observed across 0% of its length"
+        },
+        {
+          "id": "room_1_w1",
+          "start": {
+            "x": -3.1499,
+            "y": 1.7186
+          },
+          "end": {
+            "x": -2.9948,
+            "y": 4.4067
+          },
+          "length": {
+            "value": 2.6925,
+            "ci_95": [
+              1.7893999999999999,
+              3.5956
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.44,
+            "ci_95": [
+              1.6216,
+              3.2584
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [],
+          "observation_note": "1 view(s), cross-view agreement 0.50, observed across 0% of its length"
+        },
+        {
+          "id": "room_1_w2",
+          "start": {
+            "x": -2.9948,
+            "y": 4.4067
+          },
+          "end": {
+            "x": 0.0426,
+            "y": 4.2314
+          },
+          "length": {
+            "value": 3.0424,
+            "ci_95": [
+              2.0220000000000002,
+              4.0628
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.44,
+            "ci_95": [
+              1.6216,
+              3.2584
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [],
+          "observation_note": "1 view(s), cross-view agreement 0.50, observed across 0% of its length"
+        },
+        {
+          "id": "room_1_w3",
+          "start": {
+            "x": 0.0426,
+            "y": 4.2314
+          },
+          "end": {
+            "x": -0.1126,
+            "y": 1.5433
+          },
+          "length": {
+            "value": 2.6925,
+            "ci_95": [
+              1.7893999999999999,
+              3.5956
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.44,
+            "ci_95": [
+              1.6216,
+              3.2584
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [],
+          "observation_note": "1 view(s), cross-view agreement 0.50, observed across 0% of its length"
+        }
+      ],
+      "openings": [
+        {
+          "id": "room_1_w0_op0",
+          "wall_id": "room_1_w0",
+          "type": "window",
+          "width": {
+            "value": 0.537,
+            "ci_95": [
+              0.34310000000000007,
+              0.7309
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 0.5217,
+            "ci_95": [
+              0.3278000000000001,
+              0.7156
+            ],
+            "unit": "m"
+          },
+          "offset_along_wall": {
+            "value": 0.6833,
+            "ci_95": [
+              0.48940000000000006,
+              0.8772
+            ],
+            "unit": "m"
+          },
+          "sill_height": {
+            "value": 0.8079,
+            "ci_95": [
+              0.614,
+              1.0018
+            ],
+            "unit": "m"
+          },
+          "connects_room_id": null,
+          "detection_confidence": 0.289,
+          "detection_sources": [
+            "semantic"
+          ],
+          "source_note": "detector only; geometry did not find a hole here, so the extent comes from the projected mask and is looser than a measured one"
+        }
+      ],
+      "surfaces": [
+        {
+          "id": "room_1_w0_surface",
+          "room_id": "room_1",
+          "kind": "wall",
+          "wall_id": "room_1_w0",
+          "area": {
+            "value": 7.4234,
+            "ci_95": [
+              5.113705388643284,
+              9.733094611356716
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "room_1_w1_surface",
+          "room_id": "room_1",
+          "kind": "wall",
+          "wall_id": "room_1_w1",
+          "area": {
+            "value": 6.5696,
+            "ci_95": [
+              4.366089172252607,
+              8.773110827747393
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "room_1_w2_surface",
+          "room_id": "room_1",
+          "kind": "wall",
+          "wall_id": "room_1_w2",
+          "area": {
+            "value": 7.4234,
+            "ci_95": [
+              4.933515946374209,
+              9.913284053625791
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "room_1_w3_surface",
+          "room_id": "room_1",
+          "kind": "wall",
+          "wall_id": "room_1_w3",
+          "area": {
+            "value": 6.5696,
+            "ci_95": [
+              4.366089172252607,
+              8.773110827747393
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "room_1_floor",
+          "room_id": "room_1",
+          "kind": "floor",
+          "wall_id": null,
+          "area": {
+            "value": 8.1914,
+            "ci_95": [
+              3.270420284926587,
+              13.112379715073413
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "room_1_ceiling",
+          "room_id": "room_1",
+          "kind": "ceiling",
+          "wall_id": null,
+          "area": {
+            "value": 8.1914,
+            "ci_95": [
+              3.270420284926587,
+              13.112379715073413
+            ],
+            "unit": "m2"
+          }
+        }
+      ],
+      "ceiling_height": {
+        "value": 2.44,
+        "ci_95": [
+          1.708,
+          3.1719999999999997
+        ],
+        "unit": "m"
+      },
+      "floor_area": {
+        "value": 8.1914,
+        "ci_95": [
+          3.270420284926587,
+          13.112379715073413
+        ],
+        "unit": "m2"
+      },
+      "perimeter": {
+        "value": 11.4696,
+        "ci_95": [
+          7.6225792087902615,
+          15.316620791209738
+        ],
+        "unit": "m"
+      },
+      "source_frame_count": 8
+    },
+    {
+      "id": "room_3",
+      "name": "Room 3",
+      "pose": {
+        "x": 3.8728,
+        "y": -0.5905,
+        "theta_rad": -0.6758
+      },
+      "walls": [
+        {
+          "id": "room_3_w0",
+          "start": {
+            "x": 4.262,
+            "y": 1.6731
+          },
+          "end": {
+            "x": 0.0426,
+            "y": 1.9166
+          },
+          "length": {
+            "value": 4.2264,
+            "ci_95": [
+              2.9234,
+              5.5294
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.44,
+            "ci_95": [
+              1.6878,
+              3.1921999999999997
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [
+            "room_3_w0_op0"
+          ],
+          "observation_note": "4 view(s), cross-view agreement 0.79, observed across 0% of its length"
+        },
+        {
+          "id": "room_3_w1",
+          "start": {
+            "x": 0.0426,
+            "y": 1.9166
+          },
+          "end": {
+            "x": 0.1788,
+            "y": 4.2769
+          },
+          "length": {
+            "value": 2.3642,
+            "ci_95": [
+              1.5711999999999997,
+              3.1572
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.44,
+            "ci_95": [
+              1.6216,
+              3.2584
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [],
+          "observation_note": "1 view(s), cross-view agreement 1.00, observed across 0% of its length"
+        },
+        {
+          "id": "room_3_w2",
+          "start": {
+            "x": 0.1788,
+            "y": 4.2769
+          },
+          "end": {
+            "x": 4.3982,
+            "y": 4.0334
+          },
+          "length": {
+            "value": 4.2264,
+            "ci_95": [
+              2.8087999999999997,
+              5.644
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.44,
+            "ci_95": [
+              1.6216,
+              3.2584
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [],
+          "observation_note": "1 view(s), cross-view agreement 0.50, observed across 0% of its length"
+        },
+        {
+          "id": "room_3_w3",
+          "start": {
+            "x": 4.3982,
+            "y": 4.0334
+          },
+          "end": {
+            "x": 4.262,
+            "y": 1.6731
+          },
+          "length": {
+            "value": 2.3642,
+            "ci_95": [
+              1.5711999999999997,
+              3.1572
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.44,
+            "ci_95": [
+              1.6216,
+              3.2584
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [],
+          "observation_note": "1 view(s), cross-view agreement 0.50, observed across 0% of its length"
+        }
+      ],
+      "openings": [
+        {
+          "id": "room_3_w0_op0",
+          "wall_id": "room_3_w0",
+          "type": "window",
+          "width": {
+            "value": 1.4312,
+            "ci_95": [
+              0.9184,
+              1.944
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 0.571,
+            "ci_95": [
+              0.05819999999999992,
+              1.0838
+            ],
+            "unit": "m"
+          },
+          "offset_along_wall": {
+            "value": 2.9819,
+            "ci_95": [
+              2.4691,
+              3.4947
+            ],
+            "unit": "m"
+          },
+          "sill_height": {
+            "value": 2.3061,
+            "ci_95": [
+              1.7933,
+              2.8188999999999997
+            ],
+            "unit": "m"
+          },
+          "connects_room_id": null,
+          "detection_confidence": 0.438,
+          "detection_sources": [
+            "semantic"
+          ],
+          "source_note": "detector only; geometry did not find a hole here, so the extent comes from the projected mask and is looser than a measured one"
+        }
+      ],
+      "surfaces": [
+        {
+          "id": "room_3_w0_surface",
+          "room_id": "room_3",
+          "kind": "wall",
+          "wall_id": "room_3_w0",
+          "area": {
+            "value": 10.3125,
+            "ci_95": [
+              7.133288211261122,
+              13.491711788738879
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "room_3_w1_surface",
+          "room_id": "room_3",
+          "kind": "wall",
+          "wall_id": "room_3_w1",
+          "area": {
+            "value": 5.7687,
+            "ci_95": [
+              3.833819198729544,
+              7.703580801270456
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "room_3_w2_surface",
+          "room_id": "room_3",
+          "kind": "wall",
+          "wall_id": "room_3_w2",
+          "area": {
+            "value": 10.3125,
+            "ci_95": [
+              6.853582347305012,
+              13.77141765269499
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "room_3_w3_surface",
+          "room_id": "room_3",
+          "kind": "wall",
+          "wall_id": "room_3_w3",
+          "area": {
+            "value": 5.7687,
+            "ci_95": [
+              3.833819198729544,
+              7.703580801270456
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "room_3_floor",
+          "room_id": "room_3",
+          "kind": "floor",
+          "wall_id": null,
+          "area": {
+            "value": 9.9921,
+            "ci_95": [
+              3.9893506029512595,
+              15.994849397048743
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "room_3_ceiling",
+          "room_id": "room_3",
+          "kind": "ceiling",
+          "wall_id": null,
+          "area": {
+            "value": 9.9921,
+            "ci_95": [
+              3.9893506029512595,
+              15.994849397048743
+            ],
+            "unit": "m2"
+          }
+        }
+      ],
+      "ceiling_height": {
+        "value": 2.44,
+        "ci_95": [
+          1.708,
+          3.1719999999999997
+        ],
+        "unit": "m"
+      },
+      "floor_area": {
+        "value": 9.9921,
+        "ci_95": [
+          3.9893506029512595,
+          15.994849397048743
+        ],
+        "unit": "m2"
+      },
+      "perimeter": {
+        "value": 13.1813,
+        "ci_95": [
+          8.760157575227302,
+          17.602442424772697
+        ],
+        "unit": "m"
+      },
+      "source_frame_count": 5
+    },
+    {
+      "id": "room_4",
+      "name": "Room 4",
+      "pose": {
+        "x": 6.9427,
+        "y": 0.7992,
+        "theta_rad": -0.44997
+      },
+      "walls": [
+        {
+          "id": "room_4_w0",
+          "start": {
+            "x": 7.3364,
+            "y": 1.8938
+          },
+          "end": {
+            "x": 4.3982,
+            "y": 2.0634
+          },
+          "length": {
+            "value": 2.943,
+            "ci_95": [
+              2.0114,
+              3.8746
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.44,
+            "ci_95": [
+              1.6676,
+              3.2123999999999997
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [],
+          "observation_note": "2 view(s), cross-view agreement 0.49, observed across 0% of its length"
+        },
+        {
+          "id": "room_4_w1",
+          "start": {
+            "x": 4.3982,
+            "y": 2.0634
+          },
+          "end": {
+            "x": 4.5132,
+            "y": 4.0562
+          },
+          "length": {
+            "value": 1.9961,
+            "ci_95": [
+              1.3266,
+              2.6656
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.44,
+            "ci_95": [
+              1.6216,
+              3.2584
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [],
+          "observation_note": "1 view(s), cross-view agreement 0.50, observed across 0% of its length"
+        },
+        {
+          "id": "room_4_w2",
+          "start": {
+            "x": 4.5132,
+            "y": 4.0562
+          },
+          "end": {
+            "x": 7.4514,
+            "y": 3.8866
+          },
+          "length": {
+            "value": 2.943,
+            "ci_95": [
+              1.9559000000000002,
+              3.9301
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.44,
+            "ci_95": [
+              1.6216,
+              3.2584
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [],
+          "observation_note": "1 view(s), cross-view agreement 0.50, observed across 0% of its length"
+        },
+        {
+          "id": "room_4_w3",
+          "start": {
+            "x": 7.4514,
+            "y": 3.8866
+          },
+          "end": {
+            "x": 7.3364,
+            "y": 1.8938
+          },
+          "length": {
+            "value": 1.9961,
+            "ci_95": [
+              1.3266,
+              2.6656
+            ],
+            "unit": "m"
+          },
+          "height": {
+            "value": 2.44,
+            "ci_95": [
+              1.6216,
+              3.2584
+            ],
+            "unit": "m"
+          },
+          "thickness": null,
+          "is_exterior": null,
+          "opening_ids": [],
+          "observation_note": "1 view(s), cross-view agreement 0.50, observed across 0% of its length"
+        }
+      ],
+      "openings": [],
+      "surfaces": [
+        {
+          "id": "room_4_w0_surface",
+          "room_id": "room_4",
+          "kind": "wall",
+          "wall_id": "room_4_w0",
+          "area": {
+            "value": 7.181,
+            "ci_95": [
+              4.907887372134631,
+              9.454112627865369
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "room_4_w1_surface",
+          "room_id": "room_4",
+          "kind": "wall",
+          "wall_id": "room_4_w1",
+          "area": {
+            "value": 4.8705,
+            "ci_95": [
+              3.2368846373380906,
+              6.504115362661909
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "room_4_w2_surface",
+          "room_id": "room_4",
+          "kind": "wall",
+          "wall_id": "room_4_w2",
+          "area": {
+            "value": 7.181,
+            "ci_95": [
+              4.772419378036101,
+              9.589580621963899
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "room_4_w3_surface",
+          "room_id": "room_4",
+          "kind": "wall",
+          "wall_id": "room_4_w3",
+          "area": {
+            "value": 4.8705,
+            "ci_95": [
+              3.2368846373380906,
+              6.504115362661909
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "room_4_floor",
+          "room_id": "room_4",
+          "kind": "floor",
+          "wall_id": null,
+          "area": {
+            "value": 5.8747,
+            "ci_95": [
+              2.3454767253287856,
+              9.403923274671214
+            ],
+            "unit": "m2"
+          }
+        },
+        {
+          "id": "room_4_ceiling",
+          "room_id": "room_4",
+          "kind": "ceiling",
+          "wall_id": null,
+          "area": {
+            "value": 5.8747,
+            "ci_95": [
+              2.3454767253287856,
+              9.403923274671214
+            ],
+            "unit": "m2"
+          }
+        }
+      ],
+      "ceiling_height": {
+        "value": 2.44,
+        "ci_95": [
+          1.708,
+          3.1719999999999997
+        ],
+        "unit": "m"
+      },
+      "floor_area": {
+        "value": 5.8747,
+        "ci_95": [
+          2.3454767253287856,
+          9.403923274671214
+        ],
+        "unit": "m2"
+      },
+      "perimeter": {
+        "value": 9.8783,
+        "ci_95": [
+          6.565017454679573,
+          13.191582545320426
+        ],
+        "unit": "m"
+      },
+      "source_frame_count": 2
+    }
+  ],
+  "adjacencies": [
+    {
+      "room_a_id": "room_1",
+      "room_b_id": "room_3",
+      "via_opening_id": null,
+      "shared_wall_ids": [
+        null,
+        null
+      ],
+      "confidence": 0.15
+    },
+    {
+      "room_a_id": "room_3",
+      "room_b_id": "room_4",
+      "via_opening_id": null,
+      "shared_wall_ids": [
+        null,
+        null
+      ],
+      "confidence": 0.15
+    }
+  ],
+  "damage": [],
+  "concealed_flags": [],
+  "scope": [],
+  "quality": {
+    "overall_confidence": 0.3,
+    "interval_method": "Multi-room photo tier: per-room intervals as in the single-room case, footprint additionally carries each room's own scale uncertainty, then this tier's fitted calibration factor. Adjacency confidence comes from match evidence (image inlier count, doorway width agreement), not calibration.",
+    "ceiling_method": "multi_room_stitch",
+    "semantics_available": true,
+    "calibration_note": "Uncalibrated: no calibration file found (run `cozmo calibrate` against a benchmark set with ground truth). Every interval factor defaults to 1.0 -- these are the pipeline's own asserted half-widths, unchecked. Stitching additionally adds pose-graph and overlap-resolution error on top of each room's own calibrated reconstruction, which calibration does not separately account for.",
+    "degradations": [
+      "room_1: scale cues disagree (agreement 0.30); the scale interval is widened accordingly, not narrowed by averaging over it",
+      "room_1: too few walls detected across the room's u, v axis; that boundary is padded from where the data happens to stop, not a measured wall -- treat this room's size and the walls on that axis as unverified, not just wide",
+      "room_3: scale cues disagree (agreement 0.30); the scale interval is widened accordingly, not narrowed by averaging over it",
+      "room_3: too few walls detected across the room's u, v axis; that boundary is padded from where the data happens to stop, not a measured wall -- treat this room's size and the walls on that axis as unverified, not just wide",
+      "room_4: scale cues disagree (agreement 0.30); the scale interval is widened accordingly, not narrowed by averaging over it",
+      "room_4: too few walls detected across the room's u, v axis; that boundary is padded from where the data happens to stop, not a measured wall -- treat this room's size and the walls on that axis as unverified, not just wide",
+      "capture folders room_1, room_2 describe one physical room; represented once as room_1",
+      "2 room connection(s) inferred from capture order; no stable visual doorway evidence was available for every join",
+      "47 of 74 sampled frame(s) dropped for motion blur (Laplacian variance below 15.0)"
+    ],
+    "warnings": [
+      "room_2 <-> room_3: not connected (dinov2 similarity 0.24, no doorway match)",
+      "room_2 <-> room_4: not connected (only 11 keypoint match(es), no doorway match)",
+      "video tier reuses the photo-tier reconstruction path on sampled frames; no video-specific reconstruction (temporal smoothing, multi-frame bundle adjustment) runs",
+      "capture.json declares 1 room(s) ['room_a'] but the walkthrough splits into 4 by appearance; using positional names"
+    ],
+    "coverage": {
+      "rooms_placed": 3.0,
+      "edges_used": 2.0,
+      "edges_inferred": 2.0,
+      "edges_rejected": 5.0
+    },
+    "video_sampling": {
+      "stride_frames": 15,
+      "blur_threshold": 15.0,
+      "max_frames": 8,
+      "source_video": "captures/saurabh_room_video/rbc.mov",
+      "total_video_frames": 1105,
+      "frames_at_stride": 74,
+      "frames_kept_after_blur_filter": 27,
+      "frames_dropped_for_blur": 47,
+      "frames_used": 22,
+      "capped_to_max_frames": false,
+      "sharpness_scores": [
+        41.1,
+        33.6,
+        31.7,
+        35.6,
+        32.3,
+        25.7,
+        21.5,
+        21.6,
+        25.3,
+        23.0,
+        17.8,
+        18.8,
+        18.7,
+        15.3,
+        25.6,
+        27.4,
+        33.6,
+        31.2,
+        21.2,
+        16.7,
+        19.9,
+        20.2,
+        18.5,
+        19.3,
+        16.7,
+        18.8,
+        15.3
+      ],
+      "pool_max_frames": 48,
+      "pool_frames_sampled": 27,
+      "rooms_found": 4,
+      "room_frame_indices": {
+        "room_1": [
+          0,
+          15,
+          30,
+          45,
+          60,
+          75,
+          120,
+          135
+        ],
+        "room_2": [
+          270,
+          285,
+          300,
+          315,
+          330,
+          345,
+          465
+        ],
+        "room_3": [
+          585,
+          615,
+          630,
+          660,
+          690
+        ],
+        "room_4": [
+          855,
+          885
+        ]
+      },
+      "segmented_by": "dinov2_consecutive_similarity"
+    }
+  }
+}

@@ -16,7 +16,8 @@ import pytest
 from cozmo.benchmark.score import (
     FAIL, PASS, SKIP, GroundTruth, GTRow, LoadedPlan, gate_ceiling_height,
     gate_ceiling_spread, gate_footprint, gate_interval_coverage, gate_opening_widths,
-    gate_repeatability, gate_wall_lengths, load_ground_truth, render_table, score_results,
+    gate_drift_accountability, gate_repeatability, gate_wall_lengths, load_ground_truth,
+    render_table, score_results,
 )
 from cozmo.schema import (
     DriftCorrection, DriftMethod, Measurement, Opening, OpeningType, Plan, Point2D,
@@ -266,7 +267,7 @@ class TestRepeatability:
         b = make_plan("b", Tier.LIDAR, [4.009, 2.995])
         (result,) = gate_repeatability([a, b])
         assert result.status == PASS
-        assert result.scope == "lidar:living_room"
+        assert result.scope == "lidar:living_room:living_room"
 
     def test_relative_rule_rescues_long_walls(self):
         # 1.4 cm apart on a 6 m wall is 0.23% -- inside the 0.5% arm.
@@ -287,6 +288,25 @@ class TestRepeatability:
         b = make_plan("b", Tier.PHOTO, [4.300])
         (result,) = gate_repeatability([a, b])
         assert result.status == SKIP
+
+
+class TestDriftAccountability:
+    def test_lidar_requires_named_method_and_ablation(self):
+        lp = make_plan("c", Tier.LIDAR, [4.0], footprint=12.0)
+        lp.plan.drift_correction = DriftCorrection(
+            enabled=True,
+            method=DriftMethod.POSE_GRAPH,
+            ablation_footprint_area=Measurement.relative(13.0, 0.02, Unit.SQUARE_METERS),
+        )
+        result = gate_drift_accountability(lp)
+        assert result.status == PASS
+
+    def test_poses_as_is_fails_automatically(self):
+        lp = make_plan("c", Tier.LIDAR, [4.0])
+        lp.plan.drift_correction = DriftCorrection(
+            enabled=False, method=DriftMethod.NONE_POSES_AS_IS,
+        )
+        assert gate_drift_accountability(lp).status == FAIL
 
 
 class TestIntervalCoverage:
@@ -366,7 +386,8 @@ class TestFullReport:
         assert {g.gate for g in report.gates} == {
             "wall_lengths", "ceiling_height", "opening_widths", "footprint",
             "interval_coverage", "repeatability", "ceiling_spread",
-            "room_overlap", "adjacency_correctness", "interval_coverage_by_kind",
+            "room_overlap", "drift_accountability", "adjacency_correctness",
+            "interval_coverage_by_kind",
         }
 
     def test_known_fixture_verdicts(self, results_dir, ground_truth_csv):
@@ -378,9 +399,9 @@ class TestFullReport:
         assert verdicts[("opening_widths", "cap_photo_a")] == FAIL      # missed + phantom
         assert verdicts[("footprint", "cap_photo_a")] == FAIL
         assert verdicts[("interval_coverage", "cap_photo_a")] == FAIL   # confident garbage
-        assert verdicts[("repeatability", "lidar:living_room")] == FAIL
-        assert verdicts[("repeatability", "lidar:bedroom")] == PASS
-        assert verdicts[("ceiling_spread", "lidar:living_room")] == FAIL
+        assert verdicts[("repeatability", "lidar:living_room:living_room")] == FAIL
+        assert verdicts[("repeatability", "lidar:bedroom:bedroom")] == PASS
+        assert verdicts[("ceiling_spread", "lidar:living_room:living_room")] == FAIL
 
     def test_photo_detection_detail_names_the_miss_and_the_phantom(self, results_dir, ground_truth_csv):
         report = score_results(results_dir, ground_truth_csv)
